@@ -1,0 +1,5 @@
+{
+    "name": "ArrowEscape.View",
+    "rootNamespace": "ArrowEscape.View",
+    "references": ["ArrowEscape.Core", "ArrowEscape.Data"]
+}

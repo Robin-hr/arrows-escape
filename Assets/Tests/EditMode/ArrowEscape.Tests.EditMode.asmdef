@@ -1,7 +1,7 @@
 {
     "name": "ArrowEscape.Tests.EditMode",
     "rootNamespace": "ArrowEscape.Tests",
-    "references": ["ArrowEscape.Core", "ArrowEscape.Data", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+    "references": ["ArrowEscape.Core", "ArrowEscape.Data", "ArrowEscape.View", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
     "includePlatforms": ["Editor"],
     "overrideReferences": true,
     "precompiledReferences": ["nunit.framework.dll"],

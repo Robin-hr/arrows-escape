@@ -38,3 +38,13 @@ The board is cleared when no arrows remain.
   arrows (nonempty array of objects with id, x, y, and direction).
   Direction is Up, Down, Left, or Right, ignoring case. IDs and cells are unique.
 - Core validates data and builds boards; solvability is checked separately on a clone.
+
+## View layer (Step 3)
+- Assets/Scripts/View (ArrowEscape.View) references Core and Data. GameBootstrap
+  creates the entire board display at runtime; no scene or prefab setup is needed.
+- Runtime sprites are generated and cached; ViewTheme owns colors and sizes.
+- ScreenFit in Core uses pure math to fit a board centered at world (0,0) inside
+  screen margins. Padding is the total extra span per axis, split between edges.
+  CameraFitter adds phone safe-area insets and refits when screen geometry changes.
+- Core never uses UnityEngine. Scene files and prefabs must not be hand-edited.
+- Step 3 displays levels only: no tapping, animation, UI, sound, or new game rules.
