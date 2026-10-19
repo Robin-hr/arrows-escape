@@ -1,0 +1,5 @@
+{
+    "name": "ArrowEscape.Core",
+    "rootNamespace": "ArrowEscape.Core",
+    "noEngineReferences": true
+}
