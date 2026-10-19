@@ -1,0 +1,5 @@
+{
+    "name": "ArrowEscape.Data",
+    "rootNamespace": "ArrowEscape.Data",
+    "references": ["ArrowEscape.Core"]
+}

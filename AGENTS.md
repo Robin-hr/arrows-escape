@@ -28,3 +28,13 @@ The board is cleared when no arrows remain.
 - Ask before adding third-party packages.
 - No lives system: use undo and a mistake counter.
 - After each task, tell the user exactly what to do in the Unity Editor.
+
+## Level data (Step 2)
+- Scripts/Data (ArrowEscape.Data) references Core and uses the built-in
+  JsonUtility and Resources APIs. Core never uses UnityEngine.
+- JSON levels live directly in Assets/Resources/Levels, named level_001.json, etc.
+  Resource paths omit the extension, for example Levels/level_001.
+- JSON fields: name (string), width and height (integers from 1 to 64),
+  arrows (nonempty array of objects with id, x, y, and direction).
+  Direction is Up, Down, Left, or Right, ignoring case. IDs and cells are unique.
+- Core validates data and builds boards; solvability is checked separately on a clone.
