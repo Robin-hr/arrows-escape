@@ -12,5 +12,7 @@ namespace ArrowEscape.Core
         public int bestMistakes;
         /// <summary>Undos in that same best attempt.</summary>
         public int bestUndos;
+        /// <summary>Highest earned stars; zero means no star result recorded yet.</summary>
+        public int bestStars;
     }
 }

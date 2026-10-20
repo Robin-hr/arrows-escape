@@ -14,13 +14,44 @@ namespace ArrowEscape.View
         private ArrowAnimator animator;
         private string resourcePath;
         private Board initialBoard;
+        /// <summary>Fixed move budget for the current attempt.</summary>
+        public int Par { get; private set; } = 1;
+        /// <summary>Accepted taps, including mistakes and slides.</summary>
+        public int TapCount => Session == null ? 0 : Session.TapCount;
+        /// <summary>Last tap count that still earns two stars.</summary>
+        public int TwoStarLimit => StarRating.TwoStarLimit(Par);
+        /// <summary>Raised after each accepted tap and after reset.</summary>
+        public event Action<int> TapCountChanged;
+        /// <summary>Raised synchronously when the gameplay pause flag is set.</summary>
+        public event Action<bool> PauseChanged;
+        /// <summary>Raised once per displayed earned star, for sound and haptic observers.</summary>
+        public event Action<int> StarPresented;
+        /// <summary>Raised by visible economic and menu UI, independently of gameplay sounds.</summary>
+        public event Action<UiFeedbackCue> UiFeedbackRequested;
+        /// <summary>Requests presentation feedback; each director reads its current setting.</summary>
+        public void RequestUiFeedback(UiFeedbackCue cue)=>UiFeedbackRequested?.Invoke(cue);
+
+        /// <summary>Reports a visible star only for an unpaused completed attempt.</summary>
+        public void PresentStar(int index)
+        { if (IsCleared && !IsPaused && index >= 0 && index < StarRating.Stars(TapCount, Par)) StarPresented?.Invoke(index); }
+
         /// <summary>Optional feedback controller; plain gameplay tests need no guide component.</summary>
         public GuideController Guide { get; private set; }
         /// <summary>Requests accepted in this attempt; never part of saved results.</summary>
         public int HintCount { get; private set; }
         /// <summary>Whether this attempt permits requesting a hint.</summary>
-        public bool CanHint => !IsPaused && Session != null && !IsCleared && Session.Board.Arrows.Count > 0;
-        /// <summary>Raised with the chosen free arrow, without changing the session.</summary>
+        public bool CanHint => !IsPaused && !IsStuck && Session != null && !IsCleared && Session.Board.Arrows.Count > 0;
+        /// <summary>Raised after a logical ice slide; the old instance is stale.</summary>
+        public event Action<Arrow,Arrow> ArrowSlid;
+        /// <summary>Raised after undo restores a slide's prior cell.</summary>
+        public event Action<Arrow> SlideReverted;
+        /// <summary>Raised only when bounded search changes the proven stuck flag.</summary>
+        public event Action<bool> StuckChanged;
+        /// <summary>True only for a proven unsolvable ice state; Unknown never blocks play.</summary>
+        public bool IsStuck { get; private set; }
+        /// <summary>Number of bounded stuck searches in this attempt.</summary>
+        public int StuckCheckCount { get; private set; }
+        /// <summary>Raised with the chosen exit or slide arrow, without changing the session.</summary>
         public event Action<Arrow> HintShown;
         /// <summary>Wires an optional guide to the same board display and pause flag.</summary>
         public void BindGuide(GuideController value)
@@ -29,7 +60,7 @@ namespace ArrowEscape.View
             Guide = value;
             if (Guide != null) { Guide.Bind(GetComponent<BoardView>()); Guide.SetPaused(IsPaused); }
         }
-        /// <summary>Shows one deterministic free-arrow suggestion; never changes any gameplay counter.</summary>
+        /// <summary>Shows a deterministic exit or ice-slide suggestion; never changes session counters.</summary>
         public bool ShowHint()
         {
             if (!CanHint) return false;
@@ -46,6 +77,7 @@ namespace ArrowEscape.View
         public void SetPaused(bool paused)
         {
             IsPaused = paused;
+            PauseChanged?.Invoke(paused);
             if (animator == null) animator = GetComponent<ArrowAnimator>();
             animator.SetPaused(paused);
             if (Guide != null) Guide.SetPaused(paused);
@@ -93,23 +125,39 @@ namespace ArrowEscape.View
         public int StartingArrowCount => Session == null ? 0 : Session.StartingArrowCount;
         /// <summary>Total successful undos this attempt.</summary>
         public int UndoCount => Session == null ? 0 : Session.UndoCount;
-        /// <summary>Whether the latest exit can be restored.</summary>
+        /// <summary>Whether the latest exit or slide can be undone.</summary>
         public bool CanUndo => Session != null && Session.CanUndo;
 
-        /// <summary>Restores one exit and replaces any still-sliding display.</summary>
+        /// <summary>Reverses one exit or slide, preserving visual continuity and clearing the current press.</summary>
         public void Undo()
         {
             if (Session == null || IsPaused) return;
             UndoResult result = Session.TryUndo();
             if (result.Outcome != UndoOutcome.Undone) return;
             if (Guide != null) Guide.ClearAll();
-            if (boardView.TryGetReleasedView(result.Restored.Id, out ArrowView released)) animator.Cancel(released);
+            if(result.MoveKind==UndoMoveKind.Slide)
+            {
+                if(boardView.RebaseArrowView(result.Restored,true,out ArrowView movedView))
+                {
+                    int cells=Mathf.Abs(Mathf.RoundToInt(movedView.Offset.x))+Mathf.Abs(Mathf.RoundToInt(movedView.Offset.y));
+                    animator.PlayIceSlide(movedView,IceDuration(cells));
+                }
+                tapController.ResetInteraction();SlideReverted?.Invoke(result.Restored);UndoStateChanged?.Invoke();UpdateStuck();return;
+            }
+            float pathDistance=-1;
+            if (boardView.TryGetReleasedView(result.Restored.Id, out ArrowView released))
+            {
+                if(released.Path!=null)pathDistance=released.Path.Distance;
+                animator.Cancel(released);
+            }
             boardView.DiscardReleasedView(result.Restored.Id);
-            boardView.AddArrowView(result.Restored);
+            ArrowView restoredView=boardView.AddArrowView(result.Restored);
+            if(result.Restored.Length>1)animator.PlayPathReturn(restoredView,pathDistance);
             tapController.ResetInteraction();
             MoveCountChanged?.Invoke();
             UndoStateChanged?.Invoke();
             ArrowRestored?.Invoke(result.Restored);
+            UpdateStuck();
         }
 
         /// <summary>Starts with the supplied live board, stopping and removing old visuals.</summary>
@@ -119,20 +167,25 @@ namespace ArrowEscape.View
         public void StartLevel(Board board, string levelName)
         {
             if (board == null) throw new ArgumentNullException(nameof(board));
+            var zoom=GetComponent<BoardZoom>();if(zoom!=null)zoom.ResetZoom();
             SetPaused(false);
             LevelName = levelName ?? "Level";
             initialBoard = board.Clone();
+            Par = StarRating.Par(board);
             EnsureBindings();
             animator.StopAll();
             if (Guide != null) Guide.ClearAll();
             HintCount = 0;
+            StuckCheckCount=0;SetStuck(false);
             if (Session == null) Session = new GameSession(board);
             else Session.Reset(board);
             boardView.Show(board);
             MistakeCountChanged?.Invoke(0);
+            TapCountChanged?.Invoke(0);
             MoveCountChanged?.Invoke();
             UndoStateChanged?.Invoke();
             LevelStarted?.Invoke();
+            UpdateStuck();
         }
 
         /// <summary>Sets the loaded level's name and Resources path for restart.</summary>
@@ -171,6 +224,7 @@ namespace ArrowEscape.View
         {
             if (Session == null || IsPaused) return;
             MoveResult result = Session.TryMove(arrow);
+            if (result.Outcome != MoveOutcome.Ignored) TapCountChanged?.Invoke(TapCount);
             if (result.Outcome == MoveOutcome.Exited)
             {
                 if (Guide != null) Guide.ClearAll();
@@ -179,6 +233,12 @@ namespace ArrowEscape.View
                 ArrowExited?.Invoke(arrow);
                 MoveCountChanged?.Invoke();
                 UndoStateChanged?.Invoke();
+            }
+            else if(result.Outcome==MoveOutcome.Slid)
+            {
+                if(Guide!=null)Guide.ClearAll();
+                if(boardView.RebaseArrowView(result.MovedArrow,true,out ArrowView movedView))animator.PlayIceSlide(movedView,IceDuration(result.SlideCells));
+                ArrowSlid?.Invoke(arrow,result.MovedArrow);UndoStateChanged?.Invoke();
             }
             else if (result.Outcome == MoveOutcome.Blocked)
             {
@@ -189,12 +249,21 @@ namespace ArrowEscape.View
                 MoveBlocked?.Invoke(arrow, result.Blocker);
                 MistakeCountChanged?.Invoke(result.MistakeCount);
             }
+            if(result.Outcome==MoveOutcome.Exited||result.Outcome==MoveOutcome.Slid)UpdateStuck();
             if (!result.BoardCleared) return;
             BoardCleared?.Invoke();
             Debug.Log($"Level cleared. Mistakes: {result.MistakeCount}", this);
         }
 
         private void OnEnable() => EnsureBindings();
+
+        private static float IceDuration(int cells)=>AnimationMath.IceSlideDuration(cells,ViewTheme.IceSlideBaseSeconds,ViewTheme.IceSlidePerCellSeconds,ViewTheme.IceSlideMaxSeconds);
+        private void UpdateStuck()
+        {
+            if(Session==null||!Session.Board.HasIceArrows){SetStuck(false);return;}
+            StuckCheckCount++;SetStuck(PuzzleSolver.Analyze(Session.Board,20000).Status==SolveStatus.Unsolvable);
+        }
+        private void SetStuck(bool value){if(IsStuck==value)return;IsStuck=value;StuckChanged?.Invoke(value);}
 
         private void OnDisable()
         {
@@ -204,3 +273,4 @@ namespace ArrowEscape.View
         }
     }
 }
+

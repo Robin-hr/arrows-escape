@@ -26,7 +26,7 @@ namespace ArrowEscape.Tests
         {
             var t = new ProgressTracker(); t.RecordCompletion("level_001", 2, 3); t.RecordCompletion("level_001", 1, 8); t.SetLastLevel("level_002");
             Assert.That(store.TrySave(t.Data), Is.True); var r = store.Load(); Assert.That(r.Status, Is.EqualTo(ProgressLoadStatus.Loaded));
-            Assert.That(r.Data.version, Is.EqualTo(1)); Assert.That(r.Data.lastLevelId, Is.EqualTo("level_002")); Assert.That(r.Data.levels.Count, Is.EqualTo(1)); var a = r.Data.levels[0]; Assert.That(a.id, Is.EqualTo("level_001")); Assert.That(a.completions, Is.EqualTo(2)); Assert.That(a.bestMistakes, Is.EqualTo(1)); Assert.That(a.bestUndos, Is.EqualTo(8));
+            Assert.That(r.Data.version, Is.EqualTo(2)); Assert.That(r.Data.lastLevelId, Is.EqualTo("level_002")); Assert.That(r.Data.levels.Count, Is.EqualTo(1)); var a = r.Data.levels[0]; Assert.That(a.id, Is.EqualTo("level_001")); Assert.That(a.completions, Is.EqualTo(2)); Assert.That(a.bestMistakes, Is.EqualTo(1)); Assert.That(a.bestUndos, Is.EqualTo(8));
         }
         /// <summary>First save creates missing parent folders.</summary>
         [Test] public void CreatesFolder() { Assert.That(Directory.Exists(folder), Is.False); Assert.That(store.TrySave(new ProgressData()), Is.True); Assert.That(File.Exists(path), Is.True); }
@@ -66,7 +66,7 @@ namespace ArrowEscape.Tests
             var t = new ProgressTracker(); t.RecordCompletion("level_001", 1, 0); t.SetLastLevel("level_001"); t.Data.version = 99;
             Assert.That(store.TrySave(t.Data), Is.True); string json = File.ReadAllText(path);
             foreach (string key in new[] { "version", "lastLevelId", "levels", "id", "completions", "bestMistakes", "bestUndos" }) Assert.That(json, Does.Contain("\"" + key + "\""));
-            var parsed = JsonUtility.FromJson<ProgressData>(json); Assert.That(parsed.version, Is.EqualTo(1)); Assert.That(parsed.levels[0].bestMistakes, Is.EqualTo(1));
+            var parsed = JsonUtility.FromJson<ProgressData>(json); Assert.That(parsed.version, Is.EqualTo(2)); Assert.That(parsed.levels[0].bestMistakes, Is.EqualTo(1));
         }
         /// <summary>Backup names may be overwritten on a subsequent bad load.</summary>
         [Test] public void BackupOverwrite()

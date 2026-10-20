@@ -32,7 +32,7 @@ namespace ArrowEscape.Tests
         public FlowTestScene(FakeProgressStore progress = null, FakeSettingsStore settings = null, bool initializeFlow = true)
         {
             camera = new GameObject("Flow camera", typeof(Camera)); camera.tag = "MainCamera";
-            host = new GameObject("Flow gameplay"); Bootstrap = host.AddComponent<GameBootstrap>();
+            host = new GameObject("Flow gameplay"); Bootstrap = host.AddComponent<GameBootstrap>(); Bootstrap.SetLevelCatalog(OriginalTestCatalog.Paths);
             SetAutoStart(false); ProgressStore = progress ?? new FakeProgressStore(); SettingsStore = settings ?? new FakeSettingsStore();
             Bootstrap.Initialize(ProgressStore, SettingsStore); Game = host.GetComponent<GameController>(); Board = host.GetComponent<BoardView>();
             ui = new GameObject("Flow UI"); Hud = ui.AddComponent<HudController>(); Flow = ui.AddComponent<AppFlowController>();

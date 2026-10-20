@@ -76,6 +76,6 @@ namespace ArrowEscape.Tests
         [Test] public void Copy()
         { var t = new ProgressTracker(); t.RecordCompletion("a", 2, 3); t.TryGetRecord("a", out var r); r.bestMistakes = 99; t.TryGetRecord("a", out var again); Assert.That(again.bestMistakes, Is.EqualTo(2)); Assert.That(t.TryGetRecord("missing", out var missing), Is.False); Assert.That(missing, Is.Null); }
         /// <summary>Reset clears records and the last level.</summary>
-        [Test] public void Reset() { var t = new ProgressTracker(); t.RecordCompletion("a", 0, 0); t.SetLastLevel("a"); t.Reset(); Assert.That(t.Data.levels, Is.Empty); Assert.That(t.Data.lastLevelId, Is.Empty); Assert.That(t.Data.version, Is.EqualTo(1)); }
+        [Test] public void Reset() { var t = new ProgressTracker(); t.RecordCompletion("a", 0, 0); t.SetLastLevel("a"); t.Reset(); Assert.That(t.Data.levels, Is.Empty); Assert.That(t.Data.lastLevelId, Is.Empty); Assert.That(t.Data.version, Is.EqualTo(2)); }
     }
 }

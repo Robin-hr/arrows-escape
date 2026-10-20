@@ -3,10 +3,11 @@ namespace ArrowEscape.Core
     /// <summary>Checks whether repeatedly exiting free arrows can clear a board.</summary>
     public static class LevelSolvability
     {
-        /// <summary>Checks a clone, leaving the original untouched; null is unsolvable.</summary>
+        /// <summary>Normal boards use greedy removal; ice uses bounded search, with Unknown counted as false.</summary>
         public static bool IsSolvable(Board board)
         {
             if (board == null) return false;
+            if(board.HasIceArrows)return PuzzleSolver.Analyze(board).Status==SolveStatus.Solved;
             Board remaining = board.Clone();
             while (!remaining.IsCleared())
             {

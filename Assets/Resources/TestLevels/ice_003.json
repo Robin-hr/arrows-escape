@@ -1,0 +1,14 @@
+{"name":"Ice 3","width":7,"height":7,"arrows":[
+ {"id":1,"x":0,"y":0,"direction":"Right","type":"ice"},
+ {"id":2,"x":3,"y":0,"direction":"Up"},
+ {"id":3,"x":3,"y":2,"direction":"Left"},
+ {"id":4,"x":0,"y":2,"direction":"Down"},
+ {"id":5,"x":1,"y":4,"direction":"Right","type":"ice"},
+ {"id":6,"x":4,"y":4,"direction":"Up"},
+ {"id":7,"x":5,"y":6,"direction":"Down"},
+ {"id":8,"x":6,"y":6,"direction":"Left"},
+ {"id":9,"x":6,"y":4,"direction":"Up"},
+ {"id":10,"x":0,"y":6,"direction":"Up"},
+ {"id":11,"x":1,"y":6,"direction":"Up"},
+ {"id":12,"x":2,"y":6,"direction":"Up"},
+ {"id":13,"x":4,"y":6,"direction":"Up"}]}

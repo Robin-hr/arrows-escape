@@ -41,6 +41,7 @@ namespace ArrowEscape.View
             camera.backgroundColor = ViewTheme.Background;
             camera.transform.SetPositionAndRotation(new Vector3(fit.CameraX, fit.CameraY, ViewTheme.CameraZ),
                 Quaternion.identity);
+            var zoom=GetComponent<BoardZoom>();if(zoom!=null)zoom.ResetFit();
         }
 
         /// <summary>Applies the dark solid background immediately, silently skipping a missing camera.</summary>

@@ -39,7 +39,7 @@ namespace ArrowEscape.Tests
         [Test] public void Buttons()
         {
             game.StartLevel(Chain(), "Chain"); hud.Bind(game, bootstrap); Assert.That(hud.Hud.UndoButton.interactable, Is.False);
-            Tap(0); Tap(2); Assert.That(hud.Hud.UndoButton.interactable, Is.True); Assert.That(hud.Hud.MovesText.text, Is.EqualTo("Moves 1 / 3"));
+            Tap(0); Tap(2); Assert.That(hud.Hud.UndoButton.interactable, Is.True); Assert.That(hud.Hud.MovesText.text, Is.EqualTo("Moves 2 / 3"));
             hud.Hud.UndoButton.onClick.Invoke(); Assert.That(game.MoveCount, Is.Zero); Assert.That(game.MistakeCount, Is.EqualTo(1)); Assert.That(hud.Hud.UndoButton.interactable, Is.False);
             hud.Hud.RestartButton.onClick.Invoke(); Assert.That(game.MistakeCount, Is.Zero); Assert.That(game.UndoCount, Is.Zero); Assert.That(game.Session.Board.Arrows.Count, Is.EqualTo(3));
         }

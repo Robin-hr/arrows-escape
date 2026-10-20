@@ -16,7 +16,7 @@ namespace ArrowEscape.Core
                 string id = orderedLevelIds[i] ?? "";
                 var state = tracker.IsCompleted(id) ? LevelTileState.Completed : tracker.IsUnlocked(orderedLevelIds, i) ? LevelTileState.Unlocked : LevelTileState.Locked;
                 bool found = tracker.TryGetRecord(id, out LevelRecord record);
-                tiles.Add(new LevelTile(i, id, state, i == resume, found ? record.bestMistakes : -1, found ? record.bestUndos : -1));
+                tiles.Add(new LevelTile(i, id, state, i == resume, found ? record.bestMistakes : -1, found ? record.bestUndos : -1, found ? record.bestStars : 0));
             }
             return tiles.AsReadOnly();
         }

@@ -14,6 +14,9 @@ namespace ArrowEscape.UI
         private PointerInputAdapter input;
         private System.Func<Vector2, bool> screenBlocker;
         private bool initialized;
+        private ShopService wallet;
+        /// <summary>Inventory shop screen; the existing navigation machine remains the parent flow.</summary>
+        public ShopView Shop { get; private set; }
         /// <summary>The pure navigation owner, initially MainMenu.</summary>
         public ScreenStateMachine Machine { get; } = new ScreenStateMachine();
         /// <summary>Main menu view.</summary>
@@ -56,6 +59,8 @@ namespace ArrowEscape.UI
             hud.CompletePanel.LevelsRequested += OnLevelsRequested;
             bootstrap.LevelCompleted += OnLevelCompleted;
             bootstrap.ProgressReset += OnProgressReset;
+            bootstrap.InventoryReset += BindInventory;
+            BindInventory();
             game.LevelStarted += OnLevelStarted;
             ApplyScreen(ScreenState.MainMenu, ScreenState.MainMenu);
             // An explicitly auto-started scene component keeps its existing play behavior.
@@ -75,6 +80,8 @@ namespace ArrowEscape.UI
             SettingsScreen = gameObject.AddComponent<SettingsView>();
             SettingsScreen.Build(canvasObject.transform, bootstrap.Settings.Model, SetSound, SetHaptics, AskReset, Back);
             Confirm = gameObject.AddComponent<ConfirmDialog>(); Confirm.Build(canvasObject.transform);
+            Shop=gameObject.AddComponent<ShopView>();Shop.Build(canvasObject.transform,Confirm,game);Shop.Closed+=OnShopClosed;
+            MainMenu.ShopButton.onClick.AddListener(OpenShop);MainMenu.CoinsButton.onClick.AddListener(OpenShop);
             MainMenu.PlayButton.onClick.AddListener(Continue);
             MainMenu.LevelsButton.onClick.AddListener(OnLevelsRequested);
             MainMenu.SettingsButton.onClick.AddListener(OpenSettings);
@@ -88,7 +95,8 @@ namespace ArrowEscape.UI
         private void OnStateChanged(ScreenState oldState, ScreenState newState) => ApplyScreen(oldState, newState);
         private void ApplyScreen(ScreenState previous, ScreenState state)
         {
-            MainMenu.Root.gameObject.SetActive(state == ScreenState.MainMenu);
+            if(state!=ScreenState.MainMenu&&Shop.IsVisible)Shop.Close();
+            MainMenu.Root.gameObject.SetActive(state == ScreenState.MainMenu&&!Shop.IsVisible);
             Levels.Root.gameObject.SetActive(state == ScreenState.LevelSelect);
             PauseScreen.Root.gameObject.SetActive(state == ScreenState.Paused);
             SettingsScreen.Root.gameObject.SetActive(state == ScreenState.Settings);
@@ -101,7 +109,21 @@ namespace ArrowEscape.UI
             if (state == ScreenState.MainMenu) RefreshMainMenu();
             if (state == ScreenState.LevelSelect) RefreshLevels();
         }
-        private void RefreshMainMenu() => MainMenu.Refresh(bootstrap.HasAnyProgress, bootstrap.Progress.Tracker.CompletedCount(bootstrap.LevelIds), bootstrap.LevelCount, bootstrap.ContinueIndex);
+        private void RefreshMainMenu()
+        {
+            MainMenu.Refresh(bootstrap.HasAnyProgress,bootstrap.Progress.Tracker.CompletedCount(bootstrap.LevelIds),bootstrap.LevelCount,bootstrap.ContinueIndex);
+            MainMenu.SetEconomy(bootstrap.Inventory.State.Coins,bootstrap.Progress.Tracker.TotalStars,bootstrap.LevelCount*3,false);
+        }
+        private void BindInventory()
+        {
+            if(wallet!=null)wallet.CoinsChanged-=OnCoins;wallet=bootstrap.Inventory.Shop;wallet.CoinsChanged+=OnCoins;
+            Shop.Bind(bootstrap.Inventory);OnCoins(wallet.Inventory.Coins);
+        }
+        private void OnCoins(int amount)=>MainMenu.SetEconomy(amount,bootstrap.Progress.Tracker.TotalStars,bootstrap.LevelCount*3);
+        /// <summary>Opens the shop only from the main menu.</summary>
+        public void OpenShop(){if(Machine.Current!=ScreenState.MainMenu)return;MainMenu.Root.gameObject.SetActive(false);Shop.Show();}
+        private void OnShopClosed(){MainMenu.Root.gameObject.SetActive(Machine.Current==ScreenState.MainMenu);if(Machine.Current==ScreenState.MainMenu)RefreshMainMenu();}
+
         private void RefreshLevels() => Levels.Refresh(LevelSelectModel.Build(bootstrap.LevelIds, bootstrap.Progress.Tracker));
         private void Continue() => StartLevel(bootstrap.ContinueIndex);
         private void StartLevel(int index)
@@ -136,6 +158,7 @@ namespace ArrowEscape.UI
         public bool HandleBack()
         {
             if (Confirm != null && Confirm.IsOpen) { Confirm.Hide(); return true; }
+            if(Shop!=null&&Shop.IsVisible)return Shop.HandleBack();
             return Machine.Back();
         }
         private void Update()
@@ -158,11 +181,13 @@ namespace ArrowEscape.UI
         }
         private void OnDestroy()
         {
+            if(wallet!=null)wallet.CoinsChanged-=OnCoins;
+            if(Shop!=null)Shop.Closed-=OnShopClosed;
             Machine.StateChanged -= OnStateChanged;
             if (input != null) input.RemoveBlocker(screenBlocker);
             if (hud != null)
             { hud.PauseRequested -= OnPauseRequested; if (hud.CompletePanel != null) hud.CompletePanel.LevelsRequested -= OnLevelsRequested; }
-            if (bootstrap != null) { bootstrap.LevelCompleted -= OnLevelCompleted; bootstrap.ProgressReset -= OnProgressReset; }
+            if (bootstrap != null) { bootstrap.LevelCompleted -= OnLevelCompleted; bootstrap.ProgressReset -= OnProgressReset; bootstrap.InventoryReset-=BindInventory; }
             if (game != null) game.LevelStarted -= OnLevelStarted;
         }
     }

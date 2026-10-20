@@ -45,6 +45,7 @@ namespace ArrowEscape.Tests
             Assert.That(arrow.SpriteRenderer.sprite, Is.SameAs(SpriteFactory.GetArrowSprite()));
             Assert.That(arrow.SpriteRenderer.sortingOrder, Is.GreaterThan(ViewTheme.CellSortingOrder));
 
+            arrow.BaseColor = Color.white;
             Camera camera = CreateCamera();
             target = new RenderTexture(256, 256, 24, RenderTextureFormat.ARGB32);
             target.Create();

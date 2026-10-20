@@ -1,13 +1,19 @@
 using System.Collections.Generic;
 namespace ArrowEscape.Core
 {
-    /// <summary>Scores paths once and deterministically chooses a useful currently-free arrow.</summary>
+    /// <summary>Selects a useful free arrow on normal boards, or a solution action on ice boards.</summary>
     public static class HintFinder
     {
-        /// <summary>Finds the best free arrow without cloning, solving, or mutating the board.</summary>
+        /// <summary>Never mutates the board. Normal boards use path scores; ice boards use bounded search.</summary>
         public static HintResult Find(Board board)
         {
             if (board == null || board.IsCleared()) return HintResult.None;
+            if(board.HasIceArrows)
+            {
+                SolveResult result=PuzzleSolver.Analyze(board);
+                if(result.Status!=SolveStatus.Solved || result.Path.Count==0)return HintResult.None;
+                SolverMove move=result.Path[0];return new HintResult(board.GetArrowById(move.ArrowId),move.IsSlide);
+            }
             ScorePaths(board, out int[] freed, out int[] dependents, out bool[] free);
             int best = -1;
             for (int i = 0; i < board.Arrows.Count; i++)
@@ -32,10 +38,11 @@ namespace ArrowEscape.Core
                 Arrow arrow = board.Arrows[i];
                 int dx = arrow.Direction.GetDx(), dy = arrow.Direction.GetDy();
                 int blockers = 0, soleBlocker = -1;
+                var seen = new HashSet<int>();
                 for (int x = arrow.X + dx, y = arrow.Y + dy; board.InBounds(x, y); x += dx, y += dy)
                 {
                     Arrow blocker = board.GetArrowAt(x, y);
-                    if (blocker == null) continue;
+                    if (blocker == null || !seen.Add(blocker.Id)) continue;
                     soleBlocker = indices[blocker.Id];
                     dependents[soleBlocker]++;
                     blockers++;
@@ -46,3 +53,4 @@ namespace ArrowEscape.Core
         }
     }
 }
+

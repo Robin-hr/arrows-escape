@@ -20,6 +20,35 @@ namespace ArrowEscape.View
         private int width;
         private int height;
         private Board currentBoard;
+        private Color normalArrowColor=ViewTheme.ArrowColor;
+        /// <summary>Applies equipment to existing arrows and future undo-restored views.</summary>
+        public void SetNormalArrowColor(Color color)
+        {
+            normalArrowColor=color;
+            foreach(var pair in arrowViews)if(pair.Value!=null&&pair.Value.Arrow.Kind==ArrowKind.Normal)pair.Value.BaseColor=color;
+        }
+
+        /// <summary>Path-grid renderer fixed for the lifetime of this displayed attempt.</summary>
+        public DotGrid PathDots { get; private set; }
+        /// <summary>Board rectangle in world space.</summary>
+        public Bounds WorldBounds => new Bounds(Vector3.zero,new Vector3(width,height,0));
+        /// <summary>Whether this attempt was loaded with paths.</summary>
+        public bool UsesPaths { get; private set; }
+
+        /// <summary>Whether this displayed board was small enough to draw cell dots.</summary>
+        public bool HasCellDots => !UsesPaths && root != null && width > 0 && height > 0 &&
+            width <= ViewTheme.DotBoardLimit && height <= ViewTheme.DotBoardLimit;
+
+        /// <summary>Finds a cell dot for effects, safely rejecting missing or destroyed objects.</summary>
+        public bool TryGetCellDot(int x, int y, out SpriteRenderer renderer)
+        {
+            renderer = null;
+            if (!HasCellDots || x < 0 || y < 0 || x >= width || y >= height) return false;
+            Transform dot = root.Find("Cell " + x + "," + y);
+            if (dot == null) return false;
+            renderer = dot.GetComponent<SpriteRenderer>();
+            return renderer != null;
+        }
 
         /// <summary>Raised after clearing or finishing a replacement board display.</summary>
         public event Action BoardChanged;
@@ -34,8 +63,15 @@ namespace ArrowEscape.View
             height = board.Height;
             root = new GameObject("Board").transform;
             root.SetParent(transform, false);
-            if (width <= ViewTheme.DotBoardLimit && height <= ViewTheme.DotBoardLimit)
-                CreateDots();
+            if(GetComponent<BoardZoom>()==null)gameObject.AddComponent<BoardZoom>();
+            UsesPaths=false;
+            foreach(Arrow arrow in board.Arrows)if(arrow.Length>1){UsesPaths=true;break;}
+            if(UsesPaths)
+            {
+                PathDots=CreateChild("Dot Grid").AddComponent<DotGrid>();
+                PathDots.Initialize(this,board,arrowMaterial,GetComponent<GameController>());
+            }
+            else if (width <= ViewTheme.DotBoardLimit && height <= ViewTheme.DotBoardLimit) CreateDots();
             foreach (Arrow arrow in board.Arrows)
             {
                 AddArrowView(arrow);
@@ -86,6 +122,8 @@ namespace ArrowEscape.View
             DiscardReleasedView(arrow.Id);
             ArrowView view = CreateChild($"Arrow {arrow.Id}").AddComponent<ArrowView>();
             view.Initialize(arrow, arrowMaterial);
+            if(arrow.Length>1)view.InitializePath(width,height,arrowMaterial);
+            view.BaseColor=arrow.Kind==ArrowKind.Ice?ViewTheme.IceArrowColor:normalArrowColor;
             view.SetBaseWorldPosition(CellToWorld(arrow.X, arrow.Y));
             view.ResetVisual();
             arrowViews[arrow.Id] = view;
@@ -94,6 +132,12 @@ namespace ArrowEscape.View
 
         /// <summary>Finds a released view so its animation can be cancelled before disposal.</summary>
         public bool TryGetReleasedView(int id, out ArrowView view) => releasedViews.TryGetValue(id, out view) && view != null;
+        /// <summary>Reuses the current view by id and updates its logical cell without a visual jump.</summary>
+        public bool RebaseArrowView(Arrow moved,bool keepWorldPosition,out ArrowView view)
+        {
+            view=null;if(moved==null||!arrowViews.TryGetValue(moved.Id,out view)||view==null)return false;
+            view.Rebase(moved,CellToWorld(moved.X,moved.Y),keepWorldPosition);return true;
+        }
 
         /// <summary>Immediately retires a released view; it can never remain visible beside its replacement.</summary>
         public bool DiscardReleasedView(int id)
@@ -116,6 +160,7 @@ namespace ArrowEscape.View
         private void ClearDisplay(bool notify)
         {
             currentBoard = null;
+            PathDots=null;UsesPaths=false;
             if (notify) BoardChanged?.Invoke();
             arrowViews.Clear();
             releasedViews.Clear();

@@ -5,6 +5,18 @@ namespace ArrowEscape.Core
     /// <summary>Clamped animation curves and slide distances with no rendering dependencies.</summary>
     public static class AnimationMath
     {
+        /// <summary>Path travel at 28 cells per second, bounded for readable feedback.</summary>
+        public static float PathExitDuration(float trackCells) => System.Math.Max(.18f,System.Math.Min(.90f,trackCells/28f));
+        /// <summary>Clamps ice-slide time; nonpositive cell counts use the base duration.</summary>
+        public static float IceSlideDuration(int cells,float baseSeconds,float perCellSeconds,float maxSeconds)
+        {
+            if(float.IsNaN(baseSeconds)||float.IsInfinity(baseSeconds)||baseSeconds<0)throw new ArgumentOutOfRangeException(nameof(baseSeconds));
+            if(float.IsNaN(perCellSeconds)||float.IsInfinity(perCellSeconds)||perCellSeconds<0)throw new ArgumentOutOfRangeException(nameof(perCellSeconds));
+            if(float.IsNaN(maxSeconds)||float.IsInfinity(maxSeconds)||maxSeconds<baseSeconds)throw new ArgumentOutOfRangeException(nameof(maxSeconds));
+            return (float)Math.Min(maxSeconds,baseSeconds+(double)Math.Max(0,cells)*perCellSeconds);
+        }
+        /// <summary>Remaining slide offset, with exact one/zero endpoints.</summary>
+        public static float SlideOffsetFactor(float t)=>1-EaseOutCubic(t);
         /// <summary>Accelerates quadratically from zero to one.</summary>
         public static float EaseInQuad(float t)
         {

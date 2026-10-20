@@ -1,1 +1,11 @@
-{"name":"ArrowEscape.Editor","references":["ArrowEscape.Data"],"includePlatforms":["Editor"]}
+{
+  "name": "ArrowEscape.Editor",
+  "references": [
+    "ArrowEscape.Data",
+    "ArrowEscape.Core",
+    "ArrowEscape.View"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}

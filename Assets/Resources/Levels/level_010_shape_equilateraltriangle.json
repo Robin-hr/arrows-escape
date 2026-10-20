@@ -1,0 +1,302 @@
+{
+  "name": "Shape 10: EquilateralTriangle",
+  "width": 13,
+  "height": 11,
+  "arrows": [
+    {
+      "cells": [
+        5,
+        8,
+        6,
+        8,
+        6,
+        9
+      ],
+      "id": 1,
+      "x": 6,
+      "y": 9,
+      "direction": "Up",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        8,
+        7,
+        7,
+        7,
+        7,
+        8
+      ],
+      "id": 2,
+      "x": 7,
+      "y": 8,
+      "direction": "Up",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        5,
+        5,
+        5,
+        6,
+        5,
+        7,
+        4,
+        7,
+        4,
+        6
+      ],
+      "id": 3,
+      "x": 4,
+      "y": 6,
+      "direction": "Down",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        6,
+        7,
+        6,
+        6,
+        7,
+        6
+      ],
+      "id": 4,
+      "x": 7,
+      "y": 6,
+      "direction": "Right",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        8,
+        4,
+        9,
+        4,
+        9,
+        5,
+        8,
+        5,
+        8,
+        6
+      ],
+      "id": 5,
+      "x": 8,
+      "y": 6,
+      "direction": "Up",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        1,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        4
+      ],
+      "id": 6,
+      "x": 3,
+      "y": 4,
+      "direction": "Up",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        3,
+        5,
+        4,
+        5,
+        4,
+        4,
+        4,
+        3
+      ],
+      "id": 7,
+      "x": 4,
+      "y": 3,
+      "direction": "Down",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        6,
+        5,
+        6,
+        4,
+        5,
+        4,
+        5,
+        3,
+        6,
+        3
+      ],
+      "id": 8,
+      "x": 6,
+      "y": 3,
+      "direction": "Right",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        7,
+        5,
+        7,
+        4,
+        7,
+        3,
+        8,
+        3,
+        9,
+        3
+      ],
+      "id": 9,
+      "x": 9,
+      "y": 3,
+      "direction": "Right",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        7,
+        1,
+        7,
+        2,
+        8,
+        2,
+        9,
+        2,
+        10,
+        2,
+        10,
+        3
+      ],
+      "id": 10,
+      "x": 10,
+      "y": 3,
+      "direction": "Up",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        10,
+        1,
+        11,
+        1,
+        11,
+        2
+      ],
+      "id": 11,
+      "x": 11,
+      "y": 2,
+      "direction": "Up",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        4,
+        2,
+        4,
+        1
+      ],
+      "id": 12,
+      "x": 4,
+      "y": 1,
+      "direction": "Down",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        3,
+        2,
+        3,
+        1,
+        2,
+        1,
+        2,
+        0,
+        1,
+        0
+      ],
+      "id": 13,
+      "x": 1,
+      "y": 0,
+      "direction": "Left",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        4,
+        0,
+        3,
+        0
+      ],
+      "id": 14,
+      "x": 3,
+      "y": 0,
+      "direction": "Left",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        6,
+        2,
+        5,
+        2,
+        5,
+        1,
+        6,
+        1,
+        6,
+        0,
+        5,
+        0
+      ],
+      "id": 15,
+      "x": 5,
+      "y": 0,
+      "direction": "Left",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        8,
+        1,
+        9,
+        1,
+        9,
+        0,
+        8,
+        0,
+        7,
+        0
+      ],
+      "id": 16,
+      "x": 7,
+      "y": 0,
+      "direction": "Left",
+      "type": "normal"
+    },
+    {
+      "cells": [
+        12,
+        0,
+        11,
+        0,
+        10,
+        0
+      ],
+      "id": 17,
+      "x": 10,
+      "y": 0,
+      "direction": "Left",
+      "type": "normal"
+    }
+  ]
+}

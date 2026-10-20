@@ -23,6 +23,18 @@ namespace ArrowEscape.View
         /// <summary>Removes only this caller's gate.</summary>
         public void RemoveBlocker(System.Func<Vector2, bool> blocker) { if (blocker != null) blockers.Remove(blocker); }
         private bool ownerBlocked;
+        private Vector2 downScreen;
+        private BoardView pathBoard;
+        /// <summary>Cancels a tap while retaining physical ownership until release.</summary>
+        public void CancelForNavigation()
+        {
+            if(hasOwner&&!ownerBlocked&&controller!=null)controller.PointerCancel(ownerId);
+            ownerBlocked=true;pendingMousePress=false;
+        }
+        private void CheckDrag(Vector2 position)
+        {
+            if(pathBoard!=null&&pathBoard.UsesPaths&&ArrowEscape.Core.ZoomMath.CancelsTap(position.x-downScreen.x,position.y-downScreen.y))CancelForNavigation();
+        }
         private const int MousePointerId = -1;
         private TapController controller;
         private Mouse ownerMouse;
@@ -44,6 +56,7 @@ namespace ArrowEscape.View
         {
             CancelOwner();
             controller = value;
+            pathBoard=value!=null?value.GetComponent<BoardView>():null;
         }
 
         private void Update()
@@ -101,6 +114,7 @@ namespace ArrowEscape.View
             if (firstTouch != null && (!mouseDown || pressedMouse != mouse ||
                 firstTouch.startTime.ReadValue() <= mouseDownTime))
             {
+                downScreen=firstTouch.startPosition.ReadValue();
                 ownerTouch = firstTouch;
                 ownerId = firstTouch.touchId.ReadValue();
                 hasOwner = true;
@@ -109,6 +123,7 @@ namespace ArrowEscape.View
             }
             else if (mouseDown)
             {
+                downScreen=mouseDownPosition;
                 ownerMouse = mouse;
                 ownerId = MousePointerId;
                 hasOwner = true;
@@ -131,6 +146,7 @@ namespace ArrowEscape.View
                 CancelOwner();
                 return;
             }
+            CheckDrag(ownerTouch.position.ReadValue());
             Vector2 world = ToWorld(camera, ownerTouch.position.ReadValue());
             if (phase == UnityEngine.InputSystem.TouchPhase.Ended) ReleaseOwner(world);
             else if (!ownerBlocked) controller.PointerMove(ownerId, world);
@@ -139,6 +155,7 @@ namespace ArrowEscape.View
         private void PollMouse(Camera camera)
         {
             if (ownerMouse == null || !ownerMouse.added) { CancelOwner(); return; }
+            CheckDrag(ownerMouse.position.ReadValue());
             Vector2 world = ToWorld(camera, ownerMouse.position.ReadValue());
             if (ownerMouse.leftButton.isPressed) { if (!ownerBlocked) controller.PointerMove(ownerId, world); }
             else ReleaseOwner(world);

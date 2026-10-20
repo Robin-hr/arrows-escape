@@ -4,9 +4,22 @@ using UnityEngine;
 namespace ArrowEscape.View
 {
     /// <summary>Composes independent visual layers through one transform/render writer.</summary>
-    [RequireComponent(typeof(SpriteRenderer))]
     public sealed class ArrowView : MonoBehaviour
     {
+        /// <summary>Optional ribbon renderer; null for legacy one-cell sprites.</summary>
+        public PathArrowView Path { get; private set; }
+        /// <summary>Attaches the path mesh after ordinary initialization.</summary>
+        public void InitializePath(int width,int height,Material material)
+        {
+            // Unity permits only one renderer per object. Keep the public sprite-state
+            // adapter on a disabled child; the root renderer is the visible path mesh.
+            var state=new GameObject("Path sprite state");state.transform.SetParent(transform,false);
+            SpriteRenderer old=SpriteRenderer;
+            SpriteRenderer=state.AddComponent<SpriteRenderer>();SpriteRenderer.sharedMaterial=material;SpriteRenderer.enabled=false;
+            DestroyImmediate(old);
+            Path=gameObject.AddComponent<PathArrowView>();Path.Initialize(Arrow,width,height,material);
+            SpriteRenderer.enabled=false;transform.rotation=Quaternion.identity;originalScale=Vector3.one;Apply();
+        }
         private Color originalColor;
         private Vector3 originalScale;
         private bool basePositionSet;
@@ -32,23 +45,39 @@ namespace ArrowEscape.View
         public Arrow Arrow { get; private set; }
         /// <summary>The renderer using Unity's default unlit sprite material.</summary>
         public SpriteRenderer SpriteRenderer { get; private set; }
-        /// <summary>The fixed world-space cell center, set once by BoardView.</summary>
+        /// <summary>The current logical cell center, initially set by BoardView and updated by Rebase.</summary>
         public Vector2 BaseWorldPosition { get; private set; }
         /// <summary>The current world-space animation offset from the cell center.</summary>
         public Vector2 Offset => offset;
         /// <summary>The opacity multiplier independent of tint layers.</summary>
         public float Alpha => alpha;
+        /// <summary>Exact underlying tint restored when every temporary layer clears.</summary>
+        public Color BaseColor { get=>originalColor; set { originalColor=value;Apply(); } }
+        /// <summary>Current composed position, independent of the logical cell center.</summary>
+        public Vector2 CurrentWorldPosition=>BaseWorldPosition+offset;
+        /// <summary>Updates immutable arrow identity while optionally preserving visual continuity.</summary>
+        public void Rebase(Arrow arrow,Vector2 newBaseWorldPosition,bool keepWorldPosition)
+        {
+            Vector2 current=CurrentWorldPosition;Arrow=arrow;BaseWorldPosition=newBaseWorldPosition;basePositionSet=true;
+            offset=keepWorldPosition?current-newBaseWorldPosition:Vector2.zero;Apply();
+        }
 
         /// <summary>Assigns the arrow, sprite, shared default sprite material, tint, and direction.</summary>
         public void Initialize(Arrow arrow, Material spriteMaterial)
         {
             Arrow = arrow;
             SpriteRenderer = GetComponent<SpriteRenderer>();
-            SpriteRenderer.sprite = SpriteFactory.GetArrowSprite();
+            if(SpriteRenderer==null)SpriteRenderer=gameObject.AddComponent<SpriteRenderer>();
+            SpriteRenderer.sprite = arrow.Kind==ArrowKind.Ice?SpriteFactory.GetIceArrowSprite():SpriteFactory.GetArrowSprite();
             // URP initially assigns a lit material; the board supplies Sprites/Default instead.
             SpriteRenderer.sharedMaterial = spriteMaterial;
+            if(arrow.Kind==ArrowKind.Ice)
+            {
+                // Reuse the existing unlit material; per-renderer texture data needs no new material.
+                var properties=new MaterialPropertyBlock();properties.SetTexture("_MainTex",SpriteRenderer.sprite.texture);SpriteRenderer.SetPropertyBlock(properties);
+            }
             transform.rotation = Quaternion.Euler(0, 0, ArrowRotation.GetRotationZ(arrow.Direction));
-            originalColor = ViewTheme.ArrowColor;
+            originalColor = arrow.Kind==ArrowKind.Ice?ViewTheme.IceArrowColor:ViewTheme.ArrowColor;
             originalScale = Vector3.one * ViewTheme.ArrowFillRatio;
             BaseWorldPosition = transform.position;
             basePositionSet = false;
@@ -97,6 +126,7 @@ namespace ArrowEscape.View
         public void ResetVisual()
         {
             offset = Vector2.zero;
+            if(Path!=null)Path.SetDistance(0);
             alpha = 1;
             highlighted = flashing = hinted = false;
             hintScale = 1;
@@ -117,6 +147,8 @@ namespace ArrowEscape.View
             transform.localScale = originalScale * scale;
             SpriteRenderer.color = tint;
             SpriteRenderer.sortingOrder = sortingOrder;
+            if(Path!=null)Path.SetAppearance(tint,sortingOrder);
         }
     }
 }
+

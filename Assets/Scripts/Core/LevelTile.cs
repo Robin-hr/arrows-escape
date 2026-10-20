@@ -17,8 +17,10 @@ namespace ArrowEscape.Core
         public int BestMistakes { get; }
         /// <summary>Undos in that same attempt, or -1 without a record.</summary>
         public int BestUndos { get; }
+        /// <summary>Highest saved star rating, zero for old completions.</summary>
+        public int BestStars { get; }
         /// <summary>Creates one display item.</summary>
-        public LevelTile(int index, string id, LevelTileState state, bool isResume, int bestMistakes = -1, int bestUndos = -1)
-        { Index = index; Id = id; State = state; IsResume = isResume; BestMistakes = bestMistakes; BestUndos = bestUndos; }
+        public LevelTile(int index, string id, LevelTileState state, bool isResume, int bestMistakes = -1, int bestUndos = -1, int bestStars = 0)
+        { Index = index; Id = id; State = state; IsResume = isResume; BestMistakes = bestMistakes; BestUndos = bestUndos; BestStars = bestStars; }
     }
 }

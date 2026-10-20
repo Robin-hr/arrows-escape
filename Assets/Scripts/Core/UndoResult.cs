@@ -9,6 +9,11 @@ namespace ArrowEscape.Core
         public Arrow Restored { get; }
         /// <summary>Progress after this request.</summary>
         public int MoveCount { get; }
+        /// <summary>The action kind, defaulting to Exit for the legacy constructor.</summary>
+        public UndoMoveKind MoveKind { get; }
+        /// <summary>Creates a result with an explicit history kind.</summary>
+        public UndoResult(UndoOutcome outcome, Arrow restored, int moveCount, UndoMoveKind moveKind)
+            : this(outcome,restored,moveCount) { MoveKind=moveKind; }
         /// <summary>Creates an undo result.</summary>
         public UndoResult(UndoOutcome outcome, Arrow restored, int moveCount)
         {

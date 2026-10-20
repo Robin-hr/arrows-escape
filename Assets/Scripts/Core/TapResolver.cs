@@ -12,9 +12,11 @@ namespace ArrowEscape.Core
             double bestDistance = (double)selectRadius * selectRadius;
             foreach (Arrow arrow in board.Arrows)
             {
+                for(int i=0;i<arrow.Length;i++)
+                {
                 // Double precision avoids overflow for points far outside the board.
-                double dx = (double)cellX - arrow.X;
-                double dy = (double)cellY - arrow.Y;
+                double dx = (double)cellX - arrow.Cells[i].X;
+                double dy = (double)cellY - arrow.Cells[i].Y;
                 double distance = dx * dx + dy * dy;
                 if (distance < bestDistance || (distance == bestDistance &&
                     (nearest == null || arrow.Id < nearest.Id)))
@@ -22,6 +24,7 @@ namespace ArrowEscape.Core
                     nearest = arrow;
                     bestDistance = distance;
                 }
+            }
             }
             return nearest;
         }

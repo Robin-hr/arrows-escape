@@ -24,6 +24,7 @@ namespace ArrowEscape.UI
             visible = value;
             if (canvas == null) return;
             canvas.gameObject.SetActive(value);
+            if (game != null) OnPauseChanged(game.IsPaused);
             if (!value) CompletePanel.Hide();
             else { Refresh(); if (game != null && game.IsCleared) OnCleared(); else CompletePanel.Hide(); }
         }
@@ -60,8 +61,12 @@ namespace ArrowEscape.UI
             game.MoveCountChanged += Refresh;
             game.UndoStateChanged += Refresh;
             game.MistakeCountChanged += OnMistakes;
+            game.TapCountChanged += OnMistakes;
+            game.PauseChanged += OnPauseChanged;
+            OnPauseChanged(game.IsPaused);
             game.LevelStarted += OnLevelStarted;
             game.BoardCleared += OnCleared;
+            game.StuckChanged+=OnStuckChanged;
             if (bootstrap != null) bootstrap.LevelCompleted += OnLevelCompleted;
             input = game.GetComponent<PointerInputAdapter>();
             blockHandler = IsBlocked;
@@ -110,6 +115,8 @@ namespace ArrowEscape.UI
             Hud.Build(safe);
             CompletePanel = gameObject.AddComponent<LevelCompletePanel>();
             CompletePanel.Build(root.GetComponent<RectTransform>(), safe);
+            CompletePanel.StarPresented += OnStarPresented;
+            CompletePanel.CoinPresented += OnCoinPresented;
             Hud.UndoButton.onClick.AddListener(Undo);
             Hud.RestartButton.onClick.AddListener(Restart);
             Hud.HintButton.onClick.AddListener(Hint);
@@ -141,25 +148,41 @@ namespace ArrowEscape.UI
             return true;
         }
         private void OnMistakes(int count) => Refresh();
-        private void OnLevelStarted() { CompletePanel.Hide(); Refresh(); }
+        private void OnStuckChanged(bool value){Hud.SetStuckVisible(value);Hud.SetHintState(game.CanHint);}
+        private void OnLevelStarted() { CompletePanel.Hide(); Refresh(); Hud.SetStarState(game.TapCount, game.Par, true); }
+        private void OnCoinPresented(){if(game!=null)game.RequestUiFeedback(UiFeedbackCue.Coin);}
+        private void OnStarPresented(int index) { if (game != null) game.PresentStar(index); }
+        private void OnPauseChanged(bool paused)
+        { CompletePanel.IsPaused = paused; Hud.StarsPaused = paused || !visible; }
         private void OnCleared()
         {
             if (!visible) return;
             Refresh();
             if (bootstrap != null && bootstrap.LastCompletion != null) OnLevelCompleted(bootstrap.LastCompletion);
-            else CompletePanel.Show(game.MistakeCount, game.UndoCount);
+            else
+            {
+                CompletePanel.Show(game.MistakeCount, game.UndoCount);
+                var summary = new CompletionResult(false, false, game.MistakeCount, game.UndoCount, 0);
+                CompletePanel.ShowRating(new CompletionResult(summary, StarRating.Stars(game.TapCount, game.Par), game.TapCount, game.Par, 0, false), false);
+            }
         }
         private void OnLevelCompleted(CompletionResult result)
         {
             if (!visible) return;
+            if (CompletePanel.IsVisible && ReferenceEquals(CompletePanel.Rating, result)) return;
             CompletePanel.Show(game.MistakeCount, game.UndoCount, result, bootstrap.IsLastLevel,
                 bootstrap.AllLevelsCompleted, bootstrap.CanGoNext);
+            CompletePanel.ShowRating(result, bootstrap.IsSandboxLevel);
+            CompletePanel.ShowCoins(bootstrap.LastCoinReward,bootstrap.IsSandboxLevel);
+            if(bootstrap.IsSandboxLevel)CompletePanel.BestText.text="Sandbox — result not saved";
         }
         private void Refresh()
         {
-            Hud.SetState(game.LevelName, game.MoveCount, game.StartingArrowCount, game.MistakeCount, game.CanUndo);
+            Hud.SetState(game.LevelName, game.TapCount, game.Par, game.MistakeCount, game.CanUndo);
+            Hud.SetStarState(game.TapCount, game.Par);
             Hud.SetHintState(game.CanHint);
-            if (bootstrap != null) Hud.SetLevelPosition(bootstrap.CurrentLevelIndex, bootstrap.LevelCount);
+            Hud.SetStuckVisible(game.IsStuck);
+            if (bootstrap != null) Hud.SetLevelPosition(bootstrap.IsSandboxLevel?-1:bootstrap.CurrentLevelIndex, bootstrap.IsSandboxLevel?0:bootstrap.LevelCount);
         }
 
         private void Unbind()
@@ -169,8 +192,11 @@ namespace ArrowEscape.UI
                 game.MoveCountChanged -= Refresh;
                 game.UndoStateChanged -= Refresh;
                 game.MistakeCountChanged -= OnMistakes;
+                game.TapCountChanged -= OnMistakes;
+                game.PauseChanged -= OnPauseChanged;
                 game.LevelStarted -= OnLevelStarted;
                 game.BoardCleared -= OnCleared;
+                game.StuckChanged-=OnStuckChanged;
             }
             if (input != null && input.IsScreenPointBlocked == blockHandler) input.IsScreenPointBlocked = null;
             if (bootstrap != null) bootstrap.LevelCompleted -= OnLevelCompleted;

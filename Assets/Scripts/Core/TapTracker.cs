@@ -86,9 +86,12 @@ namespace ArrowEscape.Core
 
         private bool WithinCancelRadius(float x, float y)
         {
-            double dx = (double)x - PressedArrow.X;
-            double dy = (double)y - PressedArrow.Y;
-            return dx * dx + dy * dy <= (double)settings.CancelRadius * settings.CancelRadius;
+            for(int i=0;i<PressedArrow.Length;i++)
+            {
+                double dx=(double)x-PressedArrow.Cells[i].X,dy=(double)y-PressedArrow.Cells[i].Y;
+                if(dx*dx+dy*dy <= (double)settings.CancelRadius*settings.CancelRadius)return true;
+            }
+            return false;
         }
 
         private void ClearState()

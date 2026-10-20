@@ -35,6 +35,18 @@ namespace ArrowEscape.Core
             return new CompletionResult(better, first, record.bestMistakes, record.bestUndos, record.completions);
         }
 
+        /// <summary>Sum of saved best stars, including records outside the current catalog.</summary>
+        public int TotalStars { get { int total = 0; foreach (LevelRecord record in Data.levels) total = Sum(total, record.bestStars); return total; } }
+        /// <summary>Records a star result alongside the unchanged best-mistakes and best-undos rules.</summary>
+        public CompletionResult RecordCompletion(string levelId, int mistakes, int undos, int moves, int par)
+        {
+            int stars = StarRating.Stars(moves, par);
+            int previous = Find(levelId)?.bestStars ?? 0;
+            CompletionResult result = RecordCompletion(levelId, mistakes, undos);
+            LevelRecord record = Find(levelId);
+            record.bestStars = Math.Max(previous, stars);
+            return new CompletionResult(result, stars, moves, par, record.bestStars, stars > previous);
+        }
         /// <summary>Whether this id has at least one recorded clear.</summary>
         public bool IsCompleted(string levelId) => Find(levelId)?.completions > 0;
         /// <summary>Returns a detached copy so callers cannot change the stored best.</summary>
@@ -89,6 +101,7 @@ namespace ArrowEscape.Core
                         if (Better(record.bestMistakes, record.bestUndos, existing))
                         { existing.bestMistakes = record.bestMistakes; existing.bestUndos = record.bestUndos; }
                         existing.completions = Sum(existing.completions, record.completions);
+                        existing.bestStars = Math.Max(existing.bestStars, Math.Max(0, Math.Min(3, record.bestStars)));
                     }
                 }
             Data.levels = clean;
@@ -98,6 +111,6 @@ namespace ArrowEscape.Core
             mistakes < current.bestMistakes || (mistakes == current.bestMistakes && undos < current.bestUndos);
         private static int Sum(int a, int b) => (int)Math.Min(int.MaxValue, (long)a + b);
         private static LevelRecord Copy(LevelRecord record) => new LevelRecord
-        { id = record.id, completions = record.completions, bestMistakes = record.bestMistakes, bestUndos = record.bestUndos };
+        { id = record.id, completions = record.completions, bestMistakes = record.bestMistakes, bestUndos = record.bestUndos, bestStars = Math.Max(0, Math.Min(3, record.bestStars)) };
     }
 }

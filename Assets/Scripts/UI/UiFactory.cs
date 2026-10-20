@@ -29,7 +29,7 @@ namespace ArrowEscape.UI
         public static UnityEngine.UI.Text Text(string name, Transform parent, string value, int fontSize, Vector2 size, Vector2 position)
         {
             var text = Rect(name, parent, size, position).gameObject.AddComponent<UnityEngine.UI.Text>();
-            Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            Font font = UiStyle.Font;
             if (font != null) text.font = font;
             text.text = value;
             text.fontSize = fontSize;
@@ -46,16 +46,19 @@ namespace ArrowEscape.UI
             RectTransform rect = Rect(label, parent, new Vector2(ViewTheme.ButtonWidth, ViewTheme.ButtonHeight), position);
             var image = rect.gameObject.AddComponent<UnityEngine.UI.Image>();
             image.color = Color.white;
+            UiStyle.SurfaceFor(image,true);
             var button = rect.gameObject.AddComponent<UnityEngine.UI.Button>();
+            rect.gameObject.AddComponent<ButtonFeel>();
             button.targetGraphic = image;
             var colors = button.colors;
-            colors.normalColor = ViewTheme.ButtonNormal;
-            colors.highlightedColor = ViewTheme.ButtonPressed;
-            colors.pressedColor = ViewTheme.ButtonPressed;
-            colors.selectedColor = ViewTheme.ButtonNormal;
+            colors.normalColor = UiStyle.Ink;
+            colors.highlightedColor = new Color(.2f,.25f,.29f);
+            colors.pressedColor = UiStyle.Ink;
+            colors.selectedColor = UiStyle.Ink;
             colors.disabledColor = ViewTheme.ButtonDisabled;
             button.colors = colors;
             var text = Text("Label", rect, label, ViewTheme.HudFontSize, Vector2.zero, Vector2.zero);
+            text.color=Color.white;
             Stretch(text.rectTransform);
             return button;
         }
@@ -91,7 +94,7 @@ namespace ArrowEscape.UI
         {
             button.GetComponentInChildren<UnityEngine.UI.Text>().text = label;
             var colors = button.colors;
-            colors.normalColor = on ? ViewTheme.ButtonPressed : ViewTheme.ButtonNormal;
+            colors.normalColor = on ? UiStyle.Ink : UiStyle.Muted;
             button.colors = colors;
         }
         /// <summary>Creates a masked, vertically scrolling grid with fitted content height.</summary>
@@ -127,8 +130,9 @@ namespace ArrowEscape.UI
             RectTransform rect = Rect(name, parent, Vector2.zero, Vector2.zero);
             Stretch(rect);
             var image = rect.gameObject.AddComponent<UnityEngine.UI.Image>();
-            image.color = color;
+            image.color = color == ViewTheme.PanelCard ? UiStyle.Surface : color;
             image.raycastTarget = raycast;
+            if(!raycast)UiStyle.SurfaceFor(image,false,true);
             return rect;
         }
     }

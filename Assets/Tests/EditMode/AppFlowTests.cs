@@ -26,7 +26,7 @@ namespace ArrowEscape.Tests
         [Test] public void Continue()
         {
             var tracker = new ProgressTracker(); tracker.RecordCompletion("level_001", 0, 0); s = new FlowTestScene(new FakeProgressStore { Saved = tracker.Data });
-            Assert.That(s.Flow.MainMenu.PlayButton.GetComponentInChildren<UnityEngine.UI.Text>().text, Is.EqualTo("Continue")); Assert.That(s.Flow.MainMenu.ContinueText.text, Is.EqualTo("Level 2")); s.Flow.MainMenu.PlayButton.onClick.Invoke(); AssertPlaying(1);
+            Assert.That(s.Flow.MainMenu.PlayButton.GetComponentInChildren<UnityEngine.UI.Text>().text, Is.EqualTo("Continue - Level 2")); Assert.That(s.Flow.MainMenu.ContinueText.text, Is.EqualTo("Level 2")); s.Flow.MainMenu.PlayButton.onClick.Invoke(); AssertPlaying(1);
         }
         /// <summary>Locked tiles cannot start; an unlocked tile starts its exact index.</summary>
         [Test] public void Select()

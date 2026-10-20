@@ -1,0 +1,5 @@
+{"name":"Ice 1","width":4,"height":3,"arrows":[
+ {"id":1,"x":0,"y":0,"direction":"Right","type":"ice"},
+ {"id":2,"x":3,"y":0,"direction":"Up"},
+ {"id":3,"x":3,"y":2,"direction":"Left"},
+ {"id":4,"x":0,"y":2,"direction":"Down"}]}

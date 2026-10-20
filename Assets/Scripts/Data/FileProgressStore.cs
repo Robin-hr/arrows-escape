@@ -14,7 +14,7 @@ namespace ArrowEscape.Data
         /// <summary>Uses an explicit full path; never looks up an application folder.</summary>
         public FileProgressStore(string fullPath) => path = fullPath;
 
-        /// <summary>Loads version one, backing up corrupt or newer payloads before any future save.</summary>
+        /// <summary>Loads versions one and two, migrating stars in memory and backing up corrupt or newer payloads before any future save.</summary>
         public ProgressLoadResult Load()
         {
             preserveOriginal = false;
@@ -37,6 +37,11 @@ namespace ArrowEscape.Data
                 catch (Exception error) { return Backup(ProgressLoadStatus.Corrupt, "corrupt", error.Message); }
                 if (data.version > ProgressData.CurrentVersion)
                     return Backup(ProgressLoadStatus.NewerVersion, "newer", "Save uses a newer format.");
+                if (data.version == 1)
+                {
+                    if (data.levels != null) foreach (LevelRecord record in data.levels) if (record != null) record.bestStars = 0;
+                    data.version = ProgressData.CurrentVersion;
+                }
                 return new ProgressLoadResult(data, ProgressLoadStatus.Loaded);
             }
             catch (Exception error)

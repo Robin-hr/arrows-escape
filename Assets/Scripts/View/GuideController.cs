@@ -38,6 +38,11 @@ namespace ArrowEscape.View
         {
             if (IsPaused) return;
             ClearLine();
+            if(boardView!=null && tapped!=null && blocker!=null && boardView.TryGetBoard(out Board board))
+            {
+                Cell? cell=board.GetBlockingCell(tapped);
+                if(cell.HasValue)blocker=new Arrow(blocker.Id,cell.Value.X,cell.Value.Y,blocker.Direction);
+            }
             if (boardView == null || !GuideGeometry.TryComputeSegment(tapped, blocker, ViewTheme.GuideInset, out GuideSegment segment)) return;
             EnsureLineObjects();
             LineStartWorld = boardView.CellToWorld(segment.StartX, segment.StartY);

@@ -28,10 +28,7 @@ namespace ArrowEscape.Tests
         [Test]
         public void ExactlyThreeLevelsAreFoundInOrder()
         {
-            Assert.That(LevelRepository.GetLevelResourcePaths(), Is.EqualTo(new[]
-            {
-                "Levels/level_001", "Levels/level_002", "Levels/level_003"
-            }));
+            OriginalCatalogAssertions.Check();
         }
 
         /// <summary>Sample sizes and genuine three-arrow chains match the design.</summary>

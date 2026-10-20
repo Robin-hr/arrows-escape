@@ -31,12 +31,19 @@ namespace ArrowEscape.Data
             Save();
             return result;
         }
+        /// <summary>Records stars and paired best scores with exactly one save.</summary>
+        public CompletionResult RecordCompletion(string levelId, int mistakes, int undos, int moves, int par)
+        {
+            CompletionResult result = Tracker.RecordCompletion(levelId, mistakes, undos, moves, par);
+            Tracker.SetLastLevel(levelId); Save(); return result;
+        }
         /// <summary>Remembers a level start and attempts one save without saving an attempt.</summary>
         public void RememberLevel(string levelId) { Tracker.SetLastLevel(levelId); Save(); }
         /// <summary>Clears progress and attempts one save.</summary>
         public void ResetAll() { Tracker.Reset(); Save(); }
         private void Save()
         {
+            Tracker.Data.version = ProgressData.CurrentVersion;
             try { LastSaveFailed = !store.TrySave(Tracker.Data); }
             catch (Exception) { LastSaveFailed = true; }
         }

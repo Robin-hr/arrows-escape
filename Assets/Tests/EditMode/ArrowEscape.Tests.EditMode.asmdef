@@ -1,25 +1,26 @@
 {
-    "name": "ArrowEscape.Tests.EditMode",
-    "rootNamespace": "ArrowEscape.Tests",
-    "references": [
-        "ArrowEscape.Core",
-        "ArrowEscape.Data",
-        "ArrowEscape.View",
-        "Unity.InputSystem",
-        "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
-        "ArrowEscape.UI",
-        "UnityEngine.UI"
-    ],
-    "includePlatforms": [
-        "Editor"
-    ],
-    "overrideReferences": true,
-    "precompiledReferences": [
-        "nunit.framework.dll"
-    ],
-    "autoReferenced": false,
-    "defineConstraints": [
-        "UNITY_INCLUDE_TESTS"
-    ]
+  "name": "ArrowEscape.Tests.EditMode",
+  "rootNamespace": "ArrowEscape.Tests",
+  "references": [
+    "ArrowEscape.Core",
+    "ArrowEscape.Data",
+    "ArrowEscape.View",
+    "Unity.InputSystem",
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner",
+    "ArrowEscape.UI",
+    "UnityEngine.UI",
+    "ArrowEscape.Editor"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ]
 }
