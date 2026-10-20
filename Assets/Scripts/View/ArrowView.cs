@@ -3,14 +3,41 @@ using UnityEngine;
 
 namespace ArrowEscape.View
 {
-    /// <summary>Displays one immutable core arrow without handling input or game rules.</summary>
+    /// <summary>Composes independent visual layers through one transform/render writer.</summary>
     [RequireComponent(typeof(SpriteRenderer))]
     public sealed class ArrowView : MonoBehaviour
     {
+        private Color originalColor;
+        private Vector3 originalScale;
+        private bool basePositionSet;
+        private bool highlighted;
+        private bool stillOver;
+        private bool flashing;
+        private Color flashTint;
+        private float flashScale = 1;
+        private bool hinted;
+        private Color hintTint;
+        private float hintScale = 1;
+        /// <summary>Whether the independent hint layer is active.</summary>
+        public bool HasHint => hinted;
+        /// <summary>Sets the hint layer without touching position, rotation, or other visual layers.</summary>
+        public void SetHint(Color tint, float scaleMultiplier)
+        { hinted = true; hintTint = tint; hintScale = Mathf.Max(0, scaleMultiplier); Apply(); }
+        /// <summary>Clears only the hint layer, restoring exact underlying values.</summary>
+        public void ClearHint() { hinted = false; hintScale = 1; Apply(); }
+        private Vector2 offset;
+        private float alpha = 1;
+        private int sortingOrder;
         /// <summary>The core arrow represented by this view.</summary>
         public Arrow Arrow { get; private set; }
         /// <summary>The renderer using Unity's default unlit sprite material.</summary>
         public SpriteRenderer SpriteRenderer { get; private set; }
+        /// <summary>The fixed world-space cell center, set once by BoardView.</summary>
+        public Vector2 BaseWorldPosition { get; private set; }
+        /// <summary>The current world-space animation offset from the cell center.</summary>
+        public Vector2 Offset => offset;
+        /// <summary>The opacity multiplier independent of tint layers.</summary>
+        public float Alpha => alpha;
 
         /// <summary>Assigns the arrow, sprite, shared default sprite material, tint, and direction.</summary>
         public void Initialize(Arrow arrow, Material spriteMaterial)
@@ -18,12 +45,78 @@ namespace ArrowEscape.View
             Arrow = arrow;
             SpriteRenderer = GetComponent<SpriteRenderer>();
             SpriteRenderer.sprite = SpriteFactory.GetArrowSprite();
-            SpriteRenderer.color = ViewTheme.ArrowColor;
-            SpriteRenderer.sortingOrder = ViewTheme.ArrowSortingOrder;
             // URP initially assigns a lit material; the board supplies Sprites/Default instead.
             SpriteRenderer.sharedMaterial = spriteMaterial;
             transform.rotation = Quaternion.Euler(0, 0, ArrowRotation.GetRotationZ(arrow.Direction));
-            transform.localScale = Vector3.one * ViewTheme.ArrowFillRatio;
+            originalColor = ViewTheme.ArrowColor;
+            originalScale = Vector3.one * ViewTheme.ArrowFillRatio;
+            BaseWorldPosition = transform.position;
+            basePositionSet = false;
+            ResetVisual();
+        }
+
+        /// <summary>Sets the fixed cell center once after initialization.</summary>
+        public void SetBaseWorldPosition(Vector2 position)
+        {
+            if (basePositionSet) return;
+            BaseWorldPosition = position;
+            basePositionSet = true;
+            Apply();
+        }
+
+        /// <summary>Sets highlight state without disturbing flash, offset, or alpha layers.</summary>
+        public void SetHighlight(bool on, bool stillOver = true)
+        {
+            highlighted = on;
+            this.stillOver = stillOver;
+            Apply();
+        }
+
+        /// <summary>Sets an absolute offset; offsets never accumulate.</summary>
+        public void SetOffset(Vector2 worldOffset) { offset = worldOffset; Apply(); }
+
+        /// <summary>Sets opacity clamped to zero through one.</summary>
+        public void SetAlpha(float value) { alpha = Mathf.Clamp01(value); Apply(); }
+
+        /// <summary>Overrides tint and adds a pulse multiplier while preserving other layers.</summary>
+        public void SetFlash(Color tint, float scaleMultiplier)
+        {
+            flashing = true;
+            flashTint = tint;
+            flashScale = Mathf.Max(0, scaleMultiplier);
+            Apply();
+        }
+
+        /// <summary>Clears flash feedback, revealing any active highlight.</summary>
+        public void ClearFlash() { flashing = false; flashScale = 1; Apply(); }
+
+        /// <summary>Sets rendering order independently of tint and movement.</summary>
+        public void SetSortingOrder(int value) { sortingOrder = value; Apply(); }
+
+        /// <summary>Clears every layer, restoring the exact original appearance and cell center.</summary>
+        public void ResetVisual()
+        {
+            offset = Vector2.zero;
+            alpha = 1;
+            highlighted = flashing = hinted = false;
+            hintScale = 1;
+            stillOver = true;
+            flashScale = 1;
+            sortingOrder = ViewTheme.ArrowSortingOrder;
+            Apply();
+        }
+
+        private void Apply()
+        {
+            if (SpriteRenderer == null) return;
+            Color tint = flashing ? flashTint : highlighted ?
+                (stillOver ? ViewTheme.HighlightColor : ViewTheme.DraggedAwayColor) : hinted ? hintTint : originalColor;
+            tint.a *= alpha;
+            float scale = (highlighted ? ViewTheme.HighlightScaleMultiplier : 1) * (flashing ? flashScale : 1) * (hinted ? hintScale : 1);
+            transform.position = new Vector3(BaseWorldPosition.x + offset.x, BaseWorldPosition.y + offset.y, 0);
+            transform.localScale = originalScale * scale;
+            SpriteRenderer.color = tint;
+            SpriteRenderer.sortingOrder = sortingOrder;
         }
     }
 }

@@ -43,6 +43,15 @@ namespace ArrowEscape.View
                 Quaternion.identity);
         }
 
+        /// <summary>Applies the dark solid background immediately, silently skipping a missing camera.</summary>
+        public void ApplyBackground()
+        {
+            Camera camera = Camera.main;
+            if (camera == null) return;
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = ViewTheme.Background;
+        }
+
         private void Update()
         {
             if (boardWidth > 0 && boardHeight > 0 && (Screen.width != screenWidth ||

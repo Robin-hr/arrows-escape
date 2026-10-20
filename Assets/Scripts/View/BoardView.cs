@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ArrowEscape.Core;
 using UnityEngine;
@@ -8,17 +9,26 @@ namespace ArrowEscape.View
     public sealed class BoardView : MonoBehaviour
     {
         private readonly Dictionary<int, ArrowView> arrowViews = new Dictionary<int, ArrowView>();
+        private readonly Dictionary<int, ArrowView> releasedViews = new Dictionary<int, ArrowView>();
         private Transform root;
+        /// <summary>Whether the board root should be visible, including after replacement.</summary>
+        public bool IsVisible { get; private set; } = true;
+        /// <summary>Sets display visibility without changing the board.</summary>
+        public void SetVisible(bool visible) { IsVisible = visible; if (root != null) root.gameObject.SetActive(visible); }
         private Material arrowMaterial;
         private Material cellMaterial;
         private int width;
         private int height;
+        private Board currentBoard;
+
+        /// <summary>Raised after clearing or finishing a replacement board display.</summary>
+        public event Action BoardChanged;
 
         /// <summary>Replaces the current display with the supplied board; null clears it.</summary>
         public void Show(Board board)
         {
-            Clear();
-            if (board == null) return;
+            ClearDisplay(false);
+            if (board == null) { BoardChanged?.Invoke(); return; }
             arrowMaterial = PrepareMaterial(arrowMaterial, SpriteFactory.GetArrowSprite());
             width = board.Width;
             height = board.Height;
@@ -28,24 +38,87 @@ namespace ArrowEscape.View
                 CreateDots();
             foreach (Arrow arrow in board.Arrows)
             {
-                GameObject child = CreateChild($"Arrow {arrow.Id}", arrow.X, arrow.Y);
-                ArrowView view = child.AddComponent<ArrowView>();
-                view.Initialize(arrow, arrowMaterial);
-                arrowViews.Add(arrow.Id, view);
+                AddArrowView(arrow);
             }
+            root.gameObject.SetActive(IsVisible);
+            currentBoard = board;
+            BoardChanged?.Invoke();
         }
 
         /// <summary>Maps a cell center directly to y-up world space centered on the origin.</summary>
-        public Vector3 CellToWorld(int x, int y) =>
+        public Vector3 CellToWorld(int x, int y) => CellToWorld((float)x, y);
+
+        /// <summary>Maps continuous cell coordinates to the same centered y-up world space.</summary>
+        public Vector3 CellToWorld(float x, float y) =>
             new Vector3(x - (width - 1) * 0.5f, y - (height - 1) * 0.5f, 0);
+
+        /// <summary>Converts world space to continuous cell coordinates (integers are centers).</summary>
+        public Vector2 WorldToCell(Vector3 world) =>
+            new Vector2(world.x + (width - 1) * 0.5f, world.y + (height - 1) * 0.5f);
+
+        /// <summary>Reads the displayed board; input consumers must query it without mutation.</summary>
+        public bool TryGetBoard(out Board board)
+        {
+            board = currentBoard;
+            return board != null;
+        }
 
         /// <summary>Finds the current arrow view with this identifier.</summary>
         public bool TryGetArrowView(int id, out ArrowView view) => arrowViews.TryGetValue(id, out view);
 
-        /// <summary>Removes the generated display; runtime destruction finishes at frame end.</summary>
-        public void Clear()
+        /// <summary>Removes a view from tap lookup while retaining it under the cleanup root.</summary>
+        public bool ReleaseArrowView(int id, out ArrowView view)
         {
+            if (!arrowViews.TryGetValue(id, out view)) return false;
+            arrowViews.Remove(id);
+            releasedViews[id] = view;
+            return view != null;
+        }
+
+        /// <summary>Removes the generated display; runtime destruction finishes at frame end.</summary>
+        public void Clear() => ClearDisplay(true);
+
+        /// <summary>Creates a fresh normal view, replacing any registered view with this id.</summary>
+        public ArrowView AddArrowView(Arrow arrow)
+        {
+            if (arrow == null || root == null) return null;
+            if (arrowViews.TryGetValue(arrow.Id, out ArrowView old)) DestroyArrow(old);
+            DiscardReleasedView(arrow.Id);
+            ArrowView view = CreateChild($"Arrow {arrow.Id}").AddComponent<ArrowView>();
+            view.Initialize(arrow, arrowMaterial);
+            view.SetBaseWorldPosition(CellToWorld(arrow.X, arrow.Y));
+            view.ResetVisual();
+            arrowViews[arrow.Id] = view;
+            return view;
+        }
+
+        /// <summary>Finds a released view so its animation can be cancelled before disposal.</summary>
+        public bool TryGetReleasedView(int id, out ArrowView view) => releasedViews.TryGetValue(id, out view) && view != null;
+
+        /// <summary>Immediately retires a released view; it can never remain visible beside its replacement.</summary>
+        public bool DiscardReleasedView(int id)
+        {
+            if (!releasedViews.TryGetValue(id, out ArrowView view)) return false;
+            releasedViews.Remove(id);
+            if (view == null) return false;
+            DestroyArrow(view);
+            return true;
+        }
+
+        private static void DestroyArrow(ArrowView view)
+        {
+            if (view == null) return;
+            view.gameObject.SetActive(false);
+            // Runtime-created views have no saved assets; immediate disposal prevents duplicate ids.
+            DestroyImmediate(view.gameObject);
+        }
+
+        private void ClearDisplay(bool notify)
+        {
+            currentBoard = null;
+            if (notify) BoardChanged?.Invoke();
             arrowViews.Clear();
+            releasedViews.Clear();
             width = height = 0;
             if (root == null) return;
             root.gameObject.SetActive(false);
@@ -60,7 +133,8 @@ namespace ArrowEscape.View
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
                 {
-                    SpriteRenderer dot = CreateChild($"Cell {x},{y}", x, y).AddComponent<SpriteRenderer>();
+                    SpriteRenderer dot = CreateChild($"Cell {x},{y}").AddComponent<SpriteRenderer>();
+                    dot.transform.position = CellToWorld(x, y);
                     dot.sprite = SpriteFactory.GetCellSprite();
                     dot.color = ViewTheme.CellDot;
                     dot.sortingOrder = ViewTheme.CellSortingOrder;
@@ -69,11 +143,10 @@ namespace ArrowEscape.View
                 }
         }
 
-        private GameObject CreateChild(string name, int x, int y)
+        private GameObject CreateChild(string name)
         {
             var child = new GameObject(name);
             child.transform.SetParent(root, false);
-            child.transform.position = CellToWorld(x, y);
             return child;
         }
 

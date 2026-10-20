@@ -1,0 +1,11 @@
+{
+    "name": "ArrowEscape.UI",
+    "rootNamespace": "ArrowEscape.UI",
+    "references": [
+        "ArrowEscape.Core",
+        "ArrowEscape.Data",
+        "ArrowEscape.View",
+        "Unity.InputSystem",
+        "UnityEngine.UI"
+    ]
+}

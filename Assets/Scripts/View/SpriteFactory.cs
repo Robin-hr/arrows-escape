@@ -7,6 +7,7 @@ namespace ArrowEscape.View
     {
         private static Sprite arrowSprite;
         private static Sprite cellSprite;
+        private static Sprite squareSprite;
 
         /// <summary>Returns the centered, one-world-unit, upward-facing arrow sprite.</summary>
         public static Sprite GetArrowSprite()
@@ -30,13 +31,32 @@ namespace ArrowEscape.View
             return cellSprite;
         }
 
+        /// <summary>Returns a cached solid white centered square, exactly one world unit wide.</summary>
+        public static Sprite GetSquareSprite()
+        {
+            if (squareSprite == null || squareSprite.texture == null)
+            {
+                DestroySprite(squareSprite);
+                var texture = new Texture2D(4, 4, TextureFormat.RGBA32, false)
+                { name = "Guide square", hideFlags = HideFlags.HideAndDontSave, filterMode = FilterMode.Bilinear, wrapMode = TextureWrapMode.Clamp };
+                var pixels = new Color[16];
+                for (int i = 0; i < pixels.Length; i++) pixels[i] = Color.white;
+                texture.SetPixels(pixels); texture.Apply(false, true);
+                squareSprite = Sprite.Create(texture, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 4, 0, SpriteMeshType.FullRect);
+                squareSprite.name = "Guide square"; squareSprite.hideFlags = HideFlags.HideAndDontSave;
+            }
+            return squareSprite;
+        }
+
         /// <summary>Releases generated sprites and textures at the end of their lifetime.</summary>
         public static void ClearCache()
         {
             DestroySprite(arrowSprite);
             DestroySprite(cellSprite);
+            DestroySprite(squareSprite);
             arrowSprite = null;
             cellSprite = null;
+            squareSprite = null;
         }
 
         private static Sprite Create(string name, int size, bool isArrow)
