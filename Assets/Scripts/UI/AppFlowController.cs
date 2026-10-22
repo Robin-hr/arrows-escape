@@ -31,6 +31,13 @@ namespace ArrowEscape.UI
         public ConfirmDialog Confirm { get; private set; }
         /// <summary>The independent menus canvas.</summary>
         public Canvas MenusCanvas { get; private set; }
+        /// <summary>Neon profile page, opened from the home page header.</summary>
+        public ProfileView Profile { get; private set; }
+        /// <summary>Snake-arrow loading screens (startup 3 s, level start 1 s, profile 2 s).</summary>
+        public LoadingOverlay Loading { get; private set; }
+        /// <summary>Loading screens run in the player and Play mode; Edit Mode tests keep instant flow unless enabled.</summary>
+        public bool LoadingScreensEnabled { get => loadingScreens ?? Application.isPlaying; set => loadingScreens = value; }
+        private bool? loadingScreens;
 
         private void Start()
         {
@@ -65,6 +72,7 @@ namespace ArrowEscape.UI
             ApplyScreen(ScreenState.MainMenu, ScreenState.MainMenu);
             // An explicitly auto-started scene component keeps its existing play behavior.
             if (game.Session != null) Machine.StartPlaying();
+            if (LoadingScreensEnabled) Loading.Show(LoadingKind.Startup, null, MainMenu.PlayEntrance);
         }
         private void BuildScreens()
         {
@@ -81,6 +89,10 @@ namespace ArrowEscape.UI
             SettingsScreen.Build(canvasObject.transform, bootstrap.Settings.Model, SetSound, SetHaptics, AskReset, Back);
             Confirm = gameObject.AddComponent<ConfirmDialog>(); Confirm.Build(canvasObject.transform);
             Shop=gameObject.AddComponent<ShopView>();Shop.Build(canvasObject.transform,Confirm,game);Shop.Closed+=OnShopClosed;
+            Profile = gameObject.AddComponent<ProfileView>(); Profile.Build(canvasObject.transform, CloseProfile);
+            Loading = gameObject.AddComponent<LoadingOverlay>(); Loading.Build(canvasObject.transform);
+            MainMenu.ProfileButton.onClick.AddListener(OpenProfile);
+            MainMenu.StarsButton.onClick.AddListener(OnLevelsRequested);
             MainMenu.ShopButton.onClick.AddListener(OpenShop);MainMenu.CoinsButton.onClick.AddListener(OpenShop);
             MainMenu.PlayButton.onClick.AddListener(Continue);
             MainMenu.LevelsButton.onClick.AddListener(OnLevelsRequested);
@@ -91,12 +103,13 @@ namespace ArrowEscape.UI
             PauseScreen.SettingsButton.onClick.AddListener(OpenSettings);
             PauseScreen.MainMenuButton.onClick.AddListener(ToMainMenu);
         }
-        private bool IsBlocked(Vector2 position) => Machine.Current != ScreenState.Playing || Confirm.IsOpen;
+        private bool IsBlocked(Vector2 position) => Machine.Current != ScreenState.Playing || Confirm.IsOpen || (Loading != null && Loading.IsVisible);
         private void OnStateChanged(ScreenState oldState, ScreenState newState) => ApplyScreen(oldState, newState);
         private void ApplyScreen(ScreenState previous, ScreenState state)
         {
             if(state!=ScreenState.MainMenu&&Shop.IsVisible)Shop.Close();
-            MainMenu.Root.gameObject.SetActive(state == ScreenState.MainMenu&&!Shop.IsVisible);
+            if (state != ScreenState.MainMenu && Profile.IsVisible) Profile.Hide();
+            MainMenu.Root.gameObject.SetActive(state == ScreenState.MainMenu&&!Shop.IsVisible&&!Profile.IsVisible);
             Levels.Root.gameObject.SetActive(state == ScreenState.LevelSelect);
             PauseScreen.Root.gameObject.SetActive(state == ScreenState.Paused);
             SettingsScreen.Root.gameObject.SetActive(state == ScreenState.Settings);
@@ -124,6 +137,21 @@ namespace ArrowEscape.UI
         private void OnCoins(int amount)=>MainMenu.SetEconomy(amount,bootstrap.Progress.Tracker.TotalStars,bootstrap.LevelCount*3);
         /// <summary>Opens the shop only from the main menu.</summary>
         public void OpenShop(){if(Machine.Current!=ScreenState.MainMenu)return;MainMenu.Root.gameObject.SetActive(false);Shop.Show();}
+        /// <summary>Opens the profile page from the home page, behind a 2-second loading screen.</summary>
+        public void OpenProfile()
+        {
+            if (Machine.Current != ScreenState.MainMenu || Shop.IsVisible) return;
+            MainMenu.Root.gameObject.SetActive(false);
+            Profile.Show(ProfileStats.Build(bootstrap.Progress.Tracker, bootstrap.LevelIds, bootstrap.Inventory.State));
+            if (LoadingScreensEnabled) Loading.Show(LoadingKind.Profile, "LOADING PROFILE");
+        }
+        private void CloseProfile()
+        {
+            if (!Profile.IsVisible) return;
+            Profile.Hide();
+            MainMenu.Root.gameObject.SetActive(Machine.Current == ScreenState.MainMenu);
+            if (Machine.Current == ScreenState.MainMenu) RefreshMainMenu();
+        }
         private void OnShopClosed(){MainMenu.Root.gameObject.SetActive(Machine.Current==ScreenState.MainMenu);if(Machine.Current==ScreenState.MainMenu)RefreshMainMenu();}
 
         private void RefreshLevels() => Levels.Refresh(LevelSelectModel.Build(bootstrap.LevelIds, bootstrap.Progress.Tracker));
@@ -143,7 +171,11 @@ namespace ArrowEscape.UI
         private void OnLevelCompleted(CompletionResult result) => Machine.LevelCompleted();
         private void OnLevelStarted()
         {
+            ScreenState previous = Machine.Current;
             if (!Machine.StartPlaying()) ApplyScreen(Machine.Current, Machine.Current);
+            // New level starts (menu, level select, next level, replay) get a 1-second loader; restarting from pause does not.
+            if (LoadingScreensEnabled && previous != ScreenState.Playing && previous != ScreenState.Paused)
+                Loading.Show(LoadingKind.Level, "LEVEL " + (bootstrap.CurrentLevelIndex + 1));
         }
         private void OnProgressReset()
         {
@@ -159,7 +191,9 @@ namespace ArrowEscape.UI
         /// <summary>Consumes a modal first, otherwise delegates platform Back to the pure machine.</summary>
         public bool HandleBack()
         {
+            if (Loading != null && Loading.IsVisible) return true;
             if (Confirm != null && Confirm.IsOpen) { Confirm.Hide(); return true; }
+            if (Profile != null && Profile.IsVisible) { CloseProfile(); return true; }
             if(Shop!=null&&Shop.IsVisible)return Shop.HandleBack();
             return Machine.Back();
         }

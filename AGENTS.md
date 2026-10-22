@@ -747,3 +747,23 @@ The board is cleared when no arrows remain.
   C# signature pool cannot hold particle capacity after its host disappears even
   if a caller omitted Dispose. The fixed reservation table allocates nothing in
   Tick and shares the same six-hundred limit.
+
+## Neon home, profile and snake-arrow loading screens (Step 14E)
+- Brand art lives in Assets/Resources/Brand (loaded by UI/BrandArt at runtime; sprites are created with explicit
+  9-slice borders, so import settings cannot break them). Orbitron Black is in Assets/Fonts/Resources.
+- Loading element: Core/SnakeLoaderModel (pure, deterministic 7x7 self-solving snake-arrow puzzle, 11 snakes,
+  one bump + white blocker flash) drawn by UI/SnakeLoaderGraphic (one mesh, neon tile, glow/core/highlight passes).
+- UI/LoadingOverlay is a separate canvas (sorting 300) that blocks input. Fixed durations and sizes:
+  Startup 3 s (large loader + logo + loading_background), Level 1 s (medium, "LEVEL N"), Profile 2 s (small).
+  The game state underneath is already final; the overlay is cosmetic only.
+- AppFlowController shows Startup after Initialize, Level on every new level start (not on restart from Pause),
+  Profile when the header avatar opens ProfileView. LoadingScreensEnabled defaults to Application.isPlaying,
+  so Edit Mode tests keep the instant flow; set it to true in a test to exercise the overlay.
+- Home page (MainMenuView): always the neon backdrop (equipped themes affect the play area only). Header:
+  stars pill (opens Level Select), profile avatar, coins pill (opens Shop). PLAY shows "LEVEL N" (ContinueIndex).
+  CompletedText, ContinueText and QuitButton remain as hidden, still-updated API.
+- ProfileView + Core/ProfileStats: read-only levels, stars, 3-star levels, coins, owned arrows/themes, equipped items.
+- Editor/ReleaseSetup applies product name "Arrows Escape", company, id com.hebrusrobin.arrowsescape, portrait
+  orientation, dark splash and the app icons (incl. Android adaptive) once per editor session.
+- Editor/DevBridge (Editor-only) lets the AI assistant run refresh/tests/menu items/Play-mode timelines through
+  Logs/DevBridge/cmd.txt while the Editor is open. Never shipped in builds.

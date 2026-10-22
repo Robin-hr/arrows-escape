@@ -17,7 +17,7 @@ namespace ArrowEscape.Tests
         {
             s = new FlowTestScene(); Assert.That(s.Flow.Machine.Current, Is.EqualTo(ScreenState.MainMenu)); Assert.That(s.Flow.MainMenu.Root.gameObject.activeSelf, Is.True);
             Assert.That(s.Board.IsVisible || s.Hud.IsVisible, Is.False); Assert.That(s.Game.Session, Is.Null); Assert.That(s.ProgressStore.Saves, Is.Zero);
-            Assert.That(s.Flow.MainMenu.PlayButton.GetComponentInChildren<UnityEngine.UI.Text>().text, Is.EqualTo("Play")); Assert.That(s.Flow.MainMenu.CompletedText.text, Is.EqualTo("Completed 0 / 3"));
+            Assert.That(s.Flow.MainMenu.PlayButton.GetComponentInChildren<UnityEngine.UI.Text>().text, Is.EqualTo("PLAY")); Assert.That(s.Flow.MainMenu.PlayLevelText.text, Is.EqualTo("LEVEL 1")); Assert.That(s.Flow.MainMenu.CompletedText.text, Is.EqualTo("Completed 0 / 3"));
             Assert.That(s.Flow.MenusCanvas.name, Is.EqualTo("ArrowEscapeMenus")); Assert.That(s.Flow.MenusCanvas.sortingOrder, Is.EqualTo(100));
         }
         /// <summary>Play starts the first level and exposes only the gameplay display.</summary>
@@ -26,7 +26,7 @@ namespace ArrowEscape.Tests
         [Test] public void Continue()
         {
             var tracker = new ProgressTracker(); tracker.RecordCompletion("level_001", 0, 0); s = new FlowTestScene(new FakeProgressStore { Saved = tracker.Data });
-            Assert.That(s.Flow.MainMenu.PlayButton.GetComponentInChildren<UnityEngine.UI.Text>().text, Is.EqualTo("Continue - Level 2")); Assert.That(s.Flow.MainMenu.ContinueText.text, Is.EqualTo("Level 2")); s.Flow.MainMenu.PlayButton.onClick.Invoke(); AssertPlaying(1);
+            Assert.That(s.Flow.MainMenu.PlayLevelText.text, Is.EqualTo("LEVEL 2")); Assert.That(s.Flow.MainMenu.ContinueText.text, Is.EqualTo("Level 2")); s.Flow.MainMenu.PlayButton.onClick.Invoke(); AssertPlaying(1);
         }
         /// <summary>Locked tiles cannot start; an unlocked tile starts its exact index.</summary>
         [Test] public void Select()
@@ -93,7 +93,7 @@ namespace ArrowEscape.Tests
             var tracker = new ProgressTracker(); tracker.RecordCompletion("level_001", 2, 0); s = new FlowTestScene(new FakeProgressStore { Saved = tracker.Data });
             s.Flow.MainMenu.SettingsButton.onClick.Invoke(); s.Flow.SettingsScreen.ResetButton.onClick.Invoke(); s.Flow.Confirm.ConfirmButton.onClick.Invoke();
             Assert.That(s.Bootstrap.Progress.Tracker.Data.levels, Is.Empty); Assert.That(s.Flow.Machine.Current, Is.EqualTo(ScreenState.Settings)); Assert.That(s.Flow.Levels.TileButtons[1].interactable, Is.False);
-            s.Flow.SettingsScreen.BackButton.onClick.Invoke(); Assert.That(s.Flow.MainMenu.PlayButton.GetComponentInChildren<UnityEngine.UI.Text>().text, Is.EqualTo("Play")); Assert.That(s.Flow.MainMenu.CompletedText.text, Is.EqualTo("Completed 0 / 3"));
+            s.Flow.SettingsScreen.BackButton.onClick.Invoke(); Assert.That(s.Flow.MainMenu.PlayButton.GetComponentInChildren<UnityEngine.UI.Text>().text, Is.EqualTo("PLAY")); Assert.That(s.Flow.MainMenu.PlayLevelText.text, Is.EqualTo("LEVEL 1")); Assert.That(s.Flow.MainMenu.CompletedText.text, Is.EqualTo("Completed 0 / 3"));
         }
         /// <summary>Reset from pause replaces the attempt and stays paused through settings Back.</summary>
         [Test] public void ResetWhilePaused()

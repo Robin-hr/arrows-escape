@@ -1,0 +1,13 @@
+{
+    "name": "ArrowEscape.DevBridge",
+    "rootNamespace": "ArrowEscape.DevBridge",
+    "references": [
+        "UnityEditor.TestRunner",
+        "UnityEngine.TestRunner",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "autoReferenced": false
+}

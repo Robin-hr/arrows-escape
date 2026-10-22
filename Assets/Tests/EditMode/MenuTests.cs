@@ -11,7 +11,7 @@ namespace ArrowEscape.Tests
         {
             using(var scene=new EconomyTestScene(withUi:true))
             {
-                var menu=scene.Flow.MainMenu;Assert.That(menu.PlayButton.GetComponentInChildren<UnityEngine.UI.Text>().text,Is.EqualTo("Play"));Assert.That(menu.StarsText.text,Is.EqualTo("0 / 9"));Assert.That(menu.CoinsText.text,Is.EqualTo("0"));
+                var menu=scene.Flow.MainMenu;Assert.That(menu.PlayButton.GetComponentInChildren<UnityEngine.UI.Text>().text,Is.EqualTo("PLAY"));Assert.That(menu.PlayLevelText.text,Is.EqualTo("LEVEL 1"));Assert.That(menu.StarsText.text,Is.EqualTo("0 / 9"));Assert.That(menu.CoinsText.text,Is.EqualTo("0"));
                 menu.CoinsButton.onClick.Invoke();Assert.That(scene.Flow.Shop.IsVisible,Is.True);scene.Flow.HandleBack();
                 menu.LevelsButton.onClick.Invoke();Assert.That(scene.Flow.Machine.Current,Is.EqualTo(ScreenState.LevelSelect));scene.Flow.HandleBack();
                 menu.SettingsButton.onClick.Invoke();Assert.That(scene.Flow.Machine.Current,Is.EqualTo(ScreenState.Settings));scene.Flow.HandleBack();
@@ -24,7 +24,7 @@ namespace ArrowEscape.Tests
             using(var scene=new EconomyTestScene(withUi:true))
             {
                 scene.Flow.MainMenu.PlayButton.onClick.Invoke();scene.Clear();scene.Hud.CompletePanel.LevelsButton.onClick.Invoke();scene.Flow.Levels.BackButton.onClick.Invoke();var menu=scene.Flow.MainMenu;
-                Assert.That(menu.PlayButton.GetComponentInChildren<UnityEngine.UI.Text>().text,Is.EqualTo("Continue - Level 2"));Assert.That(menu.StarsText.text,Is.EqualTo("3 / 9"));Assert.That(menu.CoinsText.text,Is.EqualTo("40"));menu.PlayButton.onClick.Invoke();Assert.That(scene.Bootstrap.CurrentLevelIndex,Is.EqualTo(1));
+                Assert.That(menu.PlayLevelText.text,Is.EqualTo("LEVEL 2"));Assert.That(menu.StarsText.text,Is.EqualTo("3 / 9"));Assert.That(menu.CoinsText.text,Is.EqualTo("40"));menu.PlayButton.onClick.Invoke();Assert.That(scene.Bootstrap.CurrentLevelIndex,Is.EqualTo(1));
             }
         }
         /// <summary>Isolated Step 14B state or regression check; never accesses player saves.</summary>
@@ -50,6 +50,6 @@ namespace ArrowEscape.Tests
         }
         /// <summary>Isolated Step 14B state or regression check; never accesses player saves.</summary>
         [Test] public void FontIsBundledAndButtonWidthLimited()
-        {using(var scene=new EconomyTestScene(withUi:true)){Assert.That(ArrowEscape.UI.UiStyle.Font.name,Does.Contain("Fredoka"));Assert.That(((RectTransform)scene.Flow.MainMenu.PlayButton.transform).rect.width,Is.LessThanOrEqualTo(520));Assert.That(scene.Flow.MainMenu.GetComponentsInChildren<ArrowEscape.UI.PathPreviewGraphic>(true).Length,Is.GreaterThanOrEqualTo(5));foreach(var graphic in scene.Flow.MainMenu.GetComponentsInChildren<ArrowEscape.UI.PathPreviewGraphic>(true))Assert.That(graphic.GetComponent<CanvasRenderer>(),Is.Not.Null);}}
+        {using(var scene=new EconomyTestScene(withUi:true)){Assert.That(ArrowEscape.UI.UiStyle.Font.name,Does.Contain("Fredoka"));Assert.That(((RectTransform)scene.Flow.MainMenu.PlayButton.transform).rect.width,Is.LessThanOrEqualTo(760));Assert.That(scene.Flow.MainMenu.Background,Is.TypeOf<ArrowEscape.UI.NeonMenuBackground>());}}
     }
 }

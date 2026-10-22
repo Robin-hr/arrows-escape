@@ -17,7 +17,7 @@ namespace ArrowEscape.Tests
         }
         /// <summary>Equipment events apply the live theme through the existing menu background interface.</summary>
         [Test]public void MenuUpdatesAndPaperReturns()
-        {using(var scene=new EconomyTestScene(withUi:true)){scene.Bootstrap.Inventory.Shop.AddCoins(1000);scene.Bootstrap.Inventory.TryBuy("cosmic_nebula");scene.Bootstrap.Inventory.TryEquip("cosmic_nebula");Assert.That(scene.Flow.MainMenu.Background,Is.TypeOf<ThemeMenuBackground>());scene.Bootstrap.Inventory.TryEquip("paper");Assert.That(scene.Flow.MainMenu.Background,Is.TypeOf<PaperMenuBackground>());}}
+        {using(var scene=new EconomyTestScene(withUi:true)){scene.Bootstrap.Inventory.Shop.AddCoins(1000);scene.Bootstrap.Inventory.TryBuy("cosmic_nebula");scene.Bootstrap.Inventory.TryEquip("cosmic_nebula");Assert.That(scene.Flow.MainMenu.Background,Is.TypeOf<NeonMenuBackground>());Assert.That(scene.Flow.MainMenu.ThemeId,Is.EqualTo("cosmic_nebula"));scene.Bootstrap.Inventory.TryEquip("paper");Assert.That(scene.Flow.MainMenu.Background,Is.TypeOf<NeonMenuBackground>());Assert.That(scene.Flow.MainMenu.ThemeId,Is.EqualTo("paper"));}}
         /// <summary>All simultaneously open previews share the separate 150-mote theme budget.</summary>
         [Test]public void ThemeBudgetIsGlobal()
         {using(var scene=new EconomyTestScene(withUi:true)){scene.Flow.OpenShop();scene.Flow.Shop.ThemesButton.onClick.Invoke();int count=Object.FindObjectsByType<ThemeBackdrop>(FindObjectsSortMode.None).Sum(t=>t.ParticleCount);Assert.That(count,Is.LessThanOrEqualTo(150));}}
