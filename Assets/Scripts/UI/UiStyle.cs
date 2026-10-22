@@ -5,14 +5,14 @@ namespace ArrowEscape.UI
     /// <summary>Shared reference-size UI tokens. Reference units are twice the design point size.</summary>
     public static class UiStyle
     {
-        /// <summary>Paper background.</summary>
-        public static Color Background=>new Color32(232,242,242,255);
-        /// <summary>White card surface.</summary>
-        public static Color Surface=>Color.white;
-        /// <summary>Primary ink.</summary>
-        public static Color Ink=>new Color32(28,34,40,255);
+        /// <summary>Neon space background behind full screens.</summary>
+        public static Color Background=>new Color32(5,6,26,255);
+        /// <summary>Dark glass card surface.</summary>
+        public static Color Surface=>new Color32(20,16,72,245);
+        /// <summary>Primary text on neon surfaces.</summary>
+        public static Color Ink=>new Color32(236,240,255,255);
         /// <summary>Secondary readable text.</summary>
-        public static Color Muted=>new Color32(91,103,112,255);
+        public static Color Muted=>new Color32(170,170,220,255);
         /// <summary>Coin and star gold.</summary>
         public static Color Gold=>new Color32(245,183,0,255);
         /// <summary>Destructive action tint.</summary>
@@ -32,7 +32,8 @@ namespace ArrowEscape.UI
         /// <summary>Category frame color.</summary>
         public static Color Category(string category)
         {
-            string hex=category=="Elemental & Magic"?"#38BDF8":category=="Rare & Premium"?"#A78BFA":category=="Tactical & Sci-Fi"?"#34D399":category=="Organic & Strange"?"#84CC16":category=="Legendary"?"#F59E0B":"#C5D3D3";
+            string hex=category=="Elemental & Magic"?"#38BDF8":category=="Rare & Premium"?"#A78BFA":category=="Tactical & Sci-Fi"?"#34D399":category=="Organic & Strange"?"#84CC16":category=="Legendary"?"#F59E0B":
+                category=="Themes"?"#FF5FD2":category=="Cute Crew"?"#FF9CC8":category=="Cosmic Crew"?"#7CF0FF":category=="Metal Frames"?"#E0B080":category=="Magic Frames"?"#B85CFF":category=="Mythic Frames"?"#FFC83C":"#38E1FF";
             ColorUtility.TryParseHtmlString(hex,out Color color);return color;
         }
         /// <summary>Adds a cached glyph without blocking pointer rays.</summary>

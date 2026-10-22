@@ -25,6 +25,22 @@ namespace ArrowEscape.Core
         public int ThemesOwned { get; private set; }
         /// <summary>Themes in the shop, including Paper.</summary>
         public int ThemesTotal { get; private set; }
+        /// <summary>Owned avatars, including the free Player badge.</summary>
+        public int AvatarsOwned { get; private set; }
+        /// <summary>Avatars in the shop.</summary>
+        public int AvatarsTotal { get; private set; }
+        /// <summary>Owned avatar frames, including Bronze.</summary>
+        public int FramesOwned { get; private set; }
+        /// <summary>Avatar frames in the shop.</summary>
+        public int FramesTotal { get; private set; }
+        /// <summary>Equipped avatar id (for the badge art).</summary>
+        public string AvatarId { get; private set; } = Inventory.DefaultAvatarId;
+        /// <summary>Equipped frame id (for the badge art).</summary>
+        public string FrameId { get; private set; } = Inventory.DefaultFrameId;
+        /// <summary>Display name of the equipped avatar.</summary>
+        public string EquippedAvatar { get; private set; } = "";
+        /// <summary>Display name of the equipped frame.</summary>
+        public string EquippedFrame { get; private set; } = "";
         /// <summary>Display name of the equipped arrow.</summary>
         public string EquippedArrow { get; private set; } = "";
         /// <summary>Display name of the equipped theme.</summary>
@@ -50,12 +66,18 @@ namespace ArrowEscape.Core
                 bool owned = inventory != null && inventory.OwnedItemIds != null && inventory.OwnedItemIds.Contains(item.Id);
                 if (item.Slot == ShopSlot.Arrow) { stats.ArrowsTotal++; if (owned) stats.ArrowsOwned++; }
                 else if (item.Slot == ShopSlot.Theme) { stats.ThemesTotal++; if (owned) stats.ThemesOwned++; }
+                else if (item.Slot == ShopSlot.Avatar) { stats.AvatarsTotal++; if (owned) stats.AvatarsOwned++; }
+                else if (item.Slot == ShopSlot.Frame) { stats.FramesTotal++; if (owned) stats.FramesOwned++; }
             }
             if (inventory != null)
             {
                 stats.Coins = inventory.Coins;
                 stats.EquippedArrow = NameOf(inventory.EquippedArrowId);
                 stats.EquippedTheme = NameOf(inventory.EquippedThemeId);
+                stats.AvatarId = inventory.EquippedAvatarId ?? Inventory.DefaultAvatarId;
+                stats.FrameId = inventory.EquippedFrameId ?? Inventory.DefaultFrameId;
+                stats.EquippedAvatar = NameOf(stats.AvatarId);
+                stats.EquippedFrame = NameOf(stats.FrameId);
             }
             return stats;
         }

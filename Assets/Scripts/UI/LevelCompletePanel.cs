@@ -100,7 +100,7 @@ namespace ArrowEscape.UI
             card.anchorMin = card.anchorMax = card.pivot = new Vector2(0.5f, 0.5f);
             card.sizeDelta = new Vector2(900, 1160);
             card.anchoredPosition = Vector2.zero;
-            UiFactory.Text("Title", card, "Level Complete", 60, new Vector2(850, 90), new Vector2(0, 490)).color = ViewTheme.UiAccent;
+            BrandArt.Text("Title", card, "LEVEL COMPLETE", 58, new Vector2(850, 90), new Vector2(0, 490), new Color32(255, 214, 92, 255));
             var starRoot = UiFactory.Rect("EarnedStars", card, new Vector2(450,120), new Vector2(0,380));
             Stars = starRoot.gameObject.AddComponent<StarDisplay>(); Stars.Build(card, 110, 150);
             starRoot.anchoredPosition = new Vector2(0,380);
@@ -116,11 +116,13 @@ namespace ArrowEscape.UI
             UiStyle.Icon("Coin",coinLine,UiSpriteShape.Coin,new Vector2(-62,0),42,UiStyle.Gold);
             CoinsText=UiFactory.Text("Coins",coinLine,"",40,new Vector2(150,48),new Vector2(28,0));CoinsText.color=UiStyle.Ink;
             coinLine.gameObject.SetActive(false);
-            ReplayButton = UiFactory.Button("Replay", card, new Vector2(-270, -300));
-            NextButton = UiFactory.Button("Next Level", card, new Vector2(0, -300));
-            LevelsButton = UiFactory.Button("Levels", card, new Vector2(270, -300));
+            ReplayButton = UiFactory.Button("Replay", card, new Vector2(-275, -330));
+            NextButton = UiFactory.Button("Next Level", card, new Vector2(0, -330), NeonButtonStyle.Primary);
+            LevelsButton = UiFactory.Button("Levels", card, new Vector2(275, -330));
             foreach (var button in new[] { ReplayButton, NextButton, LevelsButton })
-                ((RectTransform)button.transform).sizeDelta = new Vector2(240, 120);
+                ((RectTransform)button.transform).sizeDelta = new Vector2(260, 130);
+            NeonKit.WithIcon(ReplayButton, "icon_restart", 50); NeonKit.WithIcon(NextButton, "icon_next", 50); NeonKit.WithIcon(LevelsButton, "icon_levels", 54);
+            FlawlessText.color = new Color32(125, 255, 176, 255); BestNoticeText.color = new Color32(255, 214, 92, 255);
             LevelsButton.onClick.AddListener(() => { if (IsVisible) LevelsRequested?.Invoke(); });
             BestText.gameObject.SetActive(false);
             BestNoticeText.gameObject.SetActive(false);

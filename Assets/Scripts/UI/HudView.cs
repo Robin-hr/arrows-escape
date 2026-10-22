@@ -8,16 +8,17 @@ namespace ArrowEscape.UI
     public sealed class HudView : MonoBehaviour
     {
         private RectTransform top, bottom;
-        private bool darkFireBoard;
         /// <summary>Keeps labels readable over Inferno without restyling any other board or menu.</summary>
         public void SetBoardContrast(bool dark)=>SetBoardContrast(dark,false);
         /// <summary>Adds readability surfaces only when a non-Paper theme is equipped.</summary>
         public void SetBoardContrast(bool dark,bool themed)
-        {darkFireBoard=dark;if(top!=null){SetBarBackground(top,themed);SetBarBackground(bottom,themed);SetThemeButtonColors(themed);}if(LevelText==null)return;Color color=dark?Color.white:ViewTheme.HudText;LevelText.color=LevelPositionText.color=MistakesText.color=color;}
-        private void SetThemeButtonColors(bool themed)
-        {if(UndoButton==null)return;var colors=UndoButton.colors;colors.disabledColor=themed?new Color(.18f,.22f,.25f):ViewTheme.ButtonDisabled;UndoButton.colors=HintButton.colors=RestartButton.colors=colors;}
-        private static void SetBarBackground(RectTransform rect,bool dark)
-        {var image=rect.GetComponent<UnityEngine.UI.Image>();if(image==null&&!dark)return;if(image==null){image=rect.gameObject.AddComponent<UnityEngine.UI.Image>();image.sprite=SpriteFactory.GetUiSprite(UiSpriteShape.RoundedRect);image.type=UnityEngine.UI.Image.Type.Sliced;image.raycastTarget=false;}image.color=new Color(0,0,0,dark?.35f:0);}
+        {if(LevelText==null)return;LevelText.color=LevelPositionText.color=MistakesText.color=TextColor;}
+        /// <summary>HUD text on the neon info bar (readable on every board theme).</summary>
+        public static Color TextColor=>new Color32(236,240,255,255);
+        /// <summary>Moves over par but still two stars.</summary>
+        public static Color AmberColor=>new Color32(255,196,74,255);
+        /// <summary>Moves at one star.</summary>
+        public static Color RedColor=>new Color32(255,106,96,255);
         /// <summary>Live potential-star meter.</summary>
         public StarDisplay Stars { get; private set; }
         /// <summary>Freezes the small loss animation while paused.</summary>
@@ -27,7 +28,7 @@ namespace ArrowEscape.UI
         {
             if (Stars == null) return;
             int count = StarRating.StarsIfClearedNow(moves, par);
-            MovesText.color = moves <= par ? (darkFireBoard?Color.white:ViewTheme.HudText) : moves <= StarRating.TwoStarLimit(par) ? (darkFireBoard?new Color(1,.76f,.29f):ViewTheme.MovesAmber) : (darkFireBoard?new Color(1,.4f,.3f):ViewTheme.MovesRed);
+            MovesText.color = moves <= par ? TextColor : moves <= StarRating.TwoStarLimit(par) ? AmberColor : RedColor;
             if (reset || Stars.Count != count) Stars.SetCount(count, !reset);
         }
         /// <summary>Explicit animation driver for tests.</summary>
@@ -75,6 +76,8 @@ namespace ArrowEscape.UI
             top.anchorMin = top.anchorMax = top.pivot = new Vector2(0.5f, 1);
             bottom = UiFactory.Rect("BottomBar", safeArea, new Vector2(1000, 120), Vector2.zero);
             bottom.anchorMin = bottom.anchorMax = bottom.pivot = new Vector2(0.5f, 0);
+            var backing = UiFactory.Rect("InfoBar", top, new Vector2(760, 168), new Vector2(-75, 4)).gameObject.AddComponent<UnityEngine.UI.Image>();
+            backing.raycastTarget = false; NeonKit.Panel(backing, NeonKit.Cyan);
             LevelText = UiFactory.Text("LevelName", top, "", ViewTheme.HudFontSize, new Vector2(320, 65), new Vector2(-260, 40));
             LevelText.resizeTextForBestFit=true;LevelText.resizeTextMinSize=20;LevelText.resizeTextMaxSize=ViewTheme.HudFontSize;
             LevelPositionText = UiFactory.Text("LevelPosition", top, "", ViewTheme.HudFontSize, new Vector2(300, 65), new Vector2(100, 40));
@@ -85,20 +88,22 @@ namespace ArrowEscape.UI
             Stars = starRoot.gameObject.AddComponent<StarDisplay>(); Stars.Build(top, 34, 40);
             starRoot.anchoredPosition = new Vector2(-70,-30);
             float step = ViewTheme.ButtonWidth + ViewTheme.UiSpacing;
-            UndoButton = UiFactory.Button("Undo", bottom, new Vector2(-step, 0));
-            HintButton = UiFactory.Button("Hint", bottom, Vector2.zero);
-            RestartButton = UiFactory.Button("Restart", bottom, new Vector2(step, 0));
+            UndoButton = UiFactory.Button("Undo", bottom, new Vector2(-step, 0)); NeonKit.WithIcon(UndoButton, "icon_undo", 58);
+            HintButton = UiFactory.Button("Hint", bottom, Vector2.zero); NeonKit.WithIcon(HintButton, "icon_hint", 62);
+            RestartButton = UiFactory.Button("Restart", bottom, new Vector2(step, 0)); NeonKit.WithIcon(RestartButton, "icon_restart", 58);
             undoRect = (RectTransform)UndoButton.transform;
             hintRect = (RectTransform)HintButton.transform;
             restartRect = (RectTransform)RestartButton.transform;
             PauseButton = UiFactory.Button("Pause", top, new Vector2(380, 0));
             ((RectTransform)PauseButton.transform).sizeDelta = new Vector2(120, 120);
-            PauseButton.GetComponentInChildren<UnityEngine.UI.Text>().fontSize = 28;
-            stuck=UiFactory.Panel("StuckBanner",safeArea,new Color(.02f,.03f,.05f,.85f));
+            var pauseLabel = PauseButton.GetComponentInChildren<UnityEngine.UI.Text>(); pauseLabel.enabled = false;
+            NeonKit.Icon("PauseIcon", PauseButton.transform, "icon_pause", 70, Vector2.zero);
+            stuck=UiFactory.Panel("StuckBanner",safeArea,ViewTheme.PanelCard);NeonKit.SetRim(stuck,"neon_panel_rim",NeonKit.PanelBorder,NeonKit.Magenta);
             stuck.sizeDelta=new Vector2(900,90);stuck.anchorMin=stuck.anchorMax=stuck.pivot=new Vector2(.5f,1);
             stuck.GetComponent<UnityEngine.UI.Image>().raycastTarget=false;
             StuckText=UiFactory.Text("StuckText",stuck,"No way out from here.\nUndo or Restart.",32,Vector2.zero,Vector2.zero);
-            StuckText.color=ViewTheme.StuckTextColor;UiFactory.Stretch(StuckText.rectTransform);stuck.gameObject.SetActive(false);
+            StuckText.color=new Color32(255,150,190,255);UiFactory.Stretch(StuckText.rectTransform);stuck.gameObject.SetActive(false);
+            foreach (var label in new[] { LevelText, LevelPositionText, MovesText, MistakesText }) label.color = TextColor;
             SetUndoState(false);
             SetHintState(false);
             UpdateLayout();

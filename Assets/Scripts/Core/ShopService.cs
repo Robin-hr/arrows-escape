@@ -46,7 +46,7 @@ namespace ArrowEscape.Core
         /// <summary>Unknown retained ids have no active ownership semantics.</summary>
         public bool IsOwned(string id)=>ShopCatalog.Find(id)!=null&&Inventory.OwnedItemIds.Contains(id);
         /// <summary>Whether a known item occupies its equipment slot.</summary>
-        public bool IsEquipped(string id)=>IsOwned(id)&&(Inventory.EquippedArrowId==id||Inventory.EquippedThemeId==id);
+        public bool IsEquipped(string id){var item=ShopCatalog.Find(id);return item!=null&&IsOwned(id)&&Inventory.EquippedIn(item.Slot)==id;}
         /// <summary>Buys once, without equipping automatically.</summary>
         public bool TryBuy(string id)
         {
@@ -61,7 +61,7 @@ namespace ArrowEscape.Core
         {
             var item=ShopCatalog.Find(id);if(item==null||!IsOwned(id))return false;
             if(IsEquipped(id))return true;
-            if(item.Slot==ShopSlot.Arrow)Inventory.EquippedArrowId=id;else Inventory.EquippedThemeId=id;
+            Inventory.SetEquipped(item.Slot,id);
             EquippedChanged?.Invoke(item.Slot,id);return true;
         }
         /// <summary>Adds development grants or other explicit integer rewards, capped safely.</summary>

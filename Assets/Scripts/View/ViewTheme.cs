@@ -148,7 +148,7 @@ namespace ArrowEscape.View
         /// <summary>Disabled button background.</summary>
         public static Color ButtonDisabled => new Color(.80f,.85f,.85f);
         /// <summary>Modal dimming overlay.</summary>
-        public static Color PanelDim => new Color(0, 0, 0, 0.8f);
+        public static Color PanelDim => new Color(0.01f, 0.01f, 0.07f, 0.84f);
         /// <summary>Completion card background.</summary>
         public static Color PanelCard => new Color(.94f,.97f,.97f);
         /// <summary>Completion accent.</summary>

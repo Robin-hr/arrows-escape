@@ -33,33 +33,28 @@ namespace ArrowEscape.UI
             if (font != null) text.font = font;
             text.text = value;
             text.fontSize = fontSize;
-            text.color = ViewTheme.HudText;
+            text.color = UiStyle.Ink;
             text.alignment = TextAnchor.MiddleCenter;
             text.raycastTarget = false;
             text.horizontalOverflow = HorizontalWrapMode.Wrap;
             return text;
         }
 
-        /// <summary>Creates a thumb-sized button with a background and centered label.</summary>
-        public static UnityEngine.UI.Button Button(string label, Transform parent, Vector2 position)
+        /// <summary>Creates a thumb-sized neon button with a centered display-font label.</summary>
+        public static UnityEngine.UI.Button Button(string label, Transform parent, Vector2 position) => Button(label, parent, position, NeonButtonStyle.Normal);
+
+        /// <summary>Creates a thumb-sized neon button in the given style.</summary>
+        public static UnityEngine.UI.Button Button(string label, Transform parent, Vector2 position, NeonButtonStyle style)
         {
             RectTransform rect = Rect(label, parent, new Vector2(ViewTheme.ButtonWidth, ViewTheme.ButtonHeight), position);
             var image = rect.gameObject.AddComponent<UnityEngine.UI.Image>();
-            image.color = Color.white;
-            UiStyle.SurfaceFor(image,true);
             var button = rect.gameObject.AddComponent<UnityEngine.UI.Button>();
             rect.gameObject.AddComponent<ButtonFeel>();
             button.targetGraphic = image;
-            var colors = button.colors;
-            colors.normalColor = UiStyle.Ink;
-            colors.highlightedColor = new Color(.2f,.25f,.29f);
-            colors.pressedColor = UiStyle.Ink;
-            colors.selectedColor = UiStyle.Ink;
-            colors.disabledColor = ViewTheme.ButtonDisabled;
-            button.colors = colors;
+            NeonKit.Style(button, style);
             var text = Text("Label", rect, label, ViewTheme.HudFontSize, Vector2.zero, Vector2.zero);
-            text.color=Color.white;
-            Stretch(text.rectTransform);
+            Stretch(text.rectTransform); text.rectTransform.offsetMin = new Vector2(18, 8); text.rectTransform.offsetMax = new Vector2(-18, -8);
+            NeonKit.Label(text, ViewTheme.HudFontSize - 4);
             return button;
         }
 
@@ -88,13 +83,13 @@ namespace ArrowEscape.UI
         }
         /// <summary>Creates a menu title with consistent styling.</summary>
         public static UnityEngine.UI.Text Title(string text, Transform parent, float y) =>
-            Text("Title", parent, text, 64, new Vector2(720, 100), new Vector2(0, y));
+            BrandArt.Text("Title", parent, text.ToUpperInvariant(), 60, new Vector2(720, 100), new Vector2(0, y), Color.white);
         /// <summary>Changes a toggle-style label and its normal state color.</summary>
         public static void SetToggle(UnityEngine.UI.Button button, string label, bool on)
         {
             button.GetComponentInChildren<UnityEngine.UI.Text>().text = label;
             var colors = button.colors;
-            colors.normalColor = on ? UiStyle.Ink : UiStyle.Muted;
+            colors.normalColor = on ? Color.white : new Color(0.55f, 0.55f, 0.7f);
             button.colors = colors;
         }
         /// <summary>Creates a masked, vertically scrolling grid with fitted content height.</summary>
@@ -130,8 +125,9 @@ namespace ArrowEscape.UI
             RectTransform rect = Rect(name, parent, Vector2.zero, Vector2.zero);
             Stretch(rect);
             var image = rect.gameObject.AddComponent<UnityEngine.UI.Image>();
-            image.color = color == ViewTheme.PanelCard ? UiStyle.Surface : color;
             image.raycastTarget = raycast;
+            if (color == ViewTheme.PanelCard) { NeonKit.Panel(image, NeonKit.Cyan); return rect; }
+            image.color = color;
             if(!raycast)UiStyle.SurfaceFor(image,false,true);
             return rect;
         }

@@ -34,8 +34,16 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Button ArrowsButton { get; private set; }
         /// <summary>Theme tab.</summary>
         public UnityEngine.UI.Button ThemesButton { get; private set; }
+        /// <summary>Avatar tab.</summary>
+        public UnityEngine.UI.Button AvatarsButton { get; private set; }
+        /// <summary>Avatar frame tab.</summary>
+        public UnityEngine.UI.Button FramesButton { get; private set; }
+        /// <summary>Coin pill (also counts the five-tap developer grant).</summary>
+        public UnityEngine.UI.Button CoinsButton { get; private set; }
         /// <summary>Coin balance label.</summary>
         public UnityEngine.UI.Text CoinsText { get; private set; }
+        /// <summary>The tab currently shown.</summary>
+        public ShopSlot Tab=>tab;
         /// <summary>The single reused detail sheet.</summary>
         public ShopDetailSheet Detail { get; private set; }
         /// <summary>Visible-tab cards for tests.</summary>
@@ -45,25 +53,45 @@ namespace ArrowEscape.UI
         /// <summary>Creates runtime hierarchy without loading previews.</summary>
         public void Build(Transform parent,ConfirmDialog confirm,GameController controller)
         {
-            game=controller;skinResources=ArrowSkinResources.Load();Root=UiFactory.ScreenRoot("Shop",parent,UiStyle.Background,out var safe);
-            var header=UiFactory.Rect("Header",safe,new Vector2(940,220),Vector2.zero);header.anchorMin=header.anchorMax=header.pivot=new Vector2(.5f,1);header.anchoredPosition=new Vector2(0,-16);
-            header.gameObject.AddComponent<MenuFit>().Configure(header,safe,new Vector2(1000,240));
-            UiFactory.Text("Title",header,"Shop",UiStyle.Heading,new Vector2(350,100),new Vector2(0,-50)).fontStyle=FontStyle.Bold;
-            BackButton=UiFactory.Button("",header,new Vector2(-400,-50));((RectTransform)BackButton.transform).sizeDelta=new Vector2(112,100);UiStyle.Icon("Back",BackButton.transform,UiSpriteShape.Back,Vector2.zero,46,Color.white);BackButton.onClick.AddListener(HandleBackAction);
-            CoinsText=UiFactory.Text("Coins",header,"",UiStyle.Body,new Vector2(220,80),new Vector2(330,-50));UiStyle.Icon("Coin",header,UiSpriteShape.Coin,new Vector2(210,-50),42,UiStyle.Gold);
+            game=controller;skinResources=ArrowSkinResources.Load();Root=UiFactory.ScreenRoot("Shop",parent,BrandArt.Space,out var safe);
+            NeonKit.Backdrop(Root,.6f);
+            // Same header geometry as the home page, so the coin pill stays under the player's finger.
+            var header=UiFactory.Rect("Header",safe,new Vector2(960,150),Vector2.zero);header.anchorMin=header.anchorMax=header.pivot=new Vector2(.5f,1);header.anchoredPosition=new Vector2(0,-16);
+            header.gameObject.AddComponent<MenuFit>().Configure(header,safe,new Vector2(1000,170));
+            BackButton=NeonKit.IconButton("Back",header,"icon_back",new Vector2(-420,-62));BackButton.onClick.AddListener(HandleBackAction);
+            NeonKit.Title("SHOP",header,new Vector2(-90,-62),60,320);
+            var coinPill=BrandArt.Image("Coins",header,"ui_pill",new Vector2(330,92),new Vector2(315,-62),NeonKit.PillBorder);coinPill.raycastTarget=true;
+            if(coinPill.sprite==null)coinPill.color=new Color(.16f,.11f,.48f,.95f);
+            CoinsButton=coinPill.gameObject.AddComponent<UnityEngine.UI.Button>();CoinsButton.targetGraphic=coinPill;coinPill.gameObject.AddComponent<ButtonFeel>();
+            var colors=CoinsButton.colors;colors.normalColor=colors.highlightedColor=colors.selectedColor=Color.white;colors.pressedColor=new Color(.82f,.85f,.95f);CoinsButton.colors=colors;
+            NeonKit.Icon("CoinIcon",coinPill.transform,"icon_coin",66,new Vector2(-118,0));
+            CoinsText=BrandArt.Text("CoinsText",coinPill.transform,"0",36,new Vector2(170,60),new Vector2(10,0),Color.white);
+            NeonKit.Icon("PlusBadge",coinPill.transform,"icon_plus",50,new Vector2(128,0));
             counter=CoinsText.gameObject.AddComponent<CoinCounter>();counter.Bind(CoinsText);
-            ArrowsButton=UiFactory.Button("Arrows",header,new Vector2(-175,-165));ThemesButton=UiFactory.Button("Themes",header,new Vector2(175,-165));
-            ((RectTransform)ArrowsButton.transform).sizeDelta=((RectTransform)ThemesButton.transform).sizeDelta=new Vector2(320,96);
-            ArrowsButton.onClick.AddListener(ShowArrows);ThemesButton.onClick.AddListener(ShowThemes);
             for(int i=0;i<header.childCount;i++){var child=(RectTransform)header.GetChild(i);child.anchorMin=child.anchorMax=new Vector2(.5f,1);}
+            var tabs=UiFactory.Rect("Tabs",safe,new Vector2(960,110),Vector2.zero);tabs.anchorMin=tabs.anchorMax=tabs.pivot=new Vector2(.5f,1);tabs.anchoredPosition=new Vector2(0,-182);
+            tabs.gameObject.AddComponent<MenuFit>().Configure(tabs,safe,new Vector2(1000,120));
+            ArrowsButton=MakeTab(tabs,"Arrows","icon_arrow",-360);ThemesButton=MakeTab(tabs,"Themes","icon_theme",-120);AvatarsButton=MakeTab(tabs,"Avatars","icon_avatar",120);FramesButton=MakeTab(tabs,"Frames","icon_frame",360);
+            ArrowsButton.onClick.AddListener(ShowArrows);ThemesButton.onClick.AddListener(ShowThemes);AvatarsButton.onClick.AddListener(()=>ShowTab(ShopSlot.Avatar));FramesButton.onClick.AddListener(()=>ShowTab(ShopSlot.Frame));
             scroll=BuildScroll(safe);
             Detail=gameObject.AddComponent<ShopDetailSheet>();Detail.Build(parent,confirm,game);Detail.Changed+=Refresh;
             Root.gameObject.SetActive(false);
         }
+        private static UnityEngine.UI.Button MakeTab(Transform parent,string label,string icon,float x)
+        {
+            var button=UiFactory.Button(label,parent,new Vector2(x,0));((RectTransform)button.transform).sizeDelta=new Vector2(232,104);
+            NeonKit.WithIcon(button,icon,46);var text=button.GetComponentInChildren<UnityEngine.UI.Text>();text.resizeTextMaxSize=28;
+            return button;
+        }
+        private void SetTabLooks()
+        {
+            NeonKit.Style(ArrowsButton,tab==ShopSlot.Arrow?NeonButtonStyle.Primary:NeonButtonStyle.Normal);NeonKit.Style(ThemesButton,tab==ShopSlot.Theme?NeonButtonStyle.Primary:NeonButtonStyle.Normal);
+            NeonKit.Style(AvatarsButton,tab==ShopSlot.Avatar?NeonButtonStyle.Primary:NeonButtonStyle.Normal);NeonKit.Style(FramesButton,tab==ShopSlot.Frame?NeonButtonStyle.Primary:NeonButtonStyle.Normal);
+        }
         private static UnityEngine.UI.ScrollRect BuildScroll(RectTransform safe)
         {
-            var root=UiFactory.Rect("ShopScroll",safe,Vector2.zero,Vector2.zero);UiFactory.Stretch(root);root.offsetMin=new Vector2(24,24);root.offsetMax=new Vector2(-24,-270);
-            var view=root.gameObject.AddComponent<UnityEngine.UI.ScrollRect>();var viewport=UiFactory.Panel("Viewport",root,UiStyle.Background,true);viewport.gameObject.AddComponent<UnityEngine.UI.Mask>().showMaskGraphic=false;
+            var root=UiFactory.Rect("ShopScroll",safe,Vector2.zero,Vector2.zero);UiFactory.Stretch(root);root.offsetMin=new Vector2(24,24);root.offsetMax=new Vector2(-24,-310);
+            var view=root.gameObject.AddComponent<UnityEngine.UI.ScrollRect>();var viewport=UiFactory.Panel("Viewport",root,Color.black,true);viewport.gameObject.AddComponent<UnityEngine.UI.Mask>().showMaskGraphic=false;
             var content=UiFactory.Rect("Content",viewport,Vector2.zero,Vector2.zero);content.anchorMin=new Vector2(0,1);content.anchorMax=Vector2.one;content.pivot=new Vector2(.5f,1);
             var layout=content.gameObject.AddComponent<UnityEngine.UI.VerticalLayoutGroup>();layout.spacing=32;layout.childControlWidth=true;layout.childControlHeight=false;layout.childForceExpandHeight=false;layout.childForceExpandWidth=true;
             content.gameObject.AddComponent<UnityEngine.UI.ContentSizeFitter>().verticalFit=UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
@@ -77,13 +105,17 @@ namespace ArrowEscape.UI
             counter.SetValue(inventory.State.Coins,false);if(IsVisible)Rebuild();
         }
         /// <summary>Opens on the Arrow tab with a new screen-lifetime preview cache.</summary>
-        public void Show()
+        public void Show()=>Show(ShopSlot.Arrow);
+        /// <summary>Opens on a chosen tab (the profile page opens Avatars).</summary>
+        public void Show(ShopSlot slot)
         {
             if(inventory==null)return;Root.gameObject.SetActive(true);Root.SetAsLastSibling();
-            renderer?.Dispose();renderer=new ArrowPreviewRenderer();tab=ShopSlot.Arrow;Rebuild();counter.SetValue(inventory.State.Coins,false);
+            renderer?.Dispose();renderer=new ArrowPreviewRenderer();tab=slot;Rebuild();counter.SetValue(inventory.State.Coins,false);
         }
-        private void ShowArrows(){tab=ShopSlot.Arrow;Rebuild();}
-        private void ShowThemes(){tab=ShopSlot.Theme;Rebuild();}
+        private void ShowArrows()=>ShowTab(ShopSlot.Arrow);
+        private void ShowThemes()=>ShowTab(ShopSlot.Theme);
+        /// <summary>Switches the visible tab.</summary>
+        public void ShowTab(ShopSlot slot){tab=slot;Rebuild();}
         private void Rebuild()
         {
             for(int n=0;n<elementalCards.Length;n++)if(elementalCards[n]!=null)elementalCards[n].gameObject.SetActive(false);
@@ -97,15 +129,15 @@ namespace ArrowEscape.UI
                 {
                     previous=item.Category;section++;
                     var block=UiFactory.Rect(item.Category,scroll.content,new Vector2(900,400),Vector2.zero);sections.Add(block);sectionCounts.Add(0);
-                    var label=UiFactory.Text("Section",block,item.Category,UiStyle.Section,new Vector2(900,72),Vector2.zero);label.alignment=TextAnchor.MiddleLeft;
+                    var label=BrandArt.Text("Section",block,item.Category.ToUpperInvariant(),38,new Vector2(900,72),Vector2.zero,UiStyle.Category(item.Category));label.alignment=TextAnchor.MiddleLeft;
                     label.rectTransform.anchorMin=new Vector2(0,1);label.rectTransform.anchorMax=new Vector2(1,1);label.rectTransform.pivot=new Vector2(.5f,1);label.rectTransform.sizeDelta=new Vector2(0,72);
                     var grid=UiFactory.Rect("Cards",block,Vector2.zero,Vector2.zero);UiFactory.Stretch(grid);grid.offsetMax=new Vector2(0,-80);
                     var layout=grid.gameObject.AddComponent<UnityEngine.UI.GridLayoutGroup>();layout.constraint=UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount;layout.spacing=new Vector2(24,24);grids.Add(layout);gridParent=grid;
                 }
                 int index=cards.Count;var root=UiFactory.Rect(item.Id,gridParent,new Vector2(360,360),Vector2.zero);root.gameObject.AddComponent<UnityEngine.UI.Image>();root.gameObject.AddComponent<UnityEngine.UI.Button>();root.gameObject.AddComponent<ButtonFeel>();
-                var card=root.gameObject.AddComponent<ShopCard>();card.Build(item,()=>OpenDetail(index));card.Refresh(inventory.Shop);cards.Add(card);sectionCounts[section]++;
+                var card=root.gameObject.AddComponent<ShopCard>();card.Build(item,()=>OpenDetail(index));card.Refresh(inventory.Shop);card.SetBadgeAvatar(inventory.State.EquippedAvatarId);cards.Add(card);sectionCounts[section]++;
             }
-            PrepareInfernoCard();PrepareThemeCards();lastSize=Vector2.zero;Canvas.ForceUpdateCanvases();UpdateLayout();scroll.verticalNormalizedPosition=1;
+            SetTabLooks();PrepareInfernoCard();PrepareThemeCards();lastSize=Vector2.zero;Canvas.ForceUpdateCanvases();UpdateLayout();scroll.verticalNormalizedPosition=1;
         }
         private void PrepareInfernoCard()
         {
@@ -128,7 +160,7 @@ namespace ArrowEscape.UI
         private void OnCoins(int amount){counter.SetValue(amount);Refresh();}
         private void OnEquipped(ShopSlot slot,string id)=>Refresh();
         /// <summary>Refreshes states without recreating the card hierarchy.</summary>
-        public void Refresh(){for(int i=0;i<cards.Count;i++)cards[i].Refresh(inventory.Shop);Detail.Refresh();}
+        public void Refresh(){for(int i=0;i<cards.Count;i++){cards[i].Refresh(inventory.Shop);cards[i].SetBadgeAvatar(inventory.State.EquippedAvatarId);}Detail.Refresh();}
         private void HandleBackAction()=>HandleBack();
         /// <summary>Closes the detail first, then the shop; callers consume confirmation modals first.</summary>
         public bool HandleBack(){if(!IsVisible)return false;if(Detail.IsVisible){Detail.Hide();return true;}Close();return true;}
@@ -138,12 +170,12 @@ namespace ArrowEscape.UI
             for(int n=0;n<elementalCards.Length;n++)if(elementalCards[n]!=null){DestroyImmediate(elementalCards[n].gameObject);elementalCards[n]=null;}
             for(int n=0;n<themeCards.Length;n++)if(themeCards[n]!=null){DestroyImmediate(themeCards[n].gameObject);themeCards[n]=null;}
             Detail.Hide();Root.gameObject.SetActive(false);renderer?.Dispose();renderer=null;
-            for(int i=0;i<cards.Count;i++)cards[i].Preview.texture=null;Closed?.Invoke();
+            for(int i=0;i<cards.Count;i++)if(!cards[i].IsPortrait)cards[i].Preview.texture=null;Closed?.Invoke();
         }
         private void UpdateLayout()
         {
             Vector2 size=scroll.viewport.rect.size;if(size==lastSize||size.x<=0)return;lastSize=size;
-            int columns=size.x<1300?2:size.x<1900?3:4;float width=(size.x-(columns-1)*24)/columns;
+            int columns=(size.x<1300?2:size.x<1900?3:4)+(tab==ShopSlot.Avatar||tab==ShopSlot.Frame?1:0);float width=(size.x-(columns-1)*24)/columns;
             for(int i=0;i<sections.Count;i++){grids[i].constraintCount=columns;grids[i].cellSize=new Vector2(width,360);sections[i].sizeDelta=new Vector2(0,80+((sectionCounts[i]+columns-1)/columns)*384);}
         }
         /// <summary>Processes only visible preview requests, capped at two renders per frame.</summary>
@@ -153,6 +185,7 @@ namespace ArrowEscape.UI
             scroll.viewport.GetWorldCorners(viewportCorners);
             for(int i=0;i<cards.Count;i++)
             {
+                if(cards[i].IsPortrait)continue;
                 cards[i].Rect.GetWorldCorners(corners);
                 int themeIndex=ThemeDesign.Index(cards[i].Item.Id);if(themeIndex>=0){bool shown=corners[2].y>=viewportCorners[0].y&&corners[0].y<=viewportCorners[2].y;themeCards[themeIndex].gameObject.SetActive(shown);continue;}
                 if(ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true)
@@ -163,10 +196,10 @@ namespace ArrowEscape.UI
                 }
                 if(corners[2].y>=viewportCorners[0].y&&corners[0].y<=viewportCorners[2].y)renderer.Request(cards[i].Item.Id);
             }
-            if(Detail.IsVisible&&ArrowSkinRegistry.Find(Detail.Item.Id)==null)renderer.Request(Detail.Item.Id);
+            if(Detail.IsVisible&&!Detail.HasStaticPreview&&ArrowSkinRegistry.Find(Detail.Item.Id)==null)renderer.Request(Detail.Item.Id);
             renderer.Tick();
-            for(int i=0;i<cards.Count;i++){if(ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true||ThemeDesign.Index(cards[i].Item.Id)>=0)continue;var art=skinResources?.Find(cards[i].Item.Id);var texture=ArrowSkinRegistry.Find(cards[i].Item.Id)!=null&&art?.Full!=null?art.Full.texture:renderer.GetCached(cards[i].Item.Id);if(cards[i].Preview.texture!=texture)cards[i].Preview.texture=texture;}
-            if(Detail.IsVisible&&!Detail.HasLivePreview)Detail.Preview.texture=renderer.GetCached(Detail.Item.Id);
+            for(int i=0;i<cards.Count;i++){if(cards[i].IsPortrait||ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true||ThemeDesign.Index(cards[i].Item.Id)>=0)continue;var art=skinResources?.Find(cards[i].Item.Id);var texture=ArrowSkinRegistry.Find(cards[i].Item.Id)!=null&&art?.Full!=null?art.Full.texture:renderer.GetCached(cards[i].Item.Id);if(cards[i].Preview.texture!=texture)cards[i].Preview.texture=texture;}
+            if(Detail.IsVisible&&!Detail.HasLivePreview&&!Detail.HasStaticPreview)Detail.Preview.texture=renderer.GetCached(Detail.Item.Id);
         }
         private void Update(){if(Application.isPlaying)Tick(Time.unscaledDeltaTime);}
         private void OnDestroy(){renderer?.Dispose();if(inventory!=null){inventory.Shop.CoinsChanged-=OnCoins;inventory.Shop.EquippedChanged-=OnEquipped;}}

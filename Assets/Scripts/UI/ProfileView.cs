@@ -7,7 +7,6 @@ namespace ArrowEscape.UI
     /// <summary>Neon profile page: progress, stars, coins, collection and equipped items. Read-only.</summary>
     public sealed class ProfileView : MonoBehaviour
     {
-        private static readonly Vector4 SecondaryBorder = new Vector4(65, 80, 65, 60);
         private static readonly Vector4 PillBorder = new Vector4(40, 40, 40, 40);
         private Action back;
 
@@ -29,11 +28,19 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Text ArrowsText { get; private set; }
         /// <summary>"owned / total" themes.</summary>
         public UnityEngine.UI.Text ThemesText { get; private set; }
+        /// <summary>"owned / total" avatars.</summary>
+        public UnityEngine.UI.Text AvatarsText { get; private set; }
+        /// <summary>"owned / total" avatar frames.</summary>
+        public UnityEngine.UI.Text FramesText { get; private set; }
+        /// <summary>The equipped avatar in its frame; tapping it opens the Avatars shop.</summary>
+        public AvatarBadge Avatar { get; private set; }
+        /// <summary>Opens the shop on the Avatars tab.</summary>
+        public UnityEngine.UI.Button AvatarButton { get; private set; }
         /// <summary>Equipped arrow and theme names.</summary>
         public UnityEngine.UI.Text EquippedText { get; private set; }
 
         /// <summary>Builds the hidden page.</summary>
-        public void Build(Transform parent, Action onBack)
+        public void Build(Transform parent, Action onBack, Action onAvatar = null)
         {
             if (Root != null) return;
             back = onBack;
@@ -58,30 +65,37 @@ namespace ArrowEscape.UI
 
             var area = UiFactory.Rect("ProfileContent", safe, Vector2.zero, Vector2.zero); UiFactory.Stretch(area); area.offsetMax = new Vector2(0, -180);
             var column = UiFactory.Column(area, 900, 1500);
-            BrandArt.Image("Avatar", column, "icon_profile", new Vector2(220, 220), new Vector2(0, 590));
-            BrandArt.Text("PlayerName", column, "PLAYER", 48, new Vector2(800, 70), new Vector2(0, 440), Color.white);
+            var hit = UiFactory.Rect("AvatarButton", column, new Vector2(300, 300), new Vector2(0, 590)).gameObject.AddComponent<UnityEngine.UI.Image>();
+            hit.color = new Color(0, 0, 0, 0);
+            AvatarButton = hit.gameObject.AddComponent<UnityEngine.UI.Button>(); AvatarButton.targetGraphic = hit; hit.gameObject.AddComponent<ButtonFeel>();
+            Avatar = AvatarBadge.Create("AvatarBadge", AvatarButton.transform, 300, Vector2.zero);
+            NeonKit.Icon("EditBadge", AvatarButton.transform, "icon_plus", 64, new Vector2(104, -104));
+            AvatarButton.onClick.AddListener(() => onAvatar?.Invoke());
+            BrandArt.Text("PlayerName", column, "PLAYER", 46, new Vector2(800, 64), new Vector2(0, 410), Color.white);
 
-            LevelsText = Stat(column, "LEVELS", -225, 250);
-            StarsText = Stat(column, "STARS", 225, 250);
-            PerfectText = Stat(column, "3-STAR LEVELS", -225, -10);
-            CoinsText = Stat(column, "COINS", 225, -10);
-            ArrowsText = Stat(column, "ARROWS", -225, -270);
-            ThemesText = Stat(column, "THEMES", 225, -270);
+            LevelsText = Stat(column, "LEVELS", -225, 270);
+            StarsText = Stat(column, "STARS", 225, 270);
+            PerfectText = Stat(column, "3-STAR LEVELS", -225, 70);
+            CoinsText = Stat(column, "COINS", 225, 70);
+            ArrowsText = Stat(column, "ARROWS", -225, -130);
+            ThemesText = Stat(column, "THEMES", 225, -130);
+            AvatarsText = Stat(column, "AVATARS", -225, -330);
+            FramesText = Stat(column, "FRAMES", 225, -330);
 
-            var equipped = BrandArt.Image("Equipped", column, "ui_pill", new Vector2(880, 190), new Vector2(0, -520), PillBorder);
-            if (equipped.sprite == null) equipped.color = new Color(0.06f, 0.04f, 0.23f, 0.9f);
-            BrandArt.Text("EquippedTitle", equipped.transform, "EQUIPPED", 28, new Vector2(800, 44), new Vector2(0, 52), BrandArt.Cyan);
-            EquippedText = BrandArt.Text("EquippedNames", equipped.transform, "", 30, new Vector2(820, 100), new Vector2(0, -20), Color.white);
-            EquippedText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            var equipped = UiFactory.Rect("Equipped", column, new Vector2(900, 210), new Vector2(0, -575)).gameObject.AddComponent<UnityEngine.UI.Image>();
+            equipped.raycastTarget = false; NeonKit.Panel(equipped, NeonKit.Cyan);
+            BrandArt.Text("EquippedTitle", equipped.transform, "EQUIPPED", 28, new Vector2(800, 44), new Vector2(0, 62), BrandArt.Cyan);
+            EquippedText = BrandArt.Text("EquippedNames", equipped.transform, "", 26, new Vector2(820, 120), new Vector2(0, -18), Color.white);
+            EquippedText.horizontalOverflow = HorizontalWrapMode.Wrap; EquippedText.lineSpacing = 1.15f;
             Root.gameObject.SetActive(false);
         }
 
         private static UnityEngine.UI.Text Stat(Transform parent, string label, float x, float y)
         {
-            var card = BrandArt.Image(label, parent, "ui_button_secondary", new Vector2(420, 230), new Vector2(x, y), SecondaryBorder);
-            if (card.sprite == null) card.color = new Color(0.16f, 0.11f, 0.48f, 0.95f);
-            var value = BrandArt.Text("Value", card.transform, "0", 58, new Vector2(400, 80), new Vector2(0, 30), Color.white);
-            BrandArt.Text("Label", card.transform, label, 26, new Vector2(400, 44), new Vector2(0, -52), BrandArt.Lavender);
+            var card = UiFactory.Rect(label, parent, new Vector2(420, 180), new Vector2(x, y)).gameObject.AddComponent<UnityEngine.UI.Image>();
+            card.raycastTarget = false; NeonKit.Panel(card, NeonKit.Cyan);
+            var value = BrandArt.Text("Value", card.transform, "0", 52, new Vector2(400, 70), new Vector2(0, 18), Color.white);
+            BrandArt.Text("Label", card.transform, label, 24, new Vector2(400, 40), new Vector2(0, -40), BrandArt.Lavender);
             return value;
         }
 
@@ -95,7 +109,10 @@ namespace ArrowEscape.UI
             CoinsText.text = stats.Coins.ToString();
             ArrowsText.text = stats.ArrowsOwned + " / " + stats.ArrowsTotal;
             ThemesText.text = stats.ThemesOwned + " / " + stats.ThemesTotal;
-            EquippedText.text = "Arrow: " + stats.EquippedArrow + "\nTheme: " + stats.EquippedTheme;
+            AvatarsText.text = stats.AvatarsOwned + " / " + stats.AvatarsTotal;
+            FramesText.text = stats.FramesOwned + " / " + stats.FramesTotal;
+            EquippedText.text = "Arrow: " + stats.EquippedArrow + "   Theme: " + stats.EquippedTheme + "\nAvatar: " + stats.EquippedAvatar + "   Frame: " + stats.EquippedFrame;
+            Avatar.Set(stats.AvatarId, stats.FrameId);
             Root.gameObject.SetActive(true); Root.SetAsLastSibling();
         }
 

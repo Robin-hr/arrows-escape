@@ -33,8 +33,30 @@ namespace ArrowEscape.Core
             new ShopItem("volcanic_underworld","Volcanic Underworld","Molten orange lava glows against dark rock.",ShopSlot.Theme,"Themes",400,"#FF5A1F","#2A0E06",true),
             new ShopItem("neon_cyberpunk","Neon Cyberpunk","Magenta neon shines through midnight city blues.",ShopSlot.Theme,"Themes",500,"#FF2BD6","#0D0221",true),
             new ShopItem("cosmic_nebula","Cosmic Nebula","Violet stardust drifts through deep space.",ShopSlot.Theme,"Themes",800,"#C77DFF","#0B0A24",true),
+            new ShopItem("avatar_player","Player","The classic neon player badge.",ShopSlot.Avatar,"Classic",0,"#38E1FF","#2A1F86",true),
+            new ShopItem("avatar_fox","Swift Fox","A quick-witted fox who always finds the way out.",ShopSlot.Avatar,"Cute Crew",100,"#FF8A3D","#2D1A6E",true),
+            new ShopItem("avatar_cat","Neon Cat","A curious violet cat with glowing green eyes.",ShopSlot.Avatar,"Cute Crew",100,"#B79CFF","#1E2A7A",true),
+            new ShopItem("avatar_bunny","Bouncy Bunny","A cheerful bunny that hops past every blocker.",ShopSlot.Avatar,"Cute Crew",120,"#FFB3D6","#6A1F78",true),
+            new ShopItem("avatar_panda","Bamboo Panda","A calm panda that never rushes a puzzle.",ShopSlot.Avatar,"Cute Crew",150,"#FFFFFF","#16536E",true),
+            new ShopItem("avatar_owl","Wise Owl","Sees every arrow's path before it moves.",ShopSlot.Avatar,"Cute Crew",150,"#B07848","#143A5E",true),
+            new ShopItem("avatar_ghost","Friendly Ghost","Slips through the maze without a sound.",ShopSlot.Avatar,"Cute Crew",200,"#D6E4FF","#3A1A8A",true),
+            new ShopItem("avatar_robot","Circuit Bot","A precise robot with cyan scanner eyes.",ShopSlot.Avatar,"Cosmic Crew",250,"#DCE6F8","#0F2E5E",true),
+            new ShopItem("avatar_alien","Star Visitor","A friendly alien from a galaxy of mazes.",ShopSlot.Avatar,"Cosmic Crew",300,"#A8FF7A","#2A0F5E",true),
+            new ShopItem("avatar_astronaut","Astronaut","Explores every corner of the puzzle cosmos.",ShopSlot.Avatar,"Cosmic Crew",350,"#9A3CF0","#0B1650",true),
+            new ShopItem("avatar_ninja","Shadow Ninja","Silent, fast and never makes a mistake.",ShopSlot.Avatar,"Cosmic Crew",400,"#FF2E4E","#5E0F2A",true),
+            new ShopItem("avatar_dragon","Little Dragon","A tiny dragon with a giant puzzle appetite.",ShopSlot.Avatar,"Cosmic Crew",600,"#6AF08A","#5E1A0F",true),
+            new ShopItem("frame_bronze","Bronze Ring","A simple bronze ring for every new player.",ShopSlot.Frame,"Classic",0,"#B07A4C","#5A361C",true),
+            new ShopItem("frame_winged","Copper Wing","A polished copper ring with a single feathered wing.",ShopSlot.Frame,"Metal Frames",150,"#E0A07A","#7A3E22",true),
+            new ShopItem("frame_silver","Silver Arrowhead","Silver crowned with an arrowhead and a laurel shield.",ShopSlot.Frame,"Metal Frames",300,"#F4F8FF","#7C8AA2",true),
+            new ShopItem("frame_gold","Royal Gold","Gold laurels set with glowing gems.",ShopSlot.Frame,"Metal Frames",500,"#F2B829","#1AB4D8",true),
+            new ShopItem("frame_neon","Neon Orbit","Two neon arrows orbit your badge forever.",ShopSlot.Frame,"Magic Frames",600,"#B85CFF","#4F7BFF",true),
+            new ShopItem("frame_runes","Rune Stone","Ancient stone runes held by two crossed arrows.",ShopSlot.Frame,"Magic Frames",700,"#9FF4FF","#5C6870",true),
+            new ShopItem("frame_void","Void Rift","Purple void smoke pierced by shadow arrowheads.",ShopSlot.Frame,"Magic Frames",800,"#8A3CF0","#2A0860",true),
+            new ShopItem("frame_cosmic","Cosmic Loop","A galaxy swirl wrapped by a rainbow arrow.",ShopSlot.Frame,"Mythic Frames",1000,"#D45CFF","#36C8FF",true),
+            new ShopItem("frame_dragon","Shadow Dragon","Dragon scales, horns and burning red eyes.",ShopSlot.Frame,"Mythic Frames",1200,"#6E6E8C","#FF3020",true),
+            new ShopItem("frame_venom","Venom Thorns","Toxic green thorns guarding two blood-red gems.",ShopSlot.Frame,"Mythic Frames",1500,"#3CD83A","#B00818",true),
         });
-        /// <summary>Stable display order including the two free defaults.</summary>
+        /// <summary>Stable display order including the four free defaults.</summary>
         public static IReadOnlyList<ShopItem> Items => items;
         /// <summary>Retired ids stay reserved forever and are never reused for another item.</summary>
         public static IReadOnlyList<string> RetiredItemIds { get; } = Array.AsReadOnly(new[] { "thunderbolt_dart" });

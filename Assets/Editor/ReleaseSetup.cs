@@ -13,7 +13,7 @@ namespace ArrowEscape.EditorTools
     [InitializeOnLoad]
     public static class ReleaseSetup
     {
-        private const string SessionKey = "ArrowEscape.ReleaseSetup.v1";
+        private const string SessionKey = "ArrowEscape.ReleaseSetup.v2";
         private const string IconFolder = "Assets/Art/AppIcon/";
         private const string BrandFolder = "Assets/Resources/Brand";
         /// <summary>Store name shown under the icon.</summary>

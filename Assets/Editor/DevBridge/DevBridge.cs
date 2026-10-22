@@ -19,6 +19,7 @@ namespace ArrowEscape.DevBridge
     ///   menu:Path/To/Item            run an Editor menu item
     ///   open:Assets/Scenes/X.unity   open a scene
     ///   play:1.5=shot;4=call:OpenProfile;6=shot;8=stop   enter Play mode and run a timeline
+    ///                                (call:Type.Method targets another ArrowEscape.UI component, e.g. call:LoadingOverlay.HideImmediate)
     /// Never included in player builds (Editor-only assembly). Delete the folder to remove it.
     /// </summary>
     [InitializeOnLoad]
@@ -63,7 +64,13 @@ namespace ArrowEscape.DevBridge
 
         private static void Poll()
         {
-            if (EditorApplication.isPlaying) { RunTimeline(); return; }
+            if (EditorApplication.isPlaying)
+            {
+                RunTimeline();
+                // Keep the game rendering while the editor window is in the background, so every shot lands.
+                if (!string.IsNullOrEmpty(SessionState.GetString(TimelineKey, ""))) { EditorApplication.QueuePlayerLoopUpdate(); UnityEditorInternal.InternalEditorUtility.RepaintAllViews(); }
+                return;
+            }
             if (EditorApplication.timeSinceStartup < nextPoll) return;
             nextPoll = EditorApplication.timeSinceStartup + 1.0;
             string path = Path.Combine(Dir, "cmd.txt");
@@ -100,23 +107,33 @@ namespace ArrowEscape.DevBridge
         }
 
         // Timeline: "time=action;time=action". Actions: shot, stop, call:Method (on AppFlowController), click:ButtonPath.
+        private static int lastActionFrame = -10;
+        private static string pendingShot;
         private static void RunTimeline()
         {
             string timeline = SessionState.GetString(TimelineKey, "");
             if (string.IsNullOrEmpty(timeline)) return;
             float start = SessionState.GetFloat(StartKey, -1f);
-            if (start < 0) { start = Time.realtimeSinceStartup; SessionState.SetFloat(StartKey, start); }
+            if (start < 0) { start = Time.realtimeSinceStartup; SessionState.SetFloat(StartKey, start); lastActionFrame = -10; pendingShot = null; Application.runInBackground = true; }
+            // A capture is written when the game view next renders; wait for it so later actions never leak into it.
+            if (pendingShot != null) { if (!File.Exists(pendingShot)) return; pendingShot = null; SessionState.SetFloat(StartKey, Time.realtimeSinceStartup - ShotTime); start = SessionState.GetFloat(StartKey, 0); }
             float now = Time.realtimeSinceStartup - start;
-            var remaining = new List<string>();
-            foreach (string entry in timeline.Split(';'))
+            // One action per rendered frame (at least two frames apart), in order, so captures never overwrite each other.
+            if (Time.frameCount < lastActionFrame + 3) return;
+            string[] entries = timeline.Split(';');
+            for (int i = 0; i < entries.Length; i++)
             {
+                string entry = entries[i];
                 if (string.IsNullOrWhiteSpace(entry)) continue;
                 int eq = entry.IndexOf('=');
                 if (eq < 0 || !float.TryParse(entry.Substring(0, eq), NumberStyles.Float, CultureInfo.InvariantCulture, out float at)) continue;
-                if (now < at) { remaining.Add(entry); continue; }
+                if (now < at) return;
+                SessionState.SetString(TimelineKey, string.Join(";", entries, i + 1, entries.Length - i - 1));
+                lastActionFrame = Time.frameCount;
                 Act(entry.Substring(eq + 1).Trim(), at);
+                return;
             }
-            SessionState.SetString(TimelineKey, string.Join(";", remaining));
+            SessionState.SetString(TimelineKey, "");
         }
 
         private static void Act(string action, float at)
@@ -126,28 +143,39 @@ namespace ArrowEscape.DevBridge
                 if (action == "shot")
                 {
                     string file = Path.Combine(Dir, "shot_" + at.ToString("0.0", CultureInfo.InvariantCulture) + ".png");
-                    ScreenCapture.CaptureScreenshot(file);
+                    try { if (File.Exists(file)) File.Delete(file); } catch (Exception) { }
+                    ScreenCapture.CaptureScreenshot(file); pendingShot = file; ShotTime = at;
                     Append("play-log.txt", Now + " shot " + file);
                 }
                 else if (action == "stop") { SessionState.SetString(TimelineKey, ""); EditorApplication.isPlaying = false; }
                 else if (action.StartsWith("call:", StringComparison.Ordinal))
                 {
-                    Type type = Type.GetType("ArrowEscape.UI.AppFlowController, ArrowEscape.UI");
+                    string target = action.Substring(5), typeName = "AppFlowController";
+                    int dot = target.IndexOf('.');
+                    if (dot > 0) { typeName = target.Substring(0, dot); target = target.Substring(dot + 1); }
+                    Type type = Type.GetType("ArrowEscape.UI." + typeName + ", ArrowEscape.UI");
                     UnityEngine.Object flow = type == null ? null : UnityEngine.Object.FindFirstObjectByType(type);
-                    MethodInfo method = type?.GetMethod(action.Substring(5), BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    MethodInfo method = type?.GetMethod(target, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
                     method?.Invoke(flow, null);
                     Append("play-log.txt", Now + " " + action + (method == null || flow == null ? " (not found)" : ""));
                 }
                 else if (action.StartsWith("click:", StringComparison.Ordinal))
                 {
-                    GameObject target = GameObject.Find(action.Substring(6));
+                    string path = action.Substring(6);
+                    GameObject target = GameObject.Find(path);
                     var button = target == null ? null : target.GetComponent<UnityEngine.UI.Button>();
+                    if (button == null)
+                        foreach (var candidate in UnityEngine.Object.FindObjectsByType<UnityEngine.UI.Button>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+                            if (PathOf(candidate.transform).EndsWith(path, StringComparison.Ordinal)) { button = candidate; break; }
                     button?.onClick.Invoke();
                     Append("play-log.txt", Now + " " + action + (button == null ? " (not found)" : ""));
                 }
             }
             catch (Exception e) { Append("play-log.txt", Now + " " + action + " failed: " + e.Message); }
         }
+
+        private static float ShotTime;
+        private static string PathOf(Transform t) { string p = t.name; while (t.parent != null) { t = t.parent; p = t.name + "/" + p; } return p; }
 
         private sealed class Results : ICallbacks
         {

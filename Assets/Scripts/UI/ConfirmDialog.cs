@@ -8,6 +8,7 @@ namespace ArrowEscape.UI
     {
         private Action confirm;
         private UnityEngine.UI.Text title, message;
+        private UnityEngine.UI.Image cardRim;
         /// <summary>Blocking screen root.</summary>
         public RectTransform Root { get; private set; }
         /// <summary>Whether a confirmation is currently open.</summary>
@@ -20,19 +21,23 @@ namespace ArrowEscape.UI
         public void Build(Transform parent)
         {
             Root = UiFactory.ScreenRoot("ConfirmDialog", parent, ViewTheme.PanelDim, out var safe);
-            var card = UiFactory.Column(safe, 900, 650);
-            card.gameObject.AddComponent<UnityEngine.UI.Image>().color = ViewTheme.PanelCard;
+            var card = UiFactory.Column(safe, 900, 680);
+            cardRim = NeonKit.Panel(card.gameObject.AddComponent<UnityEngine.UI.Image>(), NeonKit.Cyan);
             title = UiFactory.Title("", card, 220);
-            message = UiFactory.Text("Message", card, "", 40, new Vector2(820, 210), new Vector2(0, 40));
-            CancelButton = UiFactory.Button("Cancel", card, new Vector2(-170, -200));
-            ConfirmButton = UiFactory.Button("Confirm", card, new Vector2(170, -200));
+            message = UiFactory.Text("Message", card, "", 38, new Vector2(780, 210), new Vector2(0, 40));
+            CancelButton = UiFactory.Button("Cancel", card, new Vector2(-195, -205));
+            ConfirmButton = UiFactory.Button("Confirm", card, new Vector2(195, -205), NeonButtonStyle.Primary);
+            ((RectTransform)CancelButton.transform).sizeDelta = ((RectTransform)ConfirmButton.transform).sizeDelta = new Vector2(360, 130);
             CancelButton.onClick.AddListener(Hide); ConfirmButton.onClick.AddListener(Confirm);
             Hide();
         }
         /// <summary>Shows one confirmation; the callback is consumed before invocation.</summary>
         public void Show(string heading, string text, string confirmLabel, Action onConfirm)
         {
-            title.text = heading; message.text = text; confirm = onConfirm;
+            title.text = (heading ?? "").ToUpperInvariant(); message.text = text; confirm = onConfirm;
+            bool destructive = confirmLabel == "Delete";
+            NeonKit.Style(ConfirmButton, destructive ? NeonButtonStyle.Danger : NeonButtonStyle.Primary);
+            cardRim.color = destructive ? NeonKit.Magenta : NeonKit.Cyan;
             ConfirmButton.GetComponentInChildren<UnityEngine.UI.Text>().text = confirmLabel;
             Root.gameObject.SetActive(true); Root.SetAsLastSibling();
         }

@@ -14,7 +14,7 @@ namespace ArrowEscape.Tests
             using(var scene=new ProgressTestScene(withUi:true))
             {
                 scene.Bootstrap.ShowLevel(0);var hud=scene.Hud.Hud;
-                int[] moves={15,16,20,21};Color[] colors={ViewTheme.HudText,ViewTheme.MovesAmber,ViewTheme.MovesAmber,ViewTheme.MovesRed};
+                int[] moves={15,16,20,21};Color[] colors={ArrowEscape.UI.HudView.TextColor,ArrowEscape.UI.HudView.AmberColor,ArrowEscape.UI.HudView.AmberColor,ArrowEscape.UI.HudView.RedColor};
                 for(int i=0;i<moves.Length;i++)
                 {
                     hud.SetState("Stars",moves[i],15,0,false);hud.SetStarState(moves[i],15);
@@ -22,7 +22,7 @@ namespace ArrowEscape.Tests
                     Assert.That(hud.Stars.Count,Is.EqualTo(StarRating.StarsIfClearedNow(moves[i],15)));
                     hud.Tick(1);Assert.That(hud.Stars.Slot(2).rectTransform.anchoredPosition.y,Is.Zero);
                 }
-                scene.Game.RestartLevel();Assert.That(hud.Stars.Count,Is.EqualTo(3));Assert.That(hud.MovesText.color,Is.EqualTo(ViewTheme.HudText));
+                scene.Game.RestartLevel();Assert.That(hud.Stars.Count,Is.EqualTo(3));Assert.That(hud.MovesText.color,Is.EqualTo(ArrowEscape.UI.HudView.TextColor));
             }
         }
         /// <summary>Verifies star rules, presentation or persistence at their observable boundary.</summary>

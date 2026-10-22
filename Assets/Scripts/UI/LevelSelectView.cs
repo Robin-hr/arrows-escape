@@ -10,11 +10,12 @@ namespace ArrowEscape.UI
     {
         private readonly List<UnityEngine.UI.Button> buttons = new List<UnityEngine.UI.Button>();
         private readonly List<UnityEngine.UI.RawImage> thumbnails=new List<UnityEngine.UI.RawImage>();
-        private readonly LevelThumbnailRenderer renderer=new LevelThumbnailRenderer();
+        private readonly LevelThumbnailRenderer renderer=new LevelThumbnailRenderer(new Color32(14,12,52,255),new Color32(120,236,255,255));
+        private readonly List<UnityEngine.UI.Image> rims=new List<UnityEngine.UI.Image>();
+        private readonly List<GameObject> locks=new List<GameObject>();
         private readonly Vector3[] corners=new Vector3[4],viewportCorners=new Vector3[4];
         private readonly List<StarDisplay> stars = new List<StarDisplay>();
         private bool wasVisible;
-        private Sprite cardSprite;
 
         private IReadOnlyList<LevelTile> tiles;
         private Action<int> start;
@@ -32,14 +33,14 @@ namespace ArrowEscape.UI
         public void Build(Transform parent, Action<int> onStart, Action onBack)
         {
             start = onStart;
-            Root = UiFactory.ScreenRoot("LevelSelect", parent, ViewTheme.Background, out var safe);
+            Root = UiFactory.ScreenRoot("LevelSelect", parent, BrandArt.Space, out var safe);
+            NeonKit.Backdrop(Root, 0.5f);
             var header = UiFactory.Rect("Header", safe, new Vector2(900, 140), Vector2.zero);
             header.anchorMin = header.anchorMax = header.pivot = new Vector2(0.5f, 1);
             header.anchoredPosition = new Vector2(0, -20);
             header.gameObject.AddComponent<MenuFit>().Configure(header, safe, new Vector2(1000, 170));
-            UiFactory.Title("Levels", header, 0);
-            BackButton = UiFactory.Button("Back", header, new Vector2(-310, 0));
-            ((RectTransform)BackButton.transform).sizeDelta = new Vector2(220, 120);
+            NeonKit.Title("LEVELS", header, Vector2.zero, 64);
+            BackButton = NeonKit.IconButton("Back", header, "icon_back", new Vector2(-390, 0));
             BackButton.onClick.AddListener(() => onBack());
             Scroll = UiFactory.ScrollGrid(safe); grid = Scroll.content.GetComponent<UnityEngine.UI.GridLayoutGroup>();
         }
@@ -48,36 +49,40 @@ namespace ArrowEscape.UI
         {
             tiles = value ?? Array.Empty<LevelTile>();
             while (buttons.Count > tiles.Count)
-            { int i = buttons.Count - 1; DestroyImmediate(buttons[i].gameObject); buttons.RemoveAt(i); thumbnails.RemoveAt(i); stars.RemoveAt(i); }
+            { int i = buttons.Count - 1; DestroyImmediate(buttons[i].gameObject); buttons.RemoveAt(i); thumbnails.RemoveAt(i); stars.RemoveAt(i); rims.RemoveAt(i); locks.RemoveAt(i); }
             while (buttons.Count < tiles.Count)
             {
                 int index = buttons.Count;
                 var button = UiFactory.Button("Level " + (index + 1), Scroll.content, Vector2.zero);
-                button.GetComponentInChildren<UnityEngine.UI.Text>().fontSize = 32;
                 button.onClick.AddListener(() => { if (index < tiles.Count && tiles[index].State != LevelTileState.Locked) start(tiles[index].Index); });
                 var label=button.GetComponentInChildren<UnityEngine.UI.Text>();
-                label.rectTransform.anchorMin=new Vector2(0,0);label.rectTransform.anchorMax=new Vector2(1,.24f);
-                label.rectTransform.offsetMin=new Vector2(5,5);label.rectTransform.offsetMax=new Vector2(-5,0);label.fontSize=24;label.color=UiStyle.Ink;
+                label.resizeTextForBestFit=false;label.supportRichText=true;label.verticalOverflow=VerticalWrapMode.Overflow;label.lineSpacing=.82f;
+                label.rectTransform.anchorMin=new Vector2(0,.07f);label.rectTransform.anchorMax=new Vector2(1,.33f);
+                label.rectTransform.offsetMin=new Vector2(6,0);label.rectTransform.offsetMax=new Vector2(-6,0);label.fontSize=34;
+                var well=UiFactory.Rect("ThumbWell",button.transform,Vector2.zero,Vector2.zero).gameObject.AddComponent<UnityEngine.UI.Image>();
+                well.raycastTarget=false;well.color=new Color32(10,8,40,230);well.rectTransform.anchorMin=new Vector2(.12f,.48f);well.rectTransform.anchorMax=new Vector2(.88f,.92f);well.rectTransform.offsetMin=well.rectTransform.offsetMax=Vector2.zero;
                 var image=UiFactory.Rect("Thumbnail",button.transform,Vector2.zero,Vector2.zero).gameObject.AddComponent<UnityEngine.UI.RawImage>();
-                image.raycastTarget=false;image.rectTransform.anchorMin=new Vector2(.06f,.43f);image.rectTransform.anchorMax=new Vector2(.94f,.96f);
+                image.raycastTarget=false;image.rectTransform.anchorMin=new Vector2(.12f,.48f);image.rectTransform.anchorMax=new Vector2(.88f,.92f);
                 image.rectTransform.offsetMin=image.rectTransform.offsetMax=Vector2.zero;image.enabled=false;var aspect=image.gameObject.AddComponent<UnityEngine.UI.AspectRatioFitter>();aspect.aspectMode=UnityEngine.UI.AspectRatioFitter.AspectMode.HeightControlsWidth;aspect.aspectRatio=1;
-                EnsureCard();var background=button.GetComponent<UnityEngine.UI.Image>();background.sprite=cardSprite;background.type=UnityEngine.UI.Image.Type.Sliced;
+                var lockIcon=NeonKit.Icon("Lock",button.transform,"icon_lock",84,Vector2.zero);lockIcon.rectTransform.anchorMin=lockIcon.rectTransform.anchorMax=new Vector2(.5f,.70f);lockIcon.rectTransform.anchoredPosition=Vector2.zero;
                 var starRoot = UiFactory.Rect("SavedStars", button.transform, new Vector2(110,28), Vector2.zero);
-                var display = starRoot.gameObject.AddComponent<StarDisplay>(); display.Build(button.transform, 28, 34);
-                starRoot.anchorMin = starRoot.anchorMax = new Vector2(.5f,.34f); starRoot.anchoredPosition = Vector2.zero;
+                var display = starRoot.gameObject.AddComponent<StarDisplay>(); display.Build(button.transform, 30, 36);
+                starRoot.anchorMin = starRoot.anchorMax = new Vector2(.5f,.405f); starRoot.anchoredPosition = Vector2.zero;
                 stars.Add(display);
-                thumbnails.Add(image);buttons.Add(button);
+                thumbnails.Add(image);buttons.Add(button);rims.Add(button.transform.Find("Rim").GetComponent<UnityEngine.UI.Image>());locks.Add(lockIcon.gameObject);
             }
             for (int i = 0; i < tiles.Count; i++)
             {
                 LevelTile tile = tiles[i]; var button = buttons[i];
-                button.interactable = tile.State != LevelTileState.Locked;
-                stars[i].SetCount(tile.BestStars); stars[i].gameObject.SetActive(tile.State == LevelTileState.Completed);
-                string detail = tile.State == LevelTileState.Locked ? "Locked [X]" : tile.State == LevelTileState.Completed ?
-                    (tile.BestMistakes == 0 && tile.BestUndos == 0 ? "[OK] Flawless" : "[OK] " + tile.BestMistakes + " mistakes") : "Play";
-                button.GetComponentInChildren<UnityEngine.UI.Text>().text = tile.Number + "\n" + detail;
-                thumbnails[i].color=new Color(1,1,1,tile.State==LevelTileState.Locked?.35f:1);
-                var colors = button.colors; colors.normalColor = UiStyle.Surface; button.colors = colors;
+                bool locked = tile.State == LevelTileState.Locked, done = tile.State == LevelTileState.Completed;
+                button.interactable = !locked;
+                stars[i].SetCount(tile.BestStars); stars[i].gameObject.SetActive(done);
+                string detail = locked ? "Locked" : done ? (tile.BestMistakes == 0 && tile.BestUndos == 0 ? "Flawless" : tile.BestMistakes + " mistakes") : "Play";
+                button.GetComponentInChildren<UnityEngine.UI.Text>().text = "<size=32>" + tile.Number + "</size>  <size=16><color=#" + (done ? "FFD86B" : locked ? "8C86C0" : "8FF3FF") + ">" + detail + "</color></size>";
+                thumbnails[i].color=new Color(1,1,1,locked?.25f:1);
+                locks[i].SetActive(locked);
+                NeonKit.Style(button, tile.IsResume && !locked ? NeonButtonStyle.Primary : NeonButtonStyle.Normal);
+                rims[i].color = locked ? NeonKit.Dim : done ? NeonKit.Gold : tile.IsResume ? NeonKit.Bright : NeonKit.Cyan;
             }
             Canvas.ForceUpdateCanvases(); UpdateLayout(); RevealResume();
         }
@@ -95,7 +100,6 @@ namespace ArrowEscape.UI
                 break;
             }
         }
-        private void EnsureCard(){if(cardSprite==null)cardSprite=SpriteFactory.GetUiSprite(UiSpriteShape.Card);}
         private void Update()
         {
             bool showing=Root!=null&&Root.gameObject.activeInHierarchy;

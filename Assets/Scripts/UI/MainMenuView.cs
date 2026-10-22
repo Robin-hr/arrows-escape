@@ -38,6 +38,8 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Button SettingsButton { get; private set; }
         /// <summary>Profile button in the header.</summary>
         public UnityEngine.UI.Button ProfileButton { get; private set; }
+        /// <summary>The player's avatar in their frame, on the profile button.</summary>
+        public AvatarBadge Avatar { get; private set; }
         /// <summary>Star counter; opens level select.</summary>
         public UnityEngine.UI.Button StarsButton { get; private set; }
         /// <summary>Retained platform quit API (hidden).</summary>
@@ -76,9 +78,10 @@ namespace ArrowEscape.UI
             playGlow = BrandArt.Image("PlayGlow", column, "ui_button_primary", new Vector2(820, 228), new Vector2(0, -138), PrimaryBorder);
             playGlow.color = new Color(0.31f, 0.85f, 1f, 0.35f);
             PlayButton = NeonButton("Play", column, "ui_button_primary", PrimaryBorder, new Vector2(760, 200), new Vector2(0, -140));
-            BrandArt.Image("PlayIcon", PlayButton.transform, "icon_play", new Vector2(130, 130), new Vector2(-255, 10));
-            BrandArt.Text("Label", PlayButton.transform, "PLAY", 84, new Vector2(440, 100), new Vector2(60, 30), Color.white);
-            PlayLevelText = BrandArt.Text("LevelLabel", PlayButton.transform, "LEVEL 1", 32, new Vector2(440, 50), new Vector2(60, -40), new Color32(230, 247, 255, 255));
+            // The art's lit face sits 11.5 units above the sprite centre (its drop edge is at the bottom); content is centred on the face.
+            BrandArt.Image("PlayIcon", PlayButton.transform, "icon_play", new Vector2(120, 120), new Vector2(-250, 12));
+            BrandArt.Text("Label", PlayButton.transform, "PLAY", 76, new Vector2(440, 90), new Vector2(60, 36), Color.white);
+            PlayLevelText = BrandArt.Text("LevelLabel", PlayButton.transform, "LEVEL 1", 30, new Vector2(440, 44), new Vector2(60, -24), new Color32(230, 247, 255, 255));
 
             LevelsButton = Tile("Levels", "LEVELS", "icon_levels", column, -285);
             ShopButton = Tile("Shop", "SHOP", "icon_shop", column, 0);
@@ -104,8 +107,11 @@ namespace ArrowEscape.UI
             BrandArt.Image("StarIcon", StarsButton.transform, "icon_star", new Vector2(70, 70), new Vector2(-118, 0));
             StarsText = BrandArt.Text("TotalStars", StarsButton.transform, "0 / 0", 34, new Vector2(230, 60), new Vector2(35, 0), Color.white);
 
-            ProfileButton = NeonButton("Profile", header, "ui_pill", PillBorder, new Vector2(112, 112), new Vector2(0, -62));
-            BrandArt.Image("ProfileIcon", ProfileButton.transform, "icon_profile", new Vector2(84, 84), Vector2.zero);
+            var profileHit = UiFactory.Rect("Profile", header, new Vector2(140, 140), new Vector2(0, -62)).gameObject.AddComponent<UnityEngine.UI.Image>();
+            profileHit.color = new Color(0, 0, 0, 0);
+            ProfileButton = profileHit.gameObject.AddComponent<UnityEngine.UI.Button>(); ProfileButton.targetGraphic = profileHit;
+            profileHit.gameObject.AddComponent<ButtonFeel>();
+            Avatar = AvatarBadge.Create("AvatarBadge", ProfileButton.transform, 140, Vector2.zero);
 
             CoinsButton = NeonButton("Coins", header, "ui_pill", PillBorder, new Vector2(330, 92), new Vector2(315, -62));
             BrandArt.Image("CoinIcon", CoinsButton.transform, "icon_coin", new Vector2(66, 66), new Vector2(-118, 0));
@@ -134,8 +140,9 @@ namespace ArrowEscape.UI
         private static UnityEngine.UI.Button Tile(string name, string label, string icon, Transform parent, float x)
         {
             var button = NeonButton(name, parent, "ui_button_secondary", SecondaryBorder, new Vector2(250, 250), new Vector2(x, -475));
-            BrandArt.Image("Icon", button.transform, icon, new Vector2(120, 120), new Vector2(0, 30));
-            BrandArt.Text("Label", button.transform, label, 30, new Vector2(240, 50), new Vector2(0, -72), BrandArt.Lavender);
+            // Centred on the tile's lit face (+9.5 units, 183 tall) so icon and label stay inside the frame.
+            BrandArt.Image("Icon", button.transform, icon, new Vector2(104, 104), new Vector2(0, 34));
+            BrandArt.Text("Label", button.transform, label, 28, new Vector2(220, 44), new Vector2(0, -46), BrandArt.Lavender);
             return button;
         }
 
@@ -156,6 +163,9 @@ namespace ArrowEscape.UI
             CompletedText.text = $"Completed {completed} / {total}";
             background.Restart(); PlayEntrance();
         }
+
+        /// <summary>Shows the equipped avatar and frame on the profile button.</summary>
+        public void SetAvatar(string avatarId, string frameId) { if (Avatar != null && (Avatar.AvatarId != avatarId || Avatar.FrameId != frameId)) Avatar.Set(avatarId, frameId); }
 
         /// <summary>Remembers the equipped theme; the home page keeps its neon look.</summary>
         public void SetTheme(string id) { themeId = string.IsNullOrEmpty(id) ? "paper" : id; }

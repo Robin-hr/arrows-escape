@@ -16,6 +16,9 @@ namespace ArrowEscape.UI
         private UnityEngine.UI.Button flyButton,darkButton;
         private UnityEngine.UI.Text previewNote,signature;
         private UnityEngine.UI.AspectRatioFitter previewAspect;
+        private AvatarBadge badge;
+        /// <summary>Whether the selected item is an avatar or frame shown as static portrait art.</summary>
+        public bool HasStaticPreview=>badge!=null&&badge.gameObject.activeSelf;
         /// <summary>Whether the selected item uses the live skin board.</summary>
         public bool HasLivePreview=>live!=null&&live.gameObject.activeSelf||themePreview!=null&&themePreview.gameObject.activeSelf;
         private UnityEngine.UI.Text nameText,category,description,mainLabel;
@@ -40,10 +43,11 @@ namespace ArrowEscape.UI
         {
             confirm=dialog;game=controller;
             Root=UiFactory.ScreenRoot("ShopDetail",parent,ViewTheme.PanelDim,out var safe);
-            var card=UiFactory.Column(safe,900,1300);var surface=card.gameObject.AddComponent<UnityEngine.UI.Image>();surface.color=UiStyle.Surface;UiStyle.SurfaceFor(surface,true,true);
+            var card=UiFactory.Column(safe,900,1300);var surface=card.gameObject.AddComponent<UnityEngine.UI.Image>();NeonKit.Panel(surface,NeonKit.Cyan);
             BackButton=UiFactory.Button("",card,new Vector2(-340,550));((RectTransform)BackButton.transform).sizeDelta=new Vector2(112,112);UiStyle.Icon("Back",BackButton.transform,UiSpriteShape.Back,Vector2.zero,48,Color.white);BackButton.onClick.AddListener(Hide);
-            nameText=UiFactory.Text("Name",card,"",56,new Vector2(820,110),new Vector2(0,425));nameText.fontStyle=FontStyle.Bold;
+            nameText=BrandArt.Text("Name",card,"",50,new Vector2(640,110),new Vector2(40,425),Color.white);nameText.horizontalOverflow=HorizontalWrapMode.Wrap;nameText.resizeTextForBestFit=true;nameText.resizeTextMinSize=28;nameText.resizeTextMaxSize=50;
             category=UiFactory.Text("Category",card,"",UiStyle.Body,new Vector2(820,64),new Vector2(0,330));category.color=UiStyle.Muted;
+            badge=AvatarBadge.Create("PortraitPreview",card,400,new Vector2(0,110));badge.gameObject.SetActive(false);
             Preview=UiFactory.Rect("LargePreview",card,new Vector2(780,340),new Vector2(0,110)).gameObject.AddComponent<UnityEngine.UI.RawImage>();Preview.raycastTarget=false;previewAspect=Preview.gameObject.AddComponent<UnityEngine.UI.AspectRatioFitter>();previewAspect.aspectMode=UnityEngine.UI.AspectRatioFitter.AspectMode.HeightControlsWidth;
             description=UiFactory.Text("Description",card,"",UiStyle.Body,new Vector2(780,125),new Vector2(0,-140));
             signature=UiFactory.Text("Signature",card,"",UiStyle.Caption,new Vector2(780,100),new Vector2(0,-240));signature.fontStyle=FontStyle.Italic;
@@ -53,13 +57,16 @@ namespace ArrowEscape.UI
             flyButton.onClick.AddListener(FlyPreview);darkButton.onClick.AddListener(TogglePreviewDark);
             var liveGo=new GameObject("Live shop preview");liveGo.transform.SetParent(transform,false);live=liveGo.AddComponent<LiveSkinPreview>();live.Initialize(controller==null?null:controller.GetComponent<AudioDirector>());liveGo.SetActive(false);
             var themeGo=new GameObject("Live theme detail");themeGo.transform.SetParent(transform,false);themePreview=themeGo.AddComponent<LiveThemePreview>();themePreview.Initialize(new Vector2(39000,39000),640,360);themeGo.SetActive(false);
-            MainButton=UiFactory.Button("",card,new Vector2(0,-475));((RectTransform)MainButton.transform).sizeDelta=new Vector2(700,128);mainLabel=MainButton.GetComponentInChildren<UnityEngine.UI.Text>();MainButton.onClick.AddListener(OnMain);Hide();
+            MainButton=UiFactory.Button("",card,new Vector2(0,-475),NeonButtonStyle.Primary);((RectTransform)MainButton.transform).sizeDelta=new Vector2(700,128);mainLabel=MainButton.GetComponentInChildren<UnityEngine.UI.Text>();MainButton.onClick.AddListener(OnMain);Hide();
         }
         /// <summary>Shows catalog text; preview rendering remains lazy.</summary>
         public void Show(ShopItem item,InventoryService service)
         {Item=item;inventory=service;nameText.text=item.Name;category.text=item.Category;description.text=item.Description;signature.text=ArrowSkinRegistry.Find(item.Id)?.Signature??"";Preview.texture=null;bool implemented=ArrowSkinRegistry.Find(item.Id)!=null;previewAspect.aspectRatio=implemented?640f/360:1;flyButton.gameObject.SetActive(implemented);darkButton.gameObject.SetActive(implemented);previewNote.gameObject.SetActive(!implemented);
             live.gameObject.SetActive(implemented);if(implemented){if(ArrowSkinRegistry.Find(item.Id)?.PrefersDarkBoard==true)live.SetDark(true);live.Show(item.Id);Preview.texture=live.Texture;}
             bool themed=ThemeDesign.Index(item.Id)>=0;themePreview.gameObject.SetActive(themed);if(themed){themePreview.Show(item.Id);themePreview.ShowSample(service.State.EquippedArrowId);Preview.texture=themePreview.Texture;previewAspect.aspectRatio=640f/360;previewNote.gameObject.SetActive(false);}
+            category.color=UiStyle.Category(item.Category);
+            bool portrait=item.Slot==ShopSlot.Avatar||item.Slot==ShopSlot.Frame;badge.gameObject.SetActive(portrait);Preview.enabled=!portrait;
+            if(portrait){previewNote.gameObject.SetActive(false);badge.Set(item.Slot==ShopSlot.Avatar?item.Id:service.State.EquippedAvatarId,item.Slot==ShopSlot.Frame?item.Id:service.State.EquippedFrameId);}
             Root.gameObject.SetActive(true);Root.SetAsLastSibling();Refresh();}
         /// <summary>Reflects exact ownership and affordability state.</summary>
         public void Refresh()

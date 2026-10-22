@@ -25,5 +25,7 @@ namespace ArrowEscape.UI
             if (size == lastSize) return;
             lastSize = size; BrandArt.Cover(image);
         }
+
+        private void LateUpdate() { if (Application.isPlaying) Tick(0f); }
     }
 }

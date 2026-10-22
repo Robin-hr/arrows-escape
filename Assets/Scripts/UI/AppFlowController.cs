@@ -38,6 +38,11 @@ namespace ArrowEscape.UI
         /// <summary>Loading screens run in the player and Play mode; Edit Mode tests keep instant flow unless enabled.</summary>
         public bool LoadingScreensEnabled { get => loadingScreens ?? Application.isPlaying; set => loadingScreens = value; }
         private bool? loadingScreens;
+        private readonly TapStreak coinTaps = new TapStreak(5, 0.8f);
+        /// <summary>Short neon notices (developer coin grant).</summary>
+        public ToastView Toast { get; private set; }
+        /// <summary>Clock for the five-tap developer grant; tests may replace it.</summary>
+        public System.Func<float> Clock { get; set; } = () => Time.realtimeSinceStartup;
 
         private void Start()
         {
@@ -89,11 +94,12 @@ namespace ArrowEscape.UI
             SettingsScreen.Build(canvasObject.transform, bootstrap.Settings.Model, SetSound, SetHaptics, AskReset, Back);
             Confirm = gameObject.AddComponent<ConfirmDialog>(); Confirm.Build(canvasObject.transform);
             Shop=gameObject.AddComponent<ShopView>();Shop.Build(canvasObject.transform,Confirm,game);Shop.Closed+=OnShopClosed;
-            Profile = gameObject.AddComponent<ProfileView>(); Profile.Build(canvasObject.transform, CloseProfile);
+            Profile = gameObject.AddComponent<ProfileView>(); Profile.Build(canvasObject.transform, CloseProfile, OpenAvatarShop);
             Loading = gameObject.AddComponent<LoadingOverlay>(); Loading.Build(canvasObject.transform);
+            Toast = gameObject.AddComponent<ToastView>(); Toast.Build(canvasObject.transform);
             MainMenu.ProfileButton.onClick.AddListener(OpenProfile);
             MainMenu.StarsButton.onClick.AddListener(OnLevelsRequested);
-            MainMenu.ShopButton.onClick.AddListener(OpenShop);MainMenu.CoinsButton.onClick.AddListener(OpenShop);
+            MainMenu.ShopButton.onClick.AddListener(OpenShop);MainMenu.CoinsButton.onClick.AddListener(OnCoinsTapped);Shop.CoinsButton.onClick.AddListener(OnCoinsTapped);
             MainMenu.PlayButton.onClick.AddListener(Continue);
             MainMenu.LevelsButton.onClick.AddListener(OnLevelsRequested);
             MainMenu.SettingsButton.onClick.AddListener(OpenSettings);
@@ -114,6 +120,7 @@ namespace ArrowEscape.UI
             PauseScreen.Root.gameObject.SetActive(state == ScreenState.Paused);
             SettingsScreen.Root.gameObject.SetActive(state == ScreenState.Settings);
             bool settingsPaused = state == ScreenState.Settings && Machine.SettingsReturnState == ScreenState.Paused;
+            SettingsScreen.SetBackdrop(!settingsPaused);
             bool showBoard = state == ScreenState.Playing || state == ScreenState.Paused || state == ScreenState.LevelComplete || settingsPaused;
             game.SetPaused(state != ScreenState.Playing && state != ScreenState.LevelComplete);
             if (state == ScreenState.MainMenu && previous == ScreenState.Paused) game.DiscardAttempt();
@@ -127,16 +134,39 @@ namespace ArrowEscape.UI
             MainMenu.Refresh(bootstrap.HasAnyProgress,bootstrap.Progress.Tracker.CompletedCount(bootstrap.LevelIds),bootstrap.LevelCount,bootstrap.ContinueIndex);
             MainMenu.SetTheme(bootstrap.Inventory.State.EquippedThemeId);
             MainMenu.SetEconomy(bootstrap.Inventory.State.Coins,bootstrap.Progress.Tracker.TotalStars,bootstrap.LevelCount*3,false);
+            MainMenu.SetAvatar(bootstrap.Inventory.State.EquippedAvatarId,bootstrap.Inventory.State.EquippedFrameId);
         }
         private void BindInventory()
         {
             if(wallet!=null){wallet.CoinsChanged-=OnCoins;wallet.EquippedChanged-=OnThemeEquipped;}wallet=bootstrap.Inventory.Shop;wallet.CoinsChanged+=OnCoins;wallet.EquippedChanged+=OnThemeEquipped;
             Shop.Bind(bootstrap.Inventory);OnCoins(wallet.Inventory.Coins);
         }
-        private void OnThemeEquipped(ShopSlot slot,string id){if(slot==ShopSlot.Theme)MainMenu.SetTheme(id);}
+        private void OnThemeEquipped(ShopSlot slot,string id)
+        {
+            if(slot==ShopSlot.Theme)MainMenu.SetTheme(id);
+            if(slot==ShopSlot.Avatar||slot==ShopSlot.Frame)MainMenu.SetAvatar(bootstrap.Inventory.State.EquippedAvatarId,bootstrap.Inventory.State.EquippedFrameId);
+        }
+        /// <summary>
+        /// Coin pill taps: the first opens the shop; five quick taps (home and shop pills share one position)
+        /// grant the developer coins when <see cref="EconomyConfig.DeveloperGrantEnabled"/> is on.
+        /// </summary>
+        public void OnCoinsTapped()
+        {
+            bool grant=EconomyConfig.DeveloperGrantEnabled&&coinTaps.Tap(Clock());
+            if(grant){GrantDeveloperCoins();return;}
+            if(!Shop.IsVisible)OpenShop();
+        }
+        /// <summary>Adds the developer coin grant, saves it and shows a notice.</summary>
+        public void GrantDeveloperCoins()
+        {
+            bootstrap.Inventory.Shop.AddCoins(EconomyConfig.DeveloperGrant);bootstrap.Inventory.Save();
+            Toast.Show("DEVELOPER MODE\n+"+EconomyConfig.DeveloperGrant.ToString("N0",System.Globalization.CultureInfo.InvariantCulture)+" COINS");
+        }
         private void OnCoins(int amount)=>MainMenu.SetEconomy(amount,bootstrap.Progress.Tracker.TotalStars,bootstrap.LevelCount*3);
         /// <summary>Opens the shop only from the main menu.</summary>
         public void OpenShop(){if(Machine.Current!=ScreenState.MainMenu)return;MainMenu.Root.gameObject.SetActive(false);Shop.Show();}
+        /// <summary>From the profile page: opens the shop on the Avatars tab; closing it returns to the profile.</summary>
+        public void OpenAvatarShop(){if(Machine.Current!=ScreenState.MainMenu)return;MainMenu.Root.gameObject.SetActive(false);Shop.Show(ShopSlot.Avatar);}
         /// <summary>Opens the profile page from the home page, behind a 2-second loading screen.</summary>
         public void OpenProfile()
         {
@@ -152,7 +182,11 @@ namespace ArrowEscape.UI
             MainMenu.Root.gameObject.SetActive(Machine.Current == ScreenState.MainMenu);
             if (Machine.Current == ScreenState.MainMenu) RefreshMainMenu();
         }
-        private void OnShopClosed(){MainMenu.Root.gameObject.SetActive(Machine.Current==ScreenState.MainMenu);if(Machine.Current==ScreenState.MainMenu)RefreshMainMenu();}
+        private void OnShopClosed()
+        {
+            if(Profile.IsVisible){Profile.Show(ProfileStats.Build(bootstrap.Progress.Tracker,bootstrap.LevelIds,bootstrap.Inventory.State));MainMenu.Root.gameObject.SetActive(false);return;}
+            MainMenu.Root.gameObject.SetActive(Machine.Current==ScreenState.MainMenu);if(Machine.Current==ScreenState.MainMenu)RefreshMainMenu();
+        }
 
         private void RefreshLevels() => Levels.Refresh(LevelSelectModel.Build(bootstrap.LevelIds, bootstrap.Progress.Tracker));
         private void Continue() => StartLevel(bootstrap.ContinueIndex);
@@ -193,8 +227,8 @@ namespace ArrowEscape.UI
         {
             if (Loading != null && Loading.IsVisible) return true;
             if (Confirm != null && Confirm.IsOpen) { Confirm.Hide(); return true; }
-            if (Profile != null && Profile.IsVisible) { CloseProfile(); return true; }
             if(Shop!=null&&Shop.IsVisible)return Shop.HandleBack();
+            if (Profile != null && Profile.IsVisible) { CloseProfile(); return true; }
             return Machine.Back();
         }
         private void Update()
