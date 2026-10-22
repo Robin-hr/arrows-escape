@@ -37,12 +37,16 @@ namespace ArrowEscape.View
             boardView=view;game=controller;width=board.Width;height=board.Height;
             int count=width*height;centers=new Vector3[count];delays=new float[count];
             rest=new Vector3[count*13];vertices=new Vector3[rest.Length];colors=new Color[rest.Length];renderColors=new Color[rest.Length];var triangles=new int[count*36];
+            // Only cells that arrows occupy at the start get a dot; empty cells outside the level's shape stay blank.
+            var used=new bool[count];
+            foreach(Arrow arrow in board.Arrows)for(int c=0;c<arrow.Length;c++){Cell cell=arrow.Cells[c];if(cell.X>=0&&cell.Y>=0&&cell.X<width&&cell.Y<height)used[cell.Y*width+cell.X]=true;}
             for(int y=0;y<height;y++)for(int x=0;x<width;x++)
             {
                 int i=y*width+x,v=i*13;centers[i]=view.CellToWorld(x,y);rest[v]=centers[i];
+                float dotRadius=used[i]?.06f:0f;
                 for(int j=0;j<12;j++)
                 {
-                    float a=j*Mathf.PI/6;rest[v+j+1]=centers[i]+new Vector3(Mathf.Cos(a),Mathf.Sin(a),0)*.06f;
+                    float a=j*Mathf.PI/6;rest[v+j+1]=centers[i]+new Vector3(Mathf.Cos(a),Mathf.Sin(a),0)*dotRadius;
                     int t=i*36+j*3;triangles[t]=v;triangles[t+1]=v+j+1;triangles[t+2]=v+1+(j+1)%12;
                 }
             }

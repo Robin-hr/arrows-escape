@@ -35,6 +35,12 @@ namespace ArrowEscape.Tests
             foreach (var item in ShopCatalog.Items.Where(i => i.Slot == ShopSlot.Frame)) Assert.That(AvatarBadge.FrameTexture(item.Id), Is.Not.Null, item.Id);
         }
 
+        [Test] public void PremiumAvatarsAreInTheirOwnSection()
+        {
+            var premium = ShopCatalog.Items.Where(i => i.Category == "Premium").ToArray();
+            Assert.That(premium.Length, Is.EqualTo(10)); Assert.That(premium.All(i => i.Slot == ShopSlot.Avatar && i.Price >= 800), Is.True);
+        }
+
         [Test] public void TapStreakNeedsFiveQuickTaps()
         {
             var streak = new TapStreak(5, 0.8f);
@@ -68,7 +74,7 @@ namespace ArrowEscape.Tests
                 scene.Flow.OpenShop(); var shop = scene.Flow.Shop;
                 Assert.That(shop.Tab, Is.EqualTo(ShopSlot.Arrow));
                 shop.AvatarsButton.onClick.Invoke();
-                Assert.That(shop.Cards.Count, Is.EqualTo(12)); Assert.That(shop.Cards.All(c => c.IsPortrait && c.Badge != null), Is.True);
+                Assert.That(shop.Cards.Count, Is.EqualTo(22)); Assert.That(shop.Cards.All(c => c.IsPortrait && c.Badge != null), Is.True);
                 Assert.That(shop.Cards[0].StateText, Is.EqualTo("Equipped")); Assert.That(shop.Cards[1].StateText, Is.EqualTo("100"));
                 shop.FramesButton.onClick.Invoke();
                 Assert.That(shop.Cards.Count, Is.EqualTo(10)); Assert.That(shop.Cards[0].Badge.FrameId, Is.EqualTo("frame_bronze"));
@@ -91,7 +97,7 @@ namespace ArrowEscape.Tests
                 scene.Flow.HandleBack(); scene.Flow.HandleBack();
                 scene.Flow.MainMenu.ProfileButton.onClick.Invoke();
                 var profile = scene.Flow.Profile;
-                Assert.That(profile.Avatar.AvatarId, Is.EqualTo("avatar_fox")); Assert.That(profile.AvatarsText.text, Is.EqualTo("2 / 12")); Assert.That(profile.FramesText.text, Is.EqualTo("1 / 10"));
+                Assert.That(profile.Avatar.AvatarId, Is.EqualTo("avatar_fox")); Assert.That(profile.AvatarsText.text, Is.EqualTo("2 / 22")); Assert.That(profile.FramesText.text, Is.EqualTo("1 / 10"));
                 Assert.That(profile.EquippedText.text, Does.Contain("Swift Fox"));
             }
         }

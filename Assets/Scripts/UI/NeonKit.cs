@@ -127,6 +127,16 @@ namespace ArrowEscape.UI
             UiFactory.Stretch(dim.rectTransform); dim.color = new Color(0.02f, 0.02f, 0.1f, shade); dim.raycastTarget = false;
         }
 
+        /// <summary>
+        /// Gives a continuously animated element its own nested canvas, so its per-frame changes rebuild only itself
+        /// instead of the whole menus canvas.
+        /// </summary>
+        public static void Isolate(GameObject target)
+        {
+            if (target == null || target.GetComponent<Canvas>() != null) return;
+            target.AddComponent<Canvas>();
+        }
+
         /// <summary>Large Orbitron page title.</summary>
         public static UnityEngine.UI.Text Title(string text, Transform parent, Vector2 position, int size = 64, float width = 700)
             => BrandArt.Text("Title", parent, text, size, new Vector2(width, size * 1.6f), position, Color.white);

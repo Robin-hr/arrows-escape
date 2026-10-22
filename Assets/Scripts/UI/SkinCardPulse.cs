@@ -19,7 +19,7 @@ namespace ArrowEscape.UI
         private UnityEngine.UI.RawImage image;
         private float clock;
         /// <summary>Captures the existing reference preview.</summary>
-        public void Bind(UnityEngine.UI.RawImage target){image=target;}
+        public void Bind(UnityEngine.UI.RawImage target){image=target;NeonKit.Isolate(target.gameObject);}
         /// <summary>Explicit gentle alpha pulse, leaving the actual source texture unchanged.</summary>
         public void Tick(float dt){if(image==null)return;clock+=dt;float a=.9f+.1f*Mathf.Sin(clock*2);image.color=new Color(1,1,1,a);}
         private void Update(){if(Application.isPlaying)Tick(Time.unscaledDeltaTime);}

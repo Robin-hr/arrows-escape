@@ -144,14 +144,14 @@ namespace ArrowEscape.UI
             for(int i=0;i<cards.Count;i++)if(ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true)
             {
                 int n=ArrowSkinRegistry.Find(cards[i].Item.Id).Index;
-                var infernoCard=elementalCards[n];if(infernoCard==null){var go=new GameObject("Procedural Inferno card");go.transform.SetParent(transform,false);infernoCard=go.AddComponent<LiveSkinPreview>();infernoCard.Initialize(null,new Vector2(22000+n*1000,22000));infernoCard.AutoReplay=false;infernoCard.SetDark(true);infernoCard.ShowStraight(cards[i].Item.Id);elementalCards[n]=infernoCard;}
+                var infernoCard=elementalCards[n];if(infernoCard==null){var go=new GameObject("Procedural Inferno card");go.transform.SetParent(transform,false);infernoCard=go.AddComponent<LiveSkinPreview>();infernoCard.Initialize(null,new Vector2(22000+n*1000,22000));infernoCard.AutoReplay=false;infernoCard.SetDark(true);infernoCard.ShowStraight(cards[i].Item.Id);infernoCard.SetResolution(400,225);infernoCard.HalfRate=true;elementalCards[n]=infernoCard;}
                 cards[i].Preview.texture=infernoCard.Texture;
             }
         }
         private void PrepareThemeCards()
         {
             for(int i=0;i<cards.Count;i++){int n=ThemeDesign.Index(cards[i].Item.Id);if(n<0)continue;
-                if(themeCards[n]==null){var go=new GameObject("Live theme card "+n);go.transform.SetParent(transform,false);var preview=go.AddComponent<LiveThemePreview>();preview.Initialize(new Vector2(35000+n*100,35000));preview.Show(cards[i].Item.Id);themeCards[n]=preview;}
+                if(themeCards[n]==null){var go=new GameObject("Live theme card "+n);go.transform.SetParent(transform,false);var preview=go.AddComponent<LiveThemePreview>();preview.Initialize(new Vector2(35000+n*100,35000),320,200);preview.Show(cards[i].Item.Id);preview.HalfRate=true;themeCards[n]=preview;}
                 cards[i].Preview.texture=themeCards[n].Texture;cards[i].Preview.GetComponent<UnityEngine.UI.AspectRatioFitter>().aspectMode=UnityEngine.UI.AspectRatioFitter.AspectMode.EnvelopeParent;
             }
         }

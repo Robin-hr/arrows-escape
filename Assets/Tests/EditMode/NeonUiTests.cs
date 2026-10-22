@@ -91,7 +91,10 @@ namespace ArrowEscape.Tests
                 Assert.That(scene.Flow.Loading.IsVisible, Is.True); Assert.That(scene.Flow.Loading.Kind, Is.EqualTo(LoadingKind.Level));
                 Assert.That(adapter.ShouldAcceptPointerDown(point), Is.False);
                 scene.Flow.Loading.Tick(1.5f);
-                Assert.That(scene.Flow.Loading.IsVisible, Is.False); Assert.That(adapter.ShouldAcceptPointerDown(point), Is.True);
+                Assert.That(scene.Flow.Loading.IsVisible, Is.False);
+                Assert.That(scene.Flow.Intro.IsPlaying, Is.True, "arrows are still landing"); Assert.That(adapter.ShouldAcceptPointerDown(point), Is.False);
+                for (int i = 0; i < 60 && scene.Flow.Intro.IsPlaying; i++) scene.Flow.Intro.Tick(0.05f);
+                Assert.That(scene.Flow.Intro.IsPlaying, Is.False); Assert.That(adapter.ShouldAcceptPointerDown(point), Is.True);
             }
         }
 

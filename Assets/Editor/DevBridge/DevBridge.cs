@@ -147,16 +147,37 @@ namespace ArrowEscape.DevBridge
                     ScreenCapture.CaptureScreenshot(file); pendingShot = file; ShotTime = at;
                     Append("play-log.txt", Now + " shot " + file);
                 }
+                else if (action.StartsWith("probe:", StringComparison.Ordinal))
+                {
+                    string[] parts = action.Substring(6).Split(',');
+                    float seconds = parts.Length > 1 && float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float sec) ? sec : 3f;
+                    FrameProbe.Run(parts[0], seconds, Path.Combine(Dir, "probe.txt"));
+                    Append("play-log.txt", Now + " " + action);
+                }
                 else if (action == "stop") { SessionState.SetString(TimelineKey, ""); EditorApplication.isPlaying = false; }
                 else if (action.StartsWith("call:", StringComparison.Ordinal))
                 {
-                    string target = action.Substring(5), typeName = "AppFlowController";
+                    string target = action.Substring(5), typeName = "AppFlowController", argument = null;
+                    int paren = target.IndexOf('(');
+                    if (paren > 0 && target.EndsWith(")", StringComparison.Ordinal)) { argument = target.Substring(paren + 1, target.Length - paren - 2); target = target.Substring(0, paren); }
                     int dot = target.IndexOf('.');
                     if (dot > 0) { typeName = target.Substring(0, dot); target = target.Substring(dot + 1); }
                     Type type = Type.GetType("ArrowEscape.UI." + typeName + ", ArrowEscape.UI");
                     UnityEngine.Object flow = type == null ? null : UnityEngine.Object.FindFirstObjectByType(type);
-                    MethodInfo method = type?.GetMethod(target, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
-                    method?.Invoke(flow, null);
+                    MethodInfo method = null; object[] args = null;
+                    if (type != null && argument == null) method = type.GetMethod(target, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, Type.EmptyTypes, null);
+                    else if (type != null)
+                        foreach (MethodInfo candidate in type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                        {
+                            ParameterInfo[] ps = candidate.GetParameters();
+                            if (candidate.Name != target || ps.Length != 1) continue;
+                            Type pt = ps[0].ParameterType;
+                            if (pt == typeof(int) && int.TryParse(argument, NumberStyles.Integer, CultureInfo.InvariantCulture, out int iv)) { method = candidate; args = new object[] { iv }; break; }
+                            if (pt == typeof(float) && float.TryParse(argument, NumberStyles.Float, CultureInfo.InvariantCulture, out float fv)) { method = candidate; args = new object[] { fv }; break; }
+                            if (pt == typeof(string)) { method = candidate; args = new object[] { argument }; break; }
+                            if (pt.IsEnum) { try { args = new object[] { Enum.Parse(pt, argument) }; method = candidate; break; } catch (Exception) { } }
+                        }
+                    method?.Invoke(flow, args);
                     Append("play-log.txt", Now + " " + action + (method == null || flow == null ? " (not found)" : ""));
                 }
                 else if (action.StartsWith("click:", StringComparison.Ordinal))

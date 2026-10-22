@@ -22,10 +22,14 @@ namespace ArrowEscape.UI
         };
         private static readonly Color32 TileFill = new Color32(11, 16, 64, 240);
         private static readonly Color32 TileEdge = new Color32(56, 225, 255, 255);
-        private static readonly Color32 Dot = new Color32(74, 123, 230, 200);
+        private static readonly Color32 Dot = new Color32(120, 110, 220, 150);
 
         private SnakeLoaderModel model;
-        private float[] xs, ys;
+        private float[] xs, ys, sx, sy;
+        private const float BendRadius = 0.38f;
+        private const int BendSteps = 5;
+        /// <summary>Draw the built-in tile; off when the screen supplies the neon panel behind the puzzle.</summary>
+        public bool DrawTile { get; set; } = true;
         private float time;
         private float scale;
         private Vector2 center;
@@ -41,6 +45,7 @@ namespace ArrowEscape.UI
         {
             if (model != null) return;
             model = new SnakeLoaderModel(); xs = new float[model.MaxBodyPoints]; ys = new float[model.MaxBodyPoints];
+            sx = new float[model.MaxBodyPoints * (BendSteps + 1) + 2]; sy = new float[sx.Length];
             raycastTarget = false;
         }
 
@@ -63,7 +68,7 @@ namespace ArrowEscape.UI
             scale = Mathf.Min(r.width, r.height) / ViewUnits; if (scale <= 0) return;
             center = r.center;
             model.Evaluate(time);
-            DrawTile(vh);
+            if (DrawTile) DrawTileMesh(vh);
             for (int x = 0; x <= SnakeLoaderModel.Size; x++)
                 for (int y = 0; y <= SnakeLoaderModel.Size; y++) Disc(vh, P(x, y), 0.075f * scale, Dot);
             // Three passes so glows sit under every core line.
@@ -82,13 +87,11 @@ namespace ArrowEscape.UI
             float alpha = pass == 0 ? 0.28f : pass == 1 ? 1f : 0.55f;
             Color32 c = pass == 2 ? new Color32(255, 255, 255, 255) : baseColor;
             c.a = (byte)Mathf.Clamp(Mathf.RoundToInt(255 * alpha * op * color.a), 0, 255);
-            // Merge straight runs into one segment so translucent glows only overlap at real corners.
-            int start = 0;
-            for (int k = 1; k < n; k++)
-            {
-                bool corner = k < n - 1 && !SameDirection(xs[k] - xs[k - 1], ys[k] - ys[k - 1], xs[k + 1] - xs[k], ys[k + 1] - ys[k]);
-                if (k == n - 1 || corner) { Segment(vh, xs[start], ys[start], xs[k], ys[k], width, c); start = k; }
-            }
+            // Rounded bends like the game's arrows: fillet every corner, then draw clipped segments with round joints.
+            int m = Smooth(n);
+            float half = width * 0.5f;
+            for (int k = 1; k < m; k++) Line(vh, sx[k - 1], sy[k - 1], sx[k], sy[k], half, c);
+            if (pass == 1) for (int k = 1; k < m - 1; k++) if (Inside(sx[k], sy[k])) Disc(vh, P(sx[k], sy[k]), half * scale, c);
             if (pass == 2) return;
             // Head: a triangle ahead of the last point, hidden once it leaves the tile.
             model.Direction(i, out float dx, out float dy);
@@ -100,28 +103,64 @@ namespace ArrowEscape.UI
             Triangle(vh, P(hx + dx * 0.38f * grow, hy + dy * 0.38f * grow), P(bx + px * 0.3f * grow, by + py * 0.3f * grow), P(bx - px * 0.3f * grow, by - py * 0.3f * grow), c);
         }
 
-        // Axis-aligned segment, clipped to the tile, with square caps that hide the joints.
-        private void Segment(VertexHelper vh, float x0, float y0, float x1, float y1, float width, Color32 c)
+        // Fillets each interior corner of the body (xs, ys) into sx, sy; returns the point count.
+        private int Smooth(int n)
         {
-            float lo = SnakeLoaderModel.TileMin + 0.05f, hi = SnakeLoaderModel.TileMax - 0.05f, half = width * 0.5f;
-            bool horizontal = Mathf.Abs(y1 - y0) < 0.0001f;
-            if (horizontal)
+            int m = 0;
+            for (int i = 0; i < n; i++)
             {
-                if (y0 < lo || y0 > hi) return;
-                float a = Mathf.Clamp(Mathf.Min(x0, x1), lo, hi), b = Mathf.Clamp(Mathf.Max(x0, x1), lo, hi);
-                if (b - a < 0.0001f) return;
-                Quad(vh, P(Mathf.Max(lo, a - half), y0 - half), P(Mathf.Min(hi, b + half), y0 + half), c);
+                if (i > 0 && i < n - 1)
+                {
+                    float ax = xs[i] - xs[i - 1], ay = ys[i] - ys[i - 1], bx = xs[i + 1] - xs[i], by = ys[i + 1] - ys[i];
+                    float la = Mathf.Sqrt(ax * ax + ay * ay), lb = Mathf.Sqrt(bx * bx + by * by);
+                    if (la > 1e-4f && lb > 1e-4f && Mathf.Abs((ax * bx + ay * by) / (la * lb)) < 0.999f)
+                    {
+                        float r = Mathf.Min(BendRadius, la * 0.5f, lb * 0.5f);
+                        float s0x = xs[i] - ax / la * r, s0y = ys[i] - ay / la * r, e0x = xs[i] + bx / lb * r, e0y = ys[i] + by / lb * r;
+                        for (int t = 0; t <= BendSteps; t++)
+                        {
+                            float u = (float)t / BendSteps, v = 1 - u;
+                            sx[m] = v * v * s0x + 2 * v * u * xs[i] + u * u * e0x; sy[m] = v * v * s0y + 2 * v * u * ys[i] + u * u * e0y; m++;
+                        }
+                        continue;
+                    }
+                }
+                sx[m] = xs[i]; sy[m] = ys[i]; m++;
             }
-            else
-            {
-                if (x0 < lo || x0 > hi) return;
-                float a = Mathf.Clamp(Mathf.Min(y0, y1), lo, hi), b = Mathf.Clamp(Mathf.Max(y0, y1), lo, hi);
-                if (b - a < 0.0001f) return;
-                Quad(vh, P(x0 - half, Mathf.Max(lo, a - half)), P(x0 + half, Mathf.Min(hi, b + half)), c);
-            }
+            return m;
         }
 
-        private void DrawTile(VertexHelper vh)
+        private static bool Inside(float x, float y)
+        {
+            float lo = SnakeLoaderModel.TileMin + 0.05f, hi = SnakeLoaderModel.TileMax - 0.05f;
+            return x >= lo && x <= hi && y >= lo && y <= hi;
+        }
+
+        // Any-direction segment clipped to the tile (Liang-Barsky), drawn as a quad.
+        private void Line(VertexHelper vh, float x0, float y0, float x1, float y1, float half, Color32 c)
+        {
+            float lo = SnakeLoaderModel.TileMin + 0.05f, hi = SnakeLoaderModel.TileMax - 0.05f;
+            float dx = x1 - x0, dy = y1 - y0, t0 = 0, t1 = 1;
+            if (!Clip(-dx, x0 - lo, ref t0, ref t1) || !Clip(dx, hi - x0, ref t0, ref t1) || !Clip(-dy, y0 - lo, ref t0, ref t1) || !Clip(dy, hi - y0, ref t0, ref t1)) return;
+            float ax = x0 + dx * t0, ay = y0 + dy * t0, bx = x0 + dx * t1, by = y0 + dy * t1;
+            float len = Mathf.Sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay)); if (len < 1e-4f) return;
+            float nx = -(by - ay) / len * half, ny = (bx - ax) / len * half;
+            int i = vh.currentVertCount;
+            vh.AddVert(P(ax + nx, ay + ny), c, Vector2.zero); vh.AddVert(P(bx + nx, by + ny), c, Vector2.zero);
+            vh.AddVert(P(bx - nx, by - ny), c, Vector2.zero); vh.AddVert(P(ax - nx, ay - ny), c, Vector2.zero);
+            vh.AddTriangle(i, i + 1, i + 2); vh.AddTriangle(i, i + 2, i + 3);
+        }
+
+        private static bool Clip(float p, float q, ref float t0, ref float t1)
+        {
+            if (Mathf.Abs(p) < 1e-6f) return q >= 0;
+            float r = q / p;
+            if (p < 0) { if (r > t1) return false; if (r > t0) t0 = r; }
+            else { if (r < t0) return false; if (r < t1) t1 = r; }
+            return true;
+        }
+
+        private void DrawTileMesh(VertexHelper vh)
         {
             Color32 glow = TileEdge; glow.a = (byte)(70 * color.a);
             Color32 fill = TileFill; fill.a = (byte)(fill.a * color.a);
@@ -150,13 +189,6 @@ namespace ArrowEscape.UI
             }
             int ring = 4 * (steps + 1);
             for (int k = 0; k < ring; k++) vh.AddTriangle(start, start + 1 + k, start + 1 + (k + 1) % ring);
-        }
-
-        private static bool SameDirection(float ax, float ay, float bx, float by)
-        {
-            bool aHorizontal = Mathf.Abs(ay) < 0.0001f, bHorizontal = Mathf.Abs(by) < 0.0001f;
-            if (aHorizontal != bHorizontal) return false;
-            return aHorizontal ? ax * bx > 0 : ay * by > 0;
         }
 
         private static void Quad(VertexHelper vh, Vector2 a, Vector2 b, Color32 c)

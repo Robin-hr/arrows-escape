@@ -12,6 +12,8 @@ namespace ArrowEscape.View
         private int screenHeight;
         private Rect safeArea;
         private bool missingCameraLogged;
+        private int contentWidth, contentHeight;
+        private Vector3 contentCenter;
         private Color SkinBackground
         {
             get
@@ -27,6 +29,12 @@ namespace ArrowEscape.View
         /// <summary>Fits the centered board, reserving default margins plus safe-area insets.</summary>
         public void Fit(int width, int height)
         {
+            // Frame the level's shape (the cells its arrows occupy), not the empty rest of the grid.
+            var board = GetComponent<BoardView>(); Vector3 center = Vector3.zero;
+            if (board != null && board.ContentBounds.size.x >= 1 && board.ContentBounds.size.x <= width && board.ContentBounds.size.y <= height)
+            { center = board.ContentBounds.center; contentWidth = Mathf.RoundToInt(board.ContentBounds.size.x); contentHeight = Mathf.RoundToInt(board.ContentBounds.size.y); }
+            else { contentWidth = width; contentHeight = height; }
+            contentCenter = center;
             boardWidth = width;
             boardHeight = height;
             screenWidth = Screen.width;
@@ -41,7 +49,7 @@ namespace ArrowEscape.View
                 return;
             }
             if (screenWidth < 1 || screenHeight < 1) return;
-            ScreenFitResult fit = ScreenFit.Compute(width, height, (float)screenWidth / screenHeight,
+            ScreenFitResult fit = ScreenFit.Compute(contentWidth, contentHeight, (float)screenWidth / screenHeight,
                 Margin(ViewTheme.SideMargin, safeArea.xMin / screenWidth),
                 Margin(ViewTheme.SideMargin, (screenWidth - safeArea.xMax) / screenWidth),
                 Margin(ViewTheme.TopMargin, (screenHeight - safeArea.yMax) / screenHeight),
@@ -50,7 +58,7 @@ namespace ArrowEscape.View
             camera.orthographicSize = fit.OrthographicSize;
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = SkinBackground;
-            camera.transform.SetPositionAndRotation(new Vector3(fit.CameraX, fit.CameraY, ViewTheme.CameraZ),
+            camera.transform.SetPositionAndRotation(new Vector3(fit.CameraX + contentCenter.x, fit.CameraY + contentCenter.y, ViewTheme.CameraZ),
                 Quaternion.identity);
             var zoom=GetComponent<BoardZoom>();if(zoom!=null)zoom.ResetFit();
         }

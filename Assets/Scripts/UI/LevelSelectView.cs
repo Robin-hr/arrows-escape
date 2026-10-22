@@ -56,7 +56,7 @@ namespace ArrowEscape.UI
                 var button = UiFactory.Button("Level " + (index + 1), Scroll.content, Vector2.zero);
                 button.onClick.AddListener(() => { if (index < tiles.Count && tiles[index].State != LevelTileState.Locked) start(tiles[index].Index); });
                 var label=button.GetComponentInChildren<UnityEngine.UI.Text>();
-                label.resizeTextForBestFit=false;label.supportRichText=true;label.verticalOverflow=VerticalWrapMode.Overflow;label.lineSpacing=.82f;
+                label.resizeTextForBestFit=false;label.supportRichText=true;label.horizontalOverflow=HorizontalWrapMode.Overflow;label.verticalOverflow=VerticalWrapMode.Overflow;label.lineSpacing=.82f;
                 label.rectTransform.anchorMin=new Vector2(0,.07f);label.rectTransform.anchorMax=new Vector2(1,.33f);
                 label.rectTransform.offsetMin=new Vector2(6,0);label.rectTransform.offsetMax=new Vector2(-6,0);label.fontSize=34;
                 var well=UiFactory.Rect("ThumbWell",button.transform,Vector2.zero,Vector2.zero).gameObject.AddComponent<UnityEngine.UI.Image>();

@@ -77,6 +77,7 @@ namespace ArrowEscape.UI
 
             playGlow = BrandArt.Image("PlayGlow", column, "ui_button_primary", new Vector2(820, 228), new Vector2(0, -138), PrimaryBorder);
             playGlow.color = new Color(0.31f, 0.85f, 1f, 0.35f);
+            NeonKit.Isolate(playGlow.gameObject); NeonKit.Isolate(logo.gameObject);
             PlayButton = NeonButton("Play", column, "ui_button_primary", PrimaryBorder, new Vector2(760, 200), new Vector2(0, -140));
             // The art's lit face sits 11.5 units above the sprite centre (its drop edge is at the bottom); content is centred on the face.
             BrandArt.Image("PlayIcon", PlayButton.transform, "icon_play", new Vector2(120, 120), new Vector2(-250, 12));

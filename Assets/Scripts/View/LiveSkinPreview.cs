@@ -88,7 +88,17 @@ namespace ArrowEscape.View
         }
         /// <summary>Forces preview detail without changing any game LOD policy.</summary>
         public void SetLod(bool value){if(arrow!=null&&arrow.Skin!=null)arrow.Skin.SetLod(value);}
-        private void Update(){if(Application.isPlaying)Tick(Time.unscaledDeltaTime);}
+        private int phase=-1;
+        /// <summary>Card previews render at 30 Hz on alternating frames (see <see cref="PreviewThrottle"/>).</summary>
+        public bool HalfRate{get;set;}
+        private void Update()
+        {
+            if(!Application.isPlaying)return;Tick(Time.unscaledDeltaTime);
+            if(camera==null)return;
+            if(!HalfRate){if(!camera.enabled)camera.enabled=true;return;}
+            if(phase<0)phase=PreviewThrottle.NextPhase();if(camera.enabled)camera.enabled=false;
+            if(PreviewThrottle.ShouldRender(phase))RenderNow();
+        }
         /// <summary>Explicit render for Editor comparisons; runtime uses the enabled target camera.</summary>
         public void RenderNow(){if(camera==null)return;if(GraphicsSettings.currentRenderPipeline!=null)RenderPipeline.SubmitRenderRequest(camera,request);else camera.Render();}
         private void OnDisable(){particles?.Clear();}

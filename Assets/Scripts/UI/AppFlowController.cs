@@ -39,6 +39,8 @@ namespace ArrowEscape.UI
         public bool LoadingScreensEnabled { get => loadingScreens ?? Application.isPlaying; set => loadingScreens = value; }
         private bool? loadingScreens;
         private readonly TapStreak coinTaps = new TapStreak(5, 0.8f);
+        /// <summary>Level-start transition that lands the arrows on the board.</summary>
+        public BoardIntro Intro { get; private set; }
         /// <summary>Short neon notices (developer coin grant).</summary>
         public ToastView Toast { get; private set; }
         /// <summary>Clock for the five-tap developer grant; tests may replace it.</summary>
@@ -62,6 +64,7 @@ namespace ArrowEscape.UI
             bootstrap = boot; bootstrap.EnsureInitialized();
             game = boot.GetComponent<GameController>(); board = boot.GetComponent<BoardView>();
             input = boot.GetComponent<PointerInputAdapter>(); hud = display;
+            Intro = boot.GetComponent<BoardIntro>(); if (Intro == null) Intro = boot.gameObject.AddComponent<BoardIntro>();
             hud.Bind(game, bootstrap);
             EventSystemEnsurer.Ensure();
             BuildScreens();
@@ -109,7 +112,7 @@ namespace ArrowEscape.UI
             PauseScreen.SettingsButton.onClick.AddListener(OpenSettings);
             PauseScreen.MainMenuButton.onClick.AddListener(ToMainMenu);
         }
-        private bool IsBlocked(Vector2 position) => Machine.Current != ScreenState.Playing || Confirm.IsOpen || (Loading != null && Loading.IsVisible);
+        private bool IsBlocked(Vector2 position) => Machine.Current != ScreenState.Playing || Confirm.IsOpen || (Loading != null && Loading.IsVisible) || (Intro != null && Intro.IsPlaying);
         private void OnStateChanged(ScreenState oldState, ScreenState newState) => ApplyScreen(oldState, newState);
         private void ApplyScreen(ScreenState previous, ScreenState state)
         {
@@ -208,8 +211,11 @@ namespace ArrowEscape.UI
             ScreenState previous = Machine.Current;
             if (!Machine.StartPlaying()) ApplyScreen(Machine.Current, Machine.Current);
             // New level starts (menu, level select, next level, replay) get a 1-second loader; restarting from pause does not.
-            if (LoadingScreensEnabled && previous != ScreenState.Playing && previous != ScreenState.Paused)
+            bool newLevel = previous != ScreenState.Playing && previous != ScreenState.Paused;
+            if (LoadingScreensEnabled && newLevel)
                 Loading.Show(LoadingKind.Level, "LEVEL " + (bootstrap.CurrentLevelIndex + 1));
+            // Arrows land on the board as the loading screen fades (or right away on a restart).
+            if (LoadingScreensEnabled) Intro.Play(newLevel ? LoadingOverlay.LevelSeconds - 0.1f : 0f);
         }
         private void OnProgressReset()
         {

@@ -11,7 +11,7 @@ namespace ArrowEscape.Tests
         /// <summary>Isolated Step 14B state or regression check; never accesses player saves.</summary>
         [Test] public void CountsAndUniquePermanentIds()
         {
-            Assert.That(ShopCatalog.Items.Count,Is.EqualTo(49));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Arrow),Is.EqualTo(20));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Theme),Is.EqualTo(7));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Avatar),Is.EqualTo(12));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Frame),Is.EqualTo(10));Assert.That(ShopCatalog.Items.Select(i=>i.Id).Distinct().Count(),Is.EqualTo(49));
+            Assert.That(ShopCatalog.Items.Count,Is.EqualTo(59));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Arrow),Is.EqualTo(20));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Theme),Is.EqualTo(7));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Avatar),Is.EqualTo(22));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Frame),Is.EqualTo(10));Assert.That(ShopCatalog.Items.Select(i=>i.Id).Distinct().Count(),Is.EqualTo(59));
             foreach(var item in ShopCatalog.Items){Assert.That(Regex.IsMatch(item.Id,"^[a-z][a-z_]*$"),Is.True);Assert.That(ColorUtility.TryParseHtmlString(item.PrimaryColor,out _),Is.True);Assert.That(ColorUtility.TryParseHtmlString(item.SecondaryColor,out _),Is.True);}
         }
         /// <summary>Isolated Step 14B state or regression check; never accesses player saves.</summary>

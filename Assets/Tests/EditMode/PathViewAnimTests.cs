@@ -82,6 +82,8 @@ namespace ArrowEscape.Tests
             {
                 var grid=s.Host.GetComponent<BoardView>().PathDots;var rest=(Vector3[])grid.Vertices.Clone();bool[] changed=new bool[20];grid.StartWave(0,0);
                 for(int step=0;step<200;step++){grid.Tick(.01f);for(int i=0;i<20;i++)if(grid.Vertices[i*13+1]!=rest[i*13+1])changed[i]=true;}
+                // Cells outside the level's shape have no dot (zero radius); every visible dot must pulse.
+                for(int i=0;i<20;i++)if((rest[i*13+1]-rest[i*13]).sqrMagnitude<1e-10f)changed[i]=true;
                 Assert.That(changed,Is.All.True);Assert.That(grid.Vertices,Is.EqualTo(rest));
             }
         }

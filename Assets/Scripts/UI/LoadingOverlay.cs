@@ -21,7 +21,8 @@ namespace ArrowEscape.UI
         private UnityEngine.UI.RawImage background;
         private UnityEngine.UI.Image dim;
         private UnityEngine.UI.RawImage logo;
-        private RectTransform loaderRect, captionRect;
+        private RectTransform loaderRect, captionRect, loaderPanel;
+        private const float PanelScale = 1.13f;
         private string[] captionFrames = new string[4];
         private int captionFrame = -1;
         private float elapsed, duration;
@@ -68,8 +69,12 @@ namespace ArrowEscape.UI
             logo.rectTransform.anchorMin = logo.rectTransform.anchorMax = new Vector2(0.5f, 0.69f);
             if (logo.texture == null) logo.color = new Color(1, 1, 1, 0);
 
+            // The puzzle sits on the same chamfered neon panel as every other card in the game.
+            loaderPanel = UiFactory.Rect("LoaderPanel", Root, new Vector2(580, 580), Vector2.zero);
+            NeonKit.Panel(loaderPanel.gameObject.AddComponent<UnityEngine.UI.Image>(), NeonKit.Cyan).raycastTarget = false;
+            loaderPanel.GetComponent<UnityEngine.UI.Image>().raycastTarget = false;
             loaderRect = UiFactory.Rect("SnakeLoader", Root, new Vector2(520, 520), Vector2.zero);
-            Loader = loaderRect.gameObject.AddComponent<SnakeLoaderGraphic>();
+            Loader = loaderRect.gameObject.AddComponent<SnakeLoaderGraphic>(); Loader.DrawTile = false;
             Caption = BrandArt.Text("Caption", Root, "LOADING", 40, new Vector2(900, 70), Vector2.zero, BrandArt.Lavender);
             captionRect = Caption.rectTransform;
             Root.gameObject.SetActive(false);
@@ -85,6 +90,7 @@ namespace ArrowEscape.UI
             float size = LoaderSizeFor(kind);
             loaderRect.sizeDelta = new Vector2(size, size);
             loaderRect.anchorMin = loaderRect.anchorMax = new Vector2(0.5f, startup ? 0.33f : 0.52f);
+            loaderPanel.sizeDelta = loaderRect.sizeDelta * PanelScale; loaderPanel.anchorMin = loaderPanel.anchorMax = loaderRect.anchorMin;
             captionRect.anchorMin = captionRect.anchorMax = new Vector2(0.5f, startup ? 0.15f : 0.52f);
             captionRect.anchoredPosition = startup ? Vector2.zero : new Vector2(0, -size * 0.5f - 70);
             Caption.fontSize = startup ? 40 : kind == LoadingKind.Level ? 46 : 34;
@@ -144,7 +150,7 @@ namespace ArrowEscape.UI
             float logoWidth = Mathf.Min(1000f, size.x * 0.9f, size.y * 0.42f * 2.04f);
             logo.rectTransform.sizeDelta = new Vector2(logoWidth, logoWidth / 2.04f);
             float loader = Mathf.Min(LoaderSizeFor(Kind), size.x * 0.8f, size.y * (Kind == LoadingKind.Startup ? 0.3f : 0.45f));
-            loaderRect.sizeDelta = new Vector2(loader, loader);
+            loaderRect.sizeDelta = new Vector2(loader, loader); loaderPanel.sizeDelta = loaderRect.sizeDelta * PanelScale;
             if (Kind != LoadingKind.Startup) captionRect.anchoredPosition = new Vector2(0, -loader * 0.5f - 70);
         }
 

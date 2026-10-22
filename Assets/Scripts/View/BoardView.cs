@@ -71,6 +71,16 @@ namespace ArrowEscape.View
         public DotGrid PathDots { get; private set; }
         /// <summary>Board rectangle in world space.</summary>
         public Bounds WorldBounds => new Bounds(Vector3.zero,new Vector3(width,height,0));
+        /// <summary>World bounds of the cells the level's arrows occupy at the start (the visible shape).</summary>
+        public Bounds ContentBounds { get; private set; }
+        private void MeasureContent(Board board)
+        {
+            int minX=int.MaxValue,minY=int.MaxValue,maxX=int.MinValue,maxY=int.MinValue;
+            foreach(Arrow arrow in board.Arrows)for(int c=0;c<arrow.Length;c++){Cell cell=arrow.Cells[c];minX=Mathf.Min(minX,cell.X);minY=Mathf.Min(minY,cell.Y);maxX=Mathf.Max(maxX,cell.X);maxY=Mathf.Max(maxY,cell.Y);}
+            if(minX>maxX){ContentBounds=WorldBounds;return;}
+            Vector3 a=CellToWorld(minX,minY),b=CellToWorld(maxX,maxY);
+            ContentBounds=new Bounds((a+b)*.5f,new Vector3(maxX-minX+1,maxY-minY+1,0));
+        }
         /// <summary>Whether this attempt was loaded with paths.</summary>
         public bool UsesPaths { get; private set; }
 
@@ -100,6 +110,7 @@ namespace ArrowEscape.View
             arrowMaterial = PrepareMaterial(arrowMaterial, SpriteFactory.GetArrowSprite());
             width = board.Width;
             height = board.Height;
+            MeasureContent(board);
             root = new GameObject("Board").transform;
             root.SetParent(transform, false);
             if(GetComponent<BoardZoom>()==null)gameObject.AddComponent<BoardZoom>();

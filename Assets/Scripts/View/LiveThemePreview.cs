@@ -38,7 +38,16 @@ namespace ArrowEscape.View
         public void Tick(float dt){backdrop.Tick(dt);clock+=dt;if(sample!=null&&sample.Skin!=null){sample.Skin.SetClock(clock);sample.Skin.Elemental?.Tick(dt);sample.Skin.Inferno?.Tick(dt);sample.Skin.Rare?.Tick(dt);}}
         /// <summary>Renders the current state in Edit Mode.</summary>
         public void RenderNow(){if(GraphicsSettings.currentRenderPipeline!=null)RenderPipeline.SubmitRenderRequest(camera,request);else camera.Render();}
-        private void Update(){if(Application.isPlaying&&AutoTick)Tick(Time.unscaledDeltaTime);}
+        private int phase=-1;
+        /// <summary>Card previews render at 30 Hz on alternating frames (see <see cref="PreviewThrottle"/>).</summary>
+        public bool HalfRate{get;set;}
+        private void Update()
+        {
+            if(!Application.isPlaying)return;if(AutoTick)Tick(Time.unscaledDeltaTime);
+            if(!HalfRate){if(camera!=null&&!camera.enabled)camera.enabled=true;return;}
+            if(phase<0)phase=PreviewThrottle.NextPhase();if(camera!=null&&camera.enabled)camera.enabled=false;
+            if(PreviewThrottle.ShouldRender(phase))RenderNow();
+        }
         private void OnDestroy(){if(Texture==null)return;camera.targetTexture=null;Texture.Release();if(Application.isPlaying)Destroy(Texture);else DestroyImmediate(Texture);}
     }
 }

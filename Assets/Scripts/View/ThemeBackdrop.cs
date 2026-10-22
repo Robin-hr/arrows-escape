@@ -58,7 +58,7 @@ namespace ArrowEscape.View
             properties.SetFloat("_MoteBudget",ParticleAllowance());properties.SetFloat("_Clock",clock);properties.SetFloat("_Aspect",camera.aspect);
             for(int i=0;i<3;i++){layers[i].transform.position=center;layers[i].transform.localScale=new Vector3(width,height,1);layers[i].SetPropertyBlock(properties);}
             if(sampleBoard){panel.transform.position=sampleBounds.center;panel.transform.localScale=sampleBounds.size+new Vector3(.55f,.55f,1);panel.enabled=true;}
-            if(board!=null){panel.transform.position=board.WorldBounds.center;panel.transform.localScale=board.WorldBounds.size+new Vector3(.55f,.55f,1);panel.enabled=board.IsVisible;}
+            if(board!=null){panel.transform.position=board.ContentBounds.center;panel.transform.localScale=board.ContentBounds.size+new Vector3(.55f,.55f,1);panel.enabled=board.IsVisible;}
         }
         /// <summary>Gameplay pause freezes motion; hidden boards suppress their backdrop.</summary>
         public void AdvanceFrame(float dt)
