@@ -175,7 +175,7 @@ namespace ArrowEscape.UI
             CompletePanel.Show(game.MistakeCount, game.UndoCount, result, bootstrap.IsLastLevel,
                 bootstrap.AllLevelsCompleted, bootstrap.CanGoNext);
             CompletePanel.ShowRating(result, bootstrap.IsSandboxLevel);
-            CompletePanel.ShowCoins(bootstrap.LastCoinReward,bootstrap.IsSandboxLevel);
+            CompletePanel.ShowRewards(bootstrap.LastCoinReward,bootstrap.LastTrophyReward,bootstrap.LastLeaguePromoted,TrophyRules.LeagueFor(bootstrap.Inventory.State.Trophies),bootstrap.IsSandboxLevel);
             if(bootstrap.IsSandboxLevel)CompletePanel.BestText.text="Sandbox — result not saved";
         }
         private void Refresh()

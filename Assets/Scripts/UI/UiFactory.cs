@@ -99,8 +99,9 @@ namespace ArrowEscape.UI
             Stretch(root);
             root.offsetMin = new Vector2(30, 30); root.offsetMax = new Vector2(-30, -190);
             var scroll = root.gameObject.AddComponent<UnityEngine.UI.ScrollRect>();
-            RectTransform viewport = Panel("Viewport", root, ViewTheme.Background, true);
-            viewport.gameObject.AddComponent<UnityEngine.UI.Mask>().showMaskGraphic = false;
+            // RectMask2D clips without stencil and culls off-screen tiles, so long lists (360 levels) batch cheaply.
+            RectTransform viewport = Panel("Viewport", root, new Color(0, 0, 0, 0), true);
+            viewport.gameObject.AddComponent<UnityEngine.UI.RectMask2D>();
             RectTransform content = Rect("Content", viewport, Vector2.zero, Vector2.zero);
             content.anchorMin = new Vector2(0, 1); content.anchorMax = Vector2.one;
             content.pivot = new Vector2(0.5f, 1); content.sizeDelta = Vector2.zero;

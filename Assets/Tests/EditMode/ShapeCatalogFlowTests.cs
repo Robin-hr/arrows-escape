@@ -22,7 +22,7 @@ namespace ArrowEscape.Tests
         }
         /// <summary>The approved pack follows the original three without replacing their keys.</summary>
         [Test]public void CountAndLast()
-        {var paths=LevelRepository.GetLevelResourcePaths();Assert.That(paths.Count,Is.EqualTo(3+ShapePackPlan.Create().Count));Assert.That(paths.Skip(3),Is.EqualTo(ShapePackBuilder.OrderedResourcePaths()));Assert.That(paths.Last(),Does.StartWith("Levels/level_060_shape_"));OriginalCatalogAssertions.Check();}
+        {var paths=LevelRepository.GetLevelResourcePaths();Assert.That(paths.Count,Is.EqualTo(3+ShapePackPlan.Create().Count+CatalogExpansionPlan.Create().Count));Assert.That(paths.Skip(3).Take(57),Is.EqualTo(ShapePackBuilder.OrderedResourcePaths()));Assert.That(paths[59],Does.StartWith("Levels/level_060_shape_"));Assert.That(paths.Last(),Does.StartWith("Levels/level_360_shape_"));OriginalCatalogAssertions.Check();}
         /// <summary>Real-catalog terminal flow behaves like the former third-level boundary.</summary>
         [Test]public void FinalBoundaryAndDebugWrap()
         {
@@ -49,7 +49,7 @@ namespace ArrowEscape.Tests
         /// <summary>Old completion records unlock the first added shape and keep their paired results.</summary>
         [Test]public void OriginalKeysContinueIntoPack()
         {
-            var tracker=new ProgressTracker();foreach(string p in OriginalTestCatalog.Paths)tracker.RecordCompletion(ProgressTracker.ToLevelId(p),2,1);Create(tracker.Data);Assert.That(bootstrap.ContinueIndex,Is.EqualTo(3));bootstrap.StartInitialLevel();Assert.That(LevelRepository.GetLevelResourcePaths().Skip(3),Is.EqualTo(ShapePackBuilder.OrderedResourcePaths()));Assert.That(bootstrap.CurrentLevelId,Is.EqualTo(ProgressTracker.ToLevelId(ShapePackBuilder.OrderedResourcePaths()[0])));Assert.That(bootstrap.CurrentLevelId,Does.StartWith("level_004_shape_"));
+            var tracker=new ProgressTracker();foreach(string p in OriginalTestCatalog.Paths)tracker.RecordCompletion(ProgressTracker.ToLevelId(p),2,1);Create(tracker.Data);Assert.That(bootstrap.ContinueIndex,Is.EqualTo(3));bootstrap.StartInitialLevel();Assert.That(LevelRepository.GetLevelResourcePaths().Skip(3).Take(57),Is.EqualTo(ShapePackBuilder.OrderedResourcePaths()));Assert.That(bootstrap.CurrentLevelId,Is.EqualTo(ProgressTracker.ToLevelId(ShapePackBuilder.OrderedResourcePaths()[0])));Assert.That(bootstrap.CurrentLevelId,Does.StartWith("level_004_shape_"));
             foreach(string id in new[]{"level_001","level_002","level_003"}){Assert.That(bootstrap.Progress.Tracker.TryGetRecord(id,out var record),Is.True);Assert.That(record.completions,Is.EqualTo(1));Assert.That(record.bestMistakes,Is.EqualTo(2));Assert.That(record.bestUndos,Is.EqualTo(1));}
         }
     }

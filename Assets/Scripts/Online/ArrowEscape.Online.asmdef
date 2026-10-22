@@ -1,0 +1,10 @@
+{
+    "name": "ArrowEscape.Online",
+    "rootNamespace": "ArrowEscape.Online",
+    "references": [
+        "ArrowEscape.Core",
+        "Unity.Services.Core",
+        "Unity.Services.Authentication",
+        "Unity.Services.Leaderboards"
+    ]
+}

@@ -19,6 +19,8 @@ namespace ArrowEscape.Core
         public const string DefaultAvatarId = "avatar_player";
         /// <summary>Free avatar frame every player owns.</summary>
         public const string DefaultFrameId = "frame_bronze";
+        /// <summary>Total trophies; decides the player's league.</summary>
+        public int Trophies;
         /// <summary>Equipped profile avatar.</summary>
         public string EquippedAvatarId = DefaultAvatarId;
         /// <summary>Equipped profile avatar frame.</summary>
@@ -55,7 +57,7 @@ namespace ArrowEscape.Core
         /// <summary>Normalizes lists, balance and slots without discarding unknown item ids.</summary>
         public void Sanitize()
         {
-            Coins=Math.Max(0,Math.Min(EconomyConfig.MaxCoins,Coins));
+            Coins=Math.Max(0,Math.Min(EconomyConfig.MaxCoins,Coins));Trophies=Math.Max(0,Trophies);
             OwnedItemIds=OwnedItemIds??new List<string>(); RewardedStars=RewardedStars??new List<LevelRewardRecord>();
             if(!OwnedItemIds.Contains("classic"))OwnedItemIds.Add("classic");
             if(!OwnedItemIds.Contains("paper"))OwnedItemIds.Add("paper");

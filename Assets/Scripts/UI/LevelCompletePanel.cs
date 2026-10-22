@@ -12,24 +12,36 @@ namespace ArrowEscape.UI
         private Vector2 lastSize;
         private CompletionResult presentedRating;
         private CompletionResult coinResult;
-        private RectTransform coinLine;
+        private RectTransform coinLine, trophyLine;
+        private int trophyAmount; private bool promoted;
+        private string[] trophyFrames;
         private float presentationElapsed;
         private bool coinEnabled,coinEmitted;
         private string[] coinFrames;
         private int coinFrame=-1;
         /// <summary>Accepted reward shown after the stars.</summary>
         public UnityEngine.UI.Text CoinsText { get; private set; }
+        /// <summary>Trophies won, shown beside the coins.</summary>
+        public UnityEngine.UI.Text TrophiesText { get; private set; }
+        /// <summary>League promotion banner, shown only when the clear crossed a league threshold.</summary>
+        public UnityEngine.UI.Text PromotionText { get; private set; }
         /// <summary>Raised once when reward presentation starts.</summary>
         public event System.Action CoinPresented;
         /// <summary>Supplies the already saved reward; sandbox never shows it.</summary>
-        public void ShowCoins(int amount,bool sandbox)
+        public void ShowCoins(int amount,bool sandbox)=>ShowRewards(amount,0,false,League.Bronze,sandbox);
+        /// <summary>Supplies the saved coin and trophy rewards and an optional league promotion.</summary>
+        public void ShowRewards(int amount,int trophies,bool promotedNow,League league,bool sandbox)
         {
-            if(sandbox||Rating==null){coinEnabled=false;coinLine.gameObject.SetActive(false);return;}
+            if(sandbox||Rating==null){coinEnabled=false;coinLine.gameObject.SetActive(false);trophyLine.gameObject.SetActive(false);PromotionText.gameObject.SetActive(false);return;}
             coinEnabled=true;
             if(ReferenceEquals(coinResult,Rating))return;
-            coinResult=Rating;presentationElapsed=0;coinEmitted=false;coinFrame=-1;coinFrames=new string[31];
-            for(int i=0;i<=30;i++)coinFrames[i]="+"+Mathf.RoundToInt(Mathf.Lerp(0,amount,i/30f));
-            CoinsText.text=coinFrames[0];coinLine.gameObject.SetActive(false);
+            coinResult=Rating;presentationElapsed=0;coinEmitted=false;coinFrame=-1;coinFrames=new string[31];trophyFrames=new string[31];
+            trophyAmount=Mathf.Max(0,trophies);promoted=promotedNow&&trophyAmount>0;
+            for(int i=0;i<=30;i++){coinFrames[i]="+"+Mathf.RoundToInt(Mathf.Lerp(0,amount,i/30f));trophyFrames[i]="+"+Mathf.RoundToInt(Mathf.Lerp(0,trophyAmount,i/30f));}
+            CoinsText.text=coinFrames[0];TrophiesText.text=trophyFrames[0];coinLine.gameObject.SetActive(false);trophyLine.gameObject.SetActive(false);PromotionText.gameObject.SetActive(false);
+            // Coins alone stay centred; with trophies the two rewards sit side by side.
+            coinLine.anchoredPosition=new Vector2(trophyAmount>0?-130:0,-210);
+            if(promoted){PromotionText.text="PROMOTED TO "+LeagueArt.Name(league)+" LEAGUE!";PromotionText.color=LeagueArt.Tint(league);}
         }
 
         /// <summary>Earned-star presentation.</summary>
@@ -50,8 +62,9 @@ namespace ArrowEscape.UI
             if(!coinEnabled||Rating==null)return;
             presentationElapsed+=dt;float elapsed=presentationElapsed-Rating.Stars*.25f;
             if(elapsed<0)return;
-            if(!coinEmitted){coinEmitted=true;coinLine.gameObject.SetActive(true);CoinPresented?.Invoke();}
-            int current=Mathf.Min(30,Mathf.FloorToInt(elapsed/.6f*30));if(current!=coinFrame){coinFrame=current;CoinsText.text=coinFrames[current];}
+            if(!coinEmitted){coinEmitted=true;coinLine.gameObject.SetActive(true);trophyLine.gameObject.SetActive(trophyAmount>0);CoinPresented?.Invoke();}
+            int current=Mathf.Min(30,Mathf.FloorToInt(elapsed/.6f*30));if(current!=coinFrame){coinFrame=current;CoinsText.text=coinFrames[current];if(trophyFrames!=null)TrophiesText.text=trophyFrames[current];}
+            if(promoted&&current==30&&!PromotionText.gameObject.activeSelf){PromotionText.gameObject.SetActive(true);AllCompleteText.gameObject.SetActive(false);}
         }
         private void Update() { if (Application.isPlaying) Tick(Time.deltaTime); }
         /// <summary>Adds star results to the unchanged completion actions and paired-best labels.</summary>
@@ -114,8 +127,14 @@ namespace ArrowEscape.UI
             AllCompleteText = UiFactory.Text("AllComplete", card, "All levels complete!", 42, new Vector2(850, 65), new Vector2(0, -145));
             coinLine=UiFactory.Rect("CoinReward",card,new Vector2(220,48),new Vector2(0,-210));
             UiStyle.Icon("Coin",coinLine,UiSpriteShape.Coin,new Vector2(-62,0),42,UiStyle.Gold);
-            CoinsText=UiFactory.Text("Coins",coinLine,"",40,new Vector2(150,48),new Vector2(28,0));CoinsText.color=UiStyle.Ink;
+            CoinsText=UiFactory.Text("Coins",coinLine,"",40,new Vector2(150,48),new Vector2(40,0));CoinsText.color=UiStyle.Ink;CoinsText.verticalOverflow=VerticalWrapMode.Overflow;CoinsText.horizontalOverflow=HorizontalWrapMode.Overflow;CoinsText.alignment=TextAnchor.MiddleLeft;
             coinLine.gameObject.SetActive(false);
+            trophyLine=UiFactory.Rect("TrophyReward",card,new Vector2(220,48),new Vector2(130,-210));
+            NeonKit.Icon("Trophy",trophyLine,"icon_trophy",50,new Vector2(-62,2));
+            TrophiesText=UiFactory.Text("Trophies",trophyLine,"",40,new Vector2(150,48),new Vector2(40,0));TrophiesText.color=new Color32(255,214,92,255);TrophiesText.verticalOverflow=VerticalWrapMode.Overflow;TrophiesText.horizontalOverflow=HorizontalWrapMode.Overflow;TrophiesText.alignment=TextAnchor.MiddleLeft;
+            trophyLine.gameObject.SetActive(false);
+            PromotionText=BrandArt.Text("Promotion",card,"",34,new Vector2(850,60),new Vector2(0,-145),Color.white);
+            PromotionText.gameObject.SetActive(false);
             ReplayButton = UiFactory.Button("Replay", card, new Vector2(-275, -330));
             NextButton = UiFactory.Button("Next Level", card, new Vector2(0, -330), NeonButtonStyle.Primary);
             LevelsButton = UiFactory.Button("Levels", card, new Vector2(275, -330));
@@ -133,7 +152,7 @@ namespace ArrowEscape.UI
         /// <summary>Shows final counters, with flawless only for an unaided perfect attempt.</summary>
         public void Show(int mistakes, int undos)
         {
-            Rating = null; coinEnabled=false;coinLine.gameObject.SetActive(false); Stars.gameObject.SetActive(false); MovesText.gameObject.SetActive(false);
+            Rating = null; coinEnabled=false;coinLine.gameObject.SetActive(false);trophyLine.gameObject.SetActive(false);PromotionText.gameObject.SetActive(false);trophyAmount=0;promoted=false; Stars.gameObject.SetActive(false); MovesText.gameObject.SetActive(false);
             BestText.gameObject.SetActive(false);
             BestNoticeText.gameObject.SetActive(false);
             AllCompleteText.gameObject.SetActive(false);

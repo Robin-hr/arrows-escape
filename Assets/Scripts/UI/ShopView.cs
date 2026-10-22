@@ -91,7 +91,7 @@ namespace ArrowEscape.UI
         private static UnityEngine.UI.ScrollRect BuildScroll(RectTransform safe)
         {
             var root=UiFactory.Rect("ShopScroll",safe,Vector2.zero,Vector2.zero);UiFactory.Stretch(root);root.offsetMin=new Vector2(24,24);root.offsetMax=new Vector2(-24,-310);
-            var view=root.gameObject.AddComponent<UnityEngine.UI.ScrollRect>();var viewport=UiFactory.Panel("Viewport",root,Color.black,true);viewport.gameObject.AddComponent<UnityEngine.UI.Mask>().showMaskGraphic=false;
+            var view=root.gameObject.AddComponent<UnityEngine.UI.ScrollRect>();var viewport=UiFactory.Panel("Viewport",root,new Color(0,0,0,0),true);viewport.gameObject.AddComponent<UnityEngine.UI.RectMask2D>();
             var content=UiFactory.Rect("Content",viewport,Vector2.zero,Vector2.zero);content.anchorMin=new Vector2(0,1);content.anchorMax=Vector2.one;content.pivot=new Vector2(.5f,1);
             var layout=content.gameObject.AddComponent<UnityEngine.UI.VerticalLayoutGroup>();layout.spacing=32;layout.childControlWidth=true;layout.childControlHeight=false;layout.childForceExpandHeight=false;layout.childForceExpandWidth=true;
             content.gameObject.AddComponent<UnityEngine.UI.ContentSizeFitter>().verticalFit=UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;

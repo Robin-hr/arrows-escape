@@ -43,6 +43,8 @@ namespace ArrowEscape.UI
         public BoardIntro Intro { get; private set; }
         /// <summary>Short neon notices (developer coin grant).</summary>
         public ToastView Toast { get; private set; }
+        /// <summary>World ranking page.</summary>
+        public RankingView Ranking { get; private set; }
         /// <summary>Clock for the five-tap developer grant; tests may replace it.</summary>
         public System.Func<float> Clock { get; set; } = () => Time.realtimeSinceStartup;
 
@@ -97,7 +99,8 @@ namespace ArrowEscape.UI
             SettingsScreen.Build(canvasObject.transform, bootstrap.Settings.Model, SetSound, SetHaptics, AskReset, Back);
             Confirm = gameObject.AddComponent<ConfirmDialog>(); Confirm.Build(canvasObject.transform);
             Shop=gameObject.AddComponent<ShopView>();Shop.Build(canvasObject.transform,Confirm,game);Shop.Closed+=OnShopClosed;
-            Profile = gameObject.AddComponent<ProfileView>(); Profile.Build(canvasObject.transform, CloseProfile, OpenAvatarShop);
+            Profile = gameObject.AddComponent<ProfileView>(); Profile.Build(canvasObject.transform, CloseProfile, OpenAvatarShop, OpenRanking);
+            Ranking = gameObject.AddComponent<RankingView>(); Ranking.Build(canvasObject.transform, CloseRanking, bootstrap.RankingSnapshot);
             Loading = gameObject.AddComponent<LoadingOverlay>(); Loading.Build(canvasObject.transform);
             Toast = gameObject.AddComponent<ToastView>(); Toast.Build(canvasObject.transform);
             MainMenu.ProfileButton.onClick.AddListener(OpenProfile);
@@ -106,6 +109,7 @@ namespace ArrowEscape.UI
             MainMenu.PlayButton.onClick.AddListener(Continue);
             MainMenu.LevelsButton.onClick.AddListener(OnLevelsRequested);
             MainMenu.SettingsButton.onClick.AddListener(OpenSettings);
+            MainMenu.RankingButton.onClick.AddListener(OpenRanking);
             MainMenu.QuitButton.onClick.AddListener(Quit);
             PauseScreen.ResumeButton.onClick.AddListener(Resume);
             PauseScreen.RestartButton.onClick.AddListener(Restart);
@@ -118,7 +122,8 @@ namespace ArrowEscape.UI
         {
             if(state!=ScreenState.MainMenu&&Shop.IsVisible)Shop.Close();
             if (state != ScreenState.MainMenu && Profile.IsVisible) Profile.Hide();
-            MainMenu.Root.gameObject.SetActive(state == ScreenState.MainMenu&&!Shop.IsVisible&&!Profile.IsVisible);
+            if (state != ScreenState.MainMenu && Ranking.IsVisible) Ranking.Hide();
+            MainMenu.Root.gameObject.SetActive(state == ScreenState.MainMenu&&!Shop.IsVisible&&!Profile.IsVisible&&!Ranking.IsVisible);
             Levels.Root.gameObject.SetActive(state == ScreenState.LevelSelect);
             PauseScreen.Root.gameObject.SetActive(state == ScreenState.Paused);
             SettingsScreen.Root.gameObject.SetActive(state == ScreenState.Settings);
@@ -178,6 +183,22 @@ namespace ArrowEscape.UI
             Profile.Show(ProfileStats.Build(bootstrap.Progress.Tracker, bootstrap.LevelIds, bootstrap.Inventory.State));
             if (LoadingScreensEnabled) Loading.Show(LoadingKind.Profile, "LOADING PROFILE");
         }
+        /// <summary>Opens the world ranking from the home page or the profile league card.</summary>
+        public void OpenRanking()
+        {
+            if (Machine.Current != ScreenState.MainMenu || Shop.IsVisible) return;
+            MainMenu.Root.gameObject.SetActive(false);
+            Ranking.Show();
+            if (LoadingScreensEnabled) Loading.Show(LoadingKind.Profile, "LOADING RANKING");
+        }
+        private void CloseRanking()
+        {
+            if (!Ranking.IsVisible) return;
+            Ranking.Hide();
+            if (Profile.IsVisible) { Profile.Show(ProfileStats.Build(bootstrap.Progress.Tracker, bootstrap.LevelIds, bootstrap.Inventory.State)); return; }
+            MainMenu.Root.gameObject.SetActive(Machine.Current == ScreenState.MainMenu);
+            if (Machine.Current == ScreenState.MainMenu) RefreshMainMenu();
+        }
         private void CloseProfile()
         {
             if (!Profile.IsVisible) return;
@@ -234,6 +255,7 @@ namespace ArrowEscape.UI
             if (Loading != null && Loading.IsVisible) return true;
             if (Confirm != null && Confirm.IsOpen) { Confirm.Hide(); return true; }
             if(Shop!=null&&Shop.IsVisible)return Shop.HandleBack();
+            if (Ranking != null && Ranking.IsVisible) { CloseRanking(); return true; }
             if (Profile != null && Profile.IsVisible) { CloseProfile(); return true; }
             return Machine.Back();
         }

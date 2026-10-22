@@ -15,6 +15,7 @@ namespace ArrowEscape.DevBridge
     /// Development-only helper so the AI assistant can work on this project while the Editor is open.
     /// It watches Logs/DevBridge/cmd.txt once a second and writes results next to it:
     ///   refresh                      import changed files (compile errors go to compile-errors.txt)
+    ///   resolve                      re-resolve Packages/manifest.json
     ///   test[:regex]                 run Edit Mode tests -> tests.txt
     ///   menu:Path/To/Item            run an Editor menu item
     ///   open:Assets/Scenes/X.unity   open a scene
@@ -85,6 +86,7 @@ namespace ArrowEscape.DevBridge
         private static void Run(string command)
         {
             if (command == "refresh") { AssetDatabase.Refresh(); return; }
+            if (command == "resolve") { UnityEditor.PackageManager.Client.Resolve(); Write("menu.txt", Now + " resolve"); return; }
             if (command.StartsWith("test", StringComparison.Ordinal)) { RunTests(command.Length > 5 ? command.Substring(5) : null); return; }
             if (command.StartsWith("open:", StringComparison.Ordinal)) { UnityEditor.SceneManagement.EditorSceneManager.OpenScene(command.Substring(5)); Write("menu.txt", Now + " opened " + command.Substring(5)); return; }
             if (command.StartsWith("menu:", StringComparison.Ordinal)) { Write("menu.txt", Now + " " + EditorApplication.ExecuteMenuItem(command.Substring(5))); return; }
@@ -179,6 +181,26 @@ namespace ArrowEscape.DevBridge
                         }
                     method?.Invoke(flow, args);
                     Append("play-log.txt", Now + " " + action + (method == null || flow == null ? " (not found)" : ""));
+                }
+                else if (action == "solve")
+                {
+                    // Taps hinted arrows until the level is cleared (screenshots of the completion screen).
+                    Type gameType = Type.GetType("ArrowEscape.View.GameController, ArrowEscape.View"), tapType = Type.GetType("ArrowEscape.View.TapController, ArrowEscape.View");
+                    Type boardViewType = Type.GetType("ArrowEscape.View.BoardView, ArrowEscape.View"), hintType = Type.GetType("ArrowEscape.Core.HintFinder, ArrowEscape.Core");
+                    object game = UnityEngine.Object.FindFirstObjectByType(gameType), taps = UnityEngine.Object.FindFirstObjectByType(tapType), view = UnityEngine.Object.FindFirstObjectByType(boardViewType);
+                    int tapped = 0;
+                    for (int guard = 0; guard < 500 && game != null && taps != null && view != null; guard++)
+                    {
+                        if ((bool)gameType.GetProperty("IsCleared").GetValue(game)) break;
+                        object session = gameType.GetProperty("Session").GetValue(game); object board = session.GetType().GetProperty("Board").GetValue(session);
+                        object hint = hintType.GetMethod("Find").Invoke(null, new[] { board }); object arrow = hint.GetType().GetProperty("Arrow").GetValue(hint);
+                        if (arrow == null) break;
+                        int x = (int)arrow.GetType().GetProperty("X").GetValue(arrow), y = (int)arrow.GetType().GetProperty("Y").GetValue(arrow);
+                        Vector3 world = (Vector3)boardViewType.GetMethod("CellToWorld", new[] { typeof(int), typeof(int) }).Invoke(view, new object[] { x, y });
+                        tapType.GetMethod("PointerDown").Invoke(taps, new object[] { 1, (Vector2)world }); tapType.GetMethod("PointerUp").Invoke(taps, new object[] { 1, (Vector2)world });
+                        tapped++;
+                    }
+                    Append("play-log.txt", Now + " solve tapped " + tapped);
                 }
                 else if (action.StartsWith("click:", StringComparison.Ordinal))
                 {

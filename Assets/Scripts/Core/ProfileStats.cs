@@ -33,6 +33,10 @@ namespace ArrowEscape.Core
         public int FramesOwned { get; private set; }
         /// <summary>Avatar frames in the shop.</summary>
         public int FramesTotal { get; private set; }
+        /// <summary>Total trophies.</summary>
+        public int Trophies { get; private set; }
+        /// <summary>League reached with those trophies.</summary>
+        public League League { get; private set; }
         /// <summary>Equipped avatar id (for the badge art).</summary>
         public string AvatarId { get; private set; } = Inventory.DefaultAvatarId;
         /// <summary>Equipped frame id (for the badge art).</summary>
@@ -72,6 +76,7 @@ namespace ArrowEscape.Core
             if (inventory != null)
             {
                 stats.Coins = inventory.Coins;
+                stats.Trophies = inventory.Trophies; stats.League = TrophyRules.LeagueFor(inventory.Trophies);
                 stats.EquippedArrow = NameOf(inventory.EquippedArrowId);
                 stats.EquippedTheme = NameOf(inventory.EquippedThemeId);
                 stats.AvatarId = inventory.EquippedAvatarId ?? Inventory.DefaultAvatarId;

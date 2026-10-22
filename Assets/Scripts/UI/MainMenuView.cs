@@ -36,6 +36,10 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Button ShopButton { get; private set; }
         /// <summary>Settings tile.</summary>
         public UnityEngine.UI.Button SettingsButton { get; private set; }
+        /// <summary>Opens the world ranking.</summary>
+        public UnityEngine.UI.Button RankingButton { get; private set; }
+        /// <summary>Side of the four home tiles.</summary>
+        public const float TileSize = 214;
         /// <summary>Profile button in the header.</summary>
         public UnityEngine.UI.Button ProfileButton { get; private set; }
         /// <summary>The player's avatar in their frame, on the profile button.</summary>
@@ -84,15 +88,16 @@ namespace ArrowEscape.UI
             BrandArt.Text("Label", PlayButton.transform, "PLAY", 76, new Vector2(440, 90), new Vector2(60, 36), Color.white);
             PlayLevelText = BrandArt.Text("LevelLabel", PlayButton.transform, "LEVEL 1", 30, new Vector2(440, 44), new Vector2(60, -24), new Color32(230, 247, 255, 255));
 
-            LevelsButton = Tile("Levels", "LEVELS", "icon_levels", column, -285);
-            ShopButton = Tile("Shop", "SHOP", "icon_shop", column, 0);
-            SettingsButton = Tile("Settings", "SETTINGS", "icon_settings", column, 285);
+            LevelsButton = Tile("Levels", "LEVELS", "icon_levels", column, -342);
+            ShopButton = Tile("Shop", "SHOP", "icon_shop", column, -114);
+            RankingButton = Tile("Ranking", "RANKING", "icon_ranking", column, 114);
+            SettingsButton = Tile("Settings", "SETTINGS", "icon_settings", column, 342);
 
             CompletedText = UiFactory.Text("Completed", column, "", UiStyle.Caption, new Vector2(700, 64), new Vector2(0, -690)); CompletedText.gameObject.SetActive(false);
             ContinueText = UiFactory.Text("ContinueLevel", column, "", UiStyle.Caption, new Vector2(500, 48), Vector2.zero); ContinueText.gameObject.SetActive(false);
             QuitButton = UiFactory.MenuButton("Quit", column, -720); QuitButton.gameObject.SetActive(false);
 
-            entranceItems = new[] { header, logo, (RectTransform)PlayButton.transform, (RectTransform)LevelsButton.transform, (RectTransform)ShopButton.transform, (RectTransform)SettingsButton.transform };
+            entranceItems = new[] { header, logo, (RectTransform)PlayButton.transform, (RectTransform)LevelsButton.transform, (RectTransform)ShopButton.transform, (RectTransform)RankingButton.transform, (RectTransform)SettingsButton.transform };
             entranceGroups = new CanvasGroup[entranceItems.Length]; entranceRest = new Vector2[entranceItems.Length];
             for (int i = 0; i < entranceItems.Length; i++) { entranceRest[i] = entranceItems[i].anchoredPosition; entranceGroups[i] = entranceItems[i].gameObject.AddComponent<CanvasGroup>(); }
             PlayEntrance();
@@ -140,10 +145,12 @@ namespace ArrowEscape.UI
 
         private static UnityEngine.UI.Button Tile(string name, string label, string icon, Transform parent, float x)
         {
-            var button = NeonButton(name, parent, "ui_button_secondary", SecondaryBorder, new Vector2(250, 250), new Vector2(x, -475));
-            // Centred on the tile's lit face (+9.5 units, 183 tall) so icon and label stay inside the frame.
-            BrandArt.Image("Icon", button.transform, icon, new Vector2(104, 104), new Vector2(0, 34));
-            BrandArt.Text("Label", button.transform, label, 28, new Vector2(220, 44), new Vector2(0, -46), BrandArt.Lavender);
+            var button = NeonButton(name, parent, "ui_button_secondary", SecondaryBorder, new Vector2(TileSize, TileSize), new Vector2(x, -475));
+            // Centred on the tile's lit face so icon and label stay inside the frame (scaled from the 250 design).
+            const float k = TileSize / 250f;
+            BrandArt.Image("Icon", button.transform, icon, new Vector2(104, 104) * k, new Vector2(0, 34 * k));
+            var text = BrandArt.Text("Label", button.transform, label, 24, new Vector2(196, 40), new Vector2(0, -46 * k), BrandArt.Lavender);
+            text.resizeTextForBestFit = true; text.resizeTextMinSize = 16; text.resizeTextMaxSize = 24;
             return button;
         }
 

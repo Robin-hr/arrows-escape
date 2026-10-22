@@ -36,6 +36,10 @@ namespace ArrowEscape.View
         public int CurrentAttemptId { get; private set; }
         /// <summary>Coins earned by the current completed attempt, zero for sandbox.</summary>
         public int LastCoinReward { get; private set; }
+        /// <summary>Trophies won by the latest clear (0 for sandbox or a duplicate receipt).</summary>
+        public int LastTrophyReward { get; private set; }
+        /// <summary>True when the latest clear moved the player into a higher league.</summary>
+        public bool LastLeaguePromoted { get; private set; }
 
         private string sandboxPath;
         /// <summary>Whether this attempt comes from the non-progress test sandbox.</summary>
@@ -238,7 +242,7 @@ namespace ArrowEscape.View
         {
             clearRecorded = false;
             LastCompletion = null;
-            LastCoinReward=0;CurrentAttemptId=Inventory.Shop.BeginAttempt();ApplyEquipment();
+            LastCoinReward=0;LastTrophyReward=0;LastLeaguePromoted=false;CurrentAttemptId=Inventory.Shop.BeginAttempt();ApplyEquipment();
             if(IsSandboxLevel)return;
             if (string.IsNullOrEmpty(CurrentLevelId)) return;
             if(Inventory.LastSaveFailed&&!Inventory.Save())return;
@@ -255,7 +259,9 @@ namespace ArrowEscape.View
             }
             if (clearRecorded || !controller.IsCleared || string.IsNullOrEmpty(CurrentLevelId)) return;
             clearRecorded = true;
+            League leagueBefore=TrophyRules.LeagueFor(Inventory.State.Trophies);
             LastCoinReward=Inventory.AwardLevelClear(CurrentLevelId,StarRating.Stars(controller.TapCount,controller.Par),CurrentAttemptId);
+            LastTrophyReward=Inventory.Shop.LastTrophyReward;LastLeaguePromoted=TrophyRules.LeagueFor(Inventory.State.Trophies)>leagueBefore;
             // Never commit progress ahead of a failed inventory write. Keep play available in memory.
             if(Inventory.LastSaveFailed)
             {
@@ -264,7 +270,15 @@ namespace ArrowEscape.View
             }
             else LastCompletion = Progress.RecordCompletion(CurrentLevelId, controller.MistakeCount, controller.UndoCount, controller.TapCount, controller.Par);
             WarnSaveFailure();
+            if(LastTrophyReward>0)_=LeaderboardRegistry.Service.SubmitAsync(RankingSnapshot());
             LevelCompleted?.Invoke(LastCompletion);
+        }
+        /// <summary>What the local player publishes to the world ranking.</summary>
+        public PlayerSnapshot RankingSnapshot()
+        {
+            EnsureInitialized();
+            var state=Inventory.State;
+            return new PlayerSnapshot("PLAYER",state.Trophies,Progress.Tracker.TotalStars,state.EquippedAvatarId,state.EquippedFrameId);
         }
         private void WarnSaveFailure()
         {

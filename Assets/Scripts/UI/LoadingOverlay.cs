@@ -19,6 +19,7 @@ namespace ArrowEscape.UI
 
         private CanvasGroup group;
         private UnityEngine.UI.RawImage background;
+        private RectTransform startupLayer;
         private UnityEngine.UI.Image dim;
         private UnityEngine.UI.RawImage logo;
         private RectTransform loaderRect, captionRect, loaderPanel;
@@ -61,7 +62,10 @@ namespace ArrowEscape.UI
 
             dim = UiFactory.Rect("Dim", Root, Vector2.zero, Vector2.zero).gameObject.AddComponent<UnityEngine.UI.Image>();
             UiFactory.Stretch(dim.rectTransform); dim.color = new Color(0.02f, 0.024f, 0.1f, 0.94f); dim.raycastTarget = true;
-            background = BrandArt.Backdrop("StartupBackground", Root, "loading_background"); background.raycastTarget = true;
+            // Same animated neon backdrop as the home page (warp streaks + scrolling grid).
+            startupLayer = UiFactory.Rect("StartupBackground", Root, Vector2.zero, Vector2.zero); UiFactory.Stretch(startupLayer); startupLayer.SetSiblingIndex(dim.transform.GetSiblingIndex() + 1);
+            var blocker = startupLayer.gameObject.AddComponent<UnityEngine.UI.Image>(); blocker.color = BrandArt.Space; blocker.raycastTarget = true;
+            var startupBackdrop = startupLayer.gameObject.AddComponent<NeonMenuBackground>(); startupBackdrop.Build(startupLayer); background = startupBackdrop.Image;
             dim.transform.SetAsFirstSibling();
 
             logo = UiFactory.Rect("Logo", Root, new Vector2(1000, 491), Vector2.zero).gameObject.AddComponent<UnityEngine.UI.RawImage>();
@@ -86,7 +90,7 @@ namespace ArrowEscape.UI
             if (Root == null) return;
             Kind = kind; duration = DurationFor(kind); elapsed = 0; onDone = done; IsVisible = true;
             bool startup = kind == LoadingKind.Startup;
-            background.gameObject.SetActive(startup); logo.gameObject.SetActive(startup); dim.gameObject.SetActive(!startup);
+            startupLayer.gameObject.SetActive(startup); logo.gameObject.SetActive(startup); dim.gameObject.SetActive(!startup);
             float size = LoaderSizeFor(kind);
             loaderRect.sizeDelta = new Vector2(size, size);
             loaderRect.anchorMin = loaderRect.anchorMax = new Vector2(0.5f, startup ? 0.33f : 0.52f);

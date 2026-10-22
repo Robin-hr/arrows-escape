@@ -8,6 +8,10 @@ namespace ArrowEscape.Core
         public Inventory Inventory { get; }
         /// <summary>Raised once when the numeric balance changes.</summary>
         public event Action<int> CoinsChanged;
+        /// <summary>Raised when trophies are awarded (new total).</summary>
+        public event Action<int> TrophiesChanged;
+        /// <summary>Trophies awarded by the most recent accepted clear.</summary>
+        public int LastTrophyReward { get; private set; }
         /// <summary>Raised once after a successful purchase.</summary>
         public event Action<string> ItemPurchased;
         /// <summary>Raised once when equipment changes in a slot.</summary>
@@ -28,6 +32,7 @@ namespace ArrowEscape.Core
         {
             if(string.IsNullOrWhiteSpace(levelId))throw new ArgumentException("A level id is required.",nameof(levelId));
             if(stars<0||stars>3)throw new ArgumentOutOfRangeException(nameof(stars));
+            LastTrophyReward=0;
             if(attemptId<=Inventory.LastPaidAttemptId)return 0;
             if(attemptId==int.MaxValue)throw new ArgumentOutOfRangeException(nameof(attemptId));
             LevelRewardRecord record=null;
@@ -37,6 +42,8 @@ namespace ArrowEscape.Core
             if(record==null){record=new LevelRewardRecord{id=levelId};Inventory.RewardedStars.Add(record);}
             record.stars=Math.Max(previous,stars);Inventory.LastPaidAttemptId=attemptId;
             Inventory.NextAttemptId=Math.Max(Inventory.NextAttemptId,attemptId+1);
+            int trophies=TrophyRules.Award(stars,new SeededRandom(TrophyRules.Seed(levelId,attemptId)));
+            if(trophies>0){Inventory.Trophies=(int)Math.Min(int.MaxValue,(long)Inventory.Trophies+trophies);LastTrophyReward=trophies;TrophiesChanged?.Invoke(Inventory.Trophies);}
             int before=Inventory.Coins;SetCoins((long)before+reward);return Inventory.Coins-before;
         }
         /// <summary>Whether the wallet can cover a nonnegative price.</summary>

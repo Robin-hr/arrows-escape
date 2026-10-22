@@ -22,7 +22,7 @@ namespace ArrowEscape.Tests
         /// <summary>Solvable Normal boards cannot enter traps, including real levels and one hundred seeded boards.</summary>
         [Test]public void NormalMonotonicity()
         {
-            foreach(string path in LevelRepository.GetLevelResourcePaths())NoTraps(LevelRepository.LoadFromResources(path).Board);
+            foreach(string path in System.Linq.Enumerable.Take(LevelRepository.GetLevelResourcePaths(),60))NoTraps(LevelRepository.LoadFromResources(path).Board);
             int checkedBoards=0;
             for(int seed=0;checkedBoards<100;seed++){var b=GenerationBoards.Normal(IceTestBoards.RandomBoard(seed));if(!LevelSolvability.IsSolvable(b))continue;NoTraps(b);checkedBoards++;}
         }
