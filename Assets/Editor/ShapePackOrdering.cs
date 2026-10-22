@@ -29,7 +29,7 @@ namespace ArrowEscape.Editor
             for(int i=0;i<items.Count;i++)
             {
                 var old=items[i];var e=old.Entry;
-                items[i]=new ShapePackItem(new ShapePackEntry(i+4,e.Shape,e.Width,e.Height,e.BaseSeed,targetArea:e.TargetArea),old.Result,old.Milliseconds);
+                items[i]=new ShapePackItem(new ShapePackEntry(i+4,e.Shape,e.Width,e.Height,e.BaseSeed,targetArea:e.TargetArea,turnBias:e.TurnBias,coverageFloor:e.CoverageFloor,reviewed:e.Reviewed),old.Result,old.Milliseconds);
             }
             return items.AsReadOnly();
         }

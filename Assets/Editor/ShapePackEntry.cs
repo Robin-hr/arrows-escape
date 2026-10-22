@@ -18,10 +18,16 @@ namespace ArrowEscape.Editor
         public DifficultyTier Tier { get; }
         /// <summary>Requested inside-cell band; zero for legacy custom entries.</summary>
         public int TargetArea { get; }
+        /// <summary>Reviewed growth preference, independent of difficulty scoring.</summary>
+        public int TurnBias { get; }
+        /// <summary>Minimum accepted coverage, in permille.</summary>
+        public int CoverageFloor { get; }
+        /// <summary>Whether this exact seed is a reviewed installed catalog recipe.</summary>
+        public bool Reviewed { get; }
         /// <summary>Stable filename and progress id.</summary>
         public string Id=>"level_"+Number.ToString("D3",System.Globalization.CultureInfo.InvariantCulture)+"_shape_"+Shape.ToString().ToLowerInvariant();
         /// <summary>Creates one plan slot.</summary>
-        public ShapePackEntry(int number,ShapeKind shape,int width,int height,int seed,DifficultyTier tier=DifficultyTier.Easy,int targetArea=0)
-        {Number=number;Shape=shape;Width=width;Height=height;BaseSeed=seed;Tier=tier;TargetArea=targetArea;}
+        public ShapePackEntry(int number,ShapeKind shape,int width,int height,int seed,DifficultyTier tier=DifficultyTier.Easy,int targetArea=0,int turnBias=45,int coverageFloor=900,bool reviewed=false)
+        {Number=number;Shape=shape;Width=width;Height=height;BaseSeed=seed;Tier=tier;TargetArea=targetArea;TurnBias=turnBias;CoverageFloor=coverageFloor;Reviewed=reviewed;}
     }
 }

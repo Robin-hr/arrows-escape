@@ -32,25 +32,18 @@ namespace ArrowEscape.Tests
         }
 
         /// <summary>Sample sizes and genuine three-arrow chains match the design.</summary>
-        [TestCase("Levels/level_001", 4, 6, 8)]
-        [TestCase("Levels/level_002", 5, 10, 14)]
-        [TestCase("Levels/level_003", 6, 16, 22)]
+        [TestCase("Levels/level_001", 6, 4, 5)]
+        [TestCase("Levels/level_002", 6, 5, 7)]
+        [TestCase("Levels/level_003", 8, 6, 8)]
         public void SampleHasRequiredSizeAndChain(string path, int size, int min, int max)
         {
             LevelLoadResult result = LevelRepository.LoadFromResources(path);
             Assert.That(result.Success, Is.True, string.Join("; ", result.Errors));
             Board board = result.Board;
             Assert.That(board.Width, Is.EqualTo(size));
-            Assert.That(board.Height, Is.EqualTo(size));
+            Assert.That(board.Height, Is.EqualTo(path.EndsWith("001") ? 6 : 8));
             Assert.That(board.Arrows.Count, Is.InRange(min, max));
-            // Find A -> B -> C, where C can exit at the start.
-            bool hasChain = board.Arrows.Any(a =>
-            {
-                Arrow b = board.GetBlocker(a);
-                Arrow c = b == null ? null : board.GetBlocker(b);
-                return c != null && board.CanExit(c);
-            });
-            Assert.That(hasChain, Is.True, path);
+            Assert.That(CatalogLevelRules.ValidateStarter(board,int.Parse(path.Substring(path.Length-3))),Is.Empty,path);
         }
 
         /// <summary>A missing resource returns an informative failure.</summary>

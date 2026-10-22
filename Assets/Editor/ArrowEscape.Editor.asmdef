@@ -3,7 +3,9 @@
   "references": [
     "ArrowEscape.Data",
     "ArrowEscape.Core",
-    "ArrowEscape.View"
+    "ArrowEscape.View",
+    "ArrowEscape.UI",
+    "UnityEngine.UI"
   ],
   "includePlatforms": [
     "Editor"

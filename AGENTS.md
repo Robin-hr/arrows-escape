@@ -414,7 +414,7 @@ The board is cleared when no arrows remain.
   backups. Unreadable/newer files and failed renames forbid destructive writes.
   Unknown owned ids remain in the payload but have no active shop semantics;
   invalid/unowned/wrong-slot equipment falls back to classic/paper.
-- ShopCatalog ids are permanent once released. There are 20 priced arrows,
+- ShopCatalog ids remain reserved forever, including retired ids. There are 19 priced arrows,
   two free defaults, and six unavailable themes. Themes say Coming soon until
   Step 14E. Equipment currently changes only Normal arrow base tint, with a
   3:1 paper-contrast guard; Classic is exact and Ice is unchanged. Temporary
@@ -452,3 +452,298 @@ The board is cleared when no arrows remain.
 - Tick/Update paths reuse arrays, positions and cached counter strings. No
   coroutines, global time-scale changes or legacy input. Core stays free of
   engine and filesystem dependencies. Step 14C has not started.
+
+
+## Arrow skins (Step 14C)
+- Part 1 implements frostbite, inferno_streak, plasma_bolt, void_whisper,
+  obsidian_shard, chromium_spike, celestial_quill,
+  emerald_viper and crimson_relic only. Other paid arrows retain the 14B tint.
+  Classic keeps its original renderer, meshes, sprites, colors and sorting exactly;
+  Ice ignores skin equipment. Inventory/progress/settings formats do not change.
+- Art sources: Assets/ArtSource/arrows_sheet_a.png and arrows_sheet_b.png.
+  Tools > Arrow Escape > Import Arrow Art reads source bytes without changing them.
+  It detects bounds within label-free regions, estimates the local border matte,
+  un-premultiplies soft glows, pads six transparent pixels and normalizes tips right.
+  Assets/ArtSource/Arrows/<id>.png overrides a sheet without flipping the override.
+  Exports full/head/tail/seamless shaft, plus sheet-B icons, under Assets/Art/Arrows.
+  All twenty catalog references plus jade_serpent are imported; this does not
+  implement Part 2 recipes. Contact sheet: Logs/ArtImport/contact.png.
+- ArrowSkinRegistry owns optional body/pattern/core/rim, imported head/tail, halo,
+  idle/flight/impact/return/trail and quiet procedural sound recipes. SkinVisual
+  attaches separate appearance children and preserves ArrowView's classic state
+  adapter. ArrowView.Apply remains the only owner-transform/layer writer.
+- PathRibbon UV u measures distance in cells and v crosses the width, so patterns
+  tile rather than stretch. Geometry and 0.26-cell body width are unchanged.
+  Skin-only tags suppress generic heads under reference art and duplicate glow
+  caps; Classic ignores the added UV channels. Head/tail art follows the moving
+  path window, including reversed undo and blocked nudge.
+- Two mobile unlit shaders: ArrowSkinRibbon.shader and ArrowSkinGlow.shader.
+  ArrowSkinResources in Resources explicitly references both shaders and imported
+  art; no new shader-name lookup. Runtime materials are shared by recipe/mode.
+  Noise, scrolling, shimmer, glints, lightning and flight waves run on the GPU.
+  One board clock freezes on pause; live preview clocks are independent.
+- Paper uses saturated normal-alpha halos plus dark art/body edges. Dark boards
+  use additive halos. Editor/development Debug: Dark board switches only the
+  runtime comparison background to #0E1116, never the saved theme.
+- Flash > highlight > hint remain independent bright outlines/overlays over the
+  skin. Clearing them restores exactly; no state changes the art/base recipe.
+  Every new skin must pass 100-cycle state restoration and visual comparison.
+- Dense cells below 0.30 inch (160-dpi fallback) disable ambient particles,
+  simplify patterns and omit optional halo/tail layers. Exit effects remain.
+  One deterministic ambient start per 0.4 s across the board. Twelve reusable
+  fifty-particle systems, with a shared 600-live-particle budget including preview
+  pools; twelve reusable laser/prism/mist ribbons and thirty-two frost marks.
+  No effect objects are created per exit and no allocations occur in warmed Tick.
+  Hidden boards clear effects; pause freezes automatic ticks; explicit ticks test.
+- SkinSoundSynth creates deterministic chime/fire/laser/whisper/crackle/glass/
+  metal/bell/hiss/gem textures at setup. They play quietly below the unchanged
+  MoveCount pentatonic melody and blocked thud through the existing six voices.
+  Sound off silences/stops the shared player. Preview cues do not advance melody.
+- Shop cards use extracted full art on dark display cases for implemented skins.
+  Details use an isolated small render-texture board, Watch it fly (also every
+  three seconds) and a local Light/Dark switch. No equipment/progress mutation
+  occurs in previews. Level select remains unchanged.
+- Tools > Arrow Escape > Skin Gallery (Play mode) shows all ten bent samples,
+  fly buttons, dark/light and LOD controls. Captures go to Logs/SkinShots with
+  <id>_rest.png, <id>_flight.png and compare.png (reference beside game).
+  The optional Editor-only 100-arrow profiler uses memory stores and explicit
+  activation, never player saves. Every new skin must pass visual comparison,
+  particle/ambient limits, deterministic choices and allocation budget tests.
+  Built skins replace the generic exit burst; Classic and Ice keep it. Native
+  particles reserve the legacy 96-sprite pool whenever present, so completion
+  confetti plus skin particles also stays within the total six-hundred budget.
+- This step allows pooled ParticleSystem components and runtime shader materials
+  only for skins. It does not replace Classic's earlier sprite effect system.
+  No scene/prefab/manifest/ProjectSettings edit, global time-scale change,
+  coroutine, legacy input, new level, Part 2 recipe or theme background visual.
+
+
+## Skin quality standard (Inferno Streak)
+- Step 14C-R1 changes Inferno only. References under ArtSource/Skins are visual
+  targets, never runtime textures, sprites, masks or traced data. Only the Editor
+  comparison command opens reference.png, to place the unchanged target above a
+  screenshot. No runtime/Resources dependency is allowed. The old Inferno crop
+  directory is retired; Import Arrow Art skips it and cannot recreate it.
+- InfernoDesign authors three curved swept-back tongues per side. A symmetric
+  floating-point signed-distance field is generated from those curves, not pixels.
+  The head shader samples that generated field with scrolling seamless fractal
+  noise for 10 Hz flutter; the bright center grades through pale yellow, gold,
+  orange and deep red. A thin red-brown paper rim is available for debugging.
+- InfernoTextures creates cached runtime-only 256x256 R8 tileable noise, an authored
+  256x256 RFloat head SDF, and 64x64 halo, round spark and elongated spark textures.
+  Destroyed caches regenerate. Nothing is exported as an image asset.
+- InfernoVisual uses a separate fire-only ribbon mesh that omits redundant straight
+  caps, retaining rounded bends. Its shader uses distance-in-cells UVs, backwards
+  2.5-cell/s noise, 35%-to-100% width taper and a fading rear quarter. Its separate
+  head, halo and fading flight streak never alter the classic mesh or game rules.
+  InfernoProcedural.shader is the third shader, referenced by ArrowSkinResources;
+  the other two shaders and the other nine recipes remain unchanged.
+- Temperature follows quadratic-flight speed: 0 red-orange at launch, rising
+  monotonically to 1 white-hot. Undo reverses the existing track animation and
+  the temperature. A 0.12 s head flare supplements the existing bump/guide/flash.
+  Highlight, hint and blocked outlines use independent state data and restore exactly.
+- ArrowSkin.PrefersDarkBoard selects #0D0F12 for Inferno, with faint board dots.
+  It is presentation only, never saved as a theme. Unequipping restores Paper.
+  SkinDirector's development Dark board toggle exposes the light alpha/rim fallback.
+  HUD labels and budget colors gain contrast only on Inferno; menus and layouts
+  are unchanged. Paper and Classic retain their original behavior.
+- Idle emits two sparks per Inferno every 0.4 s (5/s) as one board-wide batch,
+  retaining the global ambient-start throttle. Dense LOD disables idle emission
+  and simplifies noise below 0.30 inch/cell. Flight always emits. Native pools
+  preserve the combined 600-particle cap and reserve the existing 96-sprite pool.
+  Sources and buffers are prepared outside Update; warmed Tick paths allocate zero.
+- InfernoSound generates a seeded filtered fire whoosh/crackle below the existing
+  pentatonic melody; blocked uses a quieter short crackle. Existing sound settings,
+  six voices, pause behavior and move-to-note mapping are unchanged.
+- Shop Inferno card uses a straight live procedural preview, idle only; the detail
+  keeps the existing bent live preview, dark initially, with Watch it fly and sound.
+  Other cards retain their original art and layout. No economy or save-schema change.
+- Tools > Arrow Escape > Skin Gallery > Capture procedural Inferno saves the hero,
+  flight, comparison, eight-cell bent arrow, blocked and dense 24x24 shots in
+  Logs/SkinShots. InfernoRound1..4 retain the visual iterations. The target is shown
+  above flight in inferno_compare.png and above idle in inferno_compare_idle.png.
+- Tools > Arrow Escape > Skin Gallery - Profile Inferno uses memory-only stores,
+  100 arrows at 1080x1920, classic baselines and light/dark idle/flight phases.
+  Record CPU, draw calls and GPU timing availability; never claim zero GPU time
+  when counters are unavailable. Target extra CPU is under 3 ms; validate phones.
+- Future skins must follow this fully procedural layer model, reference-only rule,
+  temperature/state restoration checks, at least three inspected visual iterations,
+  live previews and allocation/particle/performance budgets before acceptance.
+
+
+## Skin quality standard: Elemental signatures (Step 14C-R2)
+- Frostbite, Plasma Bolt and Void Whisper are fully procedural. Their reference.png
+  files are Editor comparison targets only: never crops, textures, masks, traced
+  inputs or runtime dependencies. The importer skips these ids and the retired
+  Thunderbolt slot. The five other implemented recipes keep their numeric indices.
+- One additional shared shader, ElementalProcedural.shader, renders crystal,
+  contained energy, smoke, rifts and exact-track residues. ArrowSkinResources holds
+  its explicit reference. It reuses generated deterministic seamless noise and
+  the existing preallocated rounded ribbon buffers; no new image/material assets.
+  Inferno's rest renderer, texture generation and shader remain unchanged.
+- Every future skin must make its name felt. Include anticipation, action and
+  follow-through, eased changes, secondary motion, core/body/halo/atmosphere depths,
+  rim light and fine inner detail. Visual anticipation never blocks the next tap.
+  Signature action lasts at most 0.9 seconds; lingering frost may melt over 1.2.
+  Never use screen copies or GrabPass. Add every future skin to this table:
+
+  | Skin | Name meaning | Signature moment |
+  | --- | --- | --- |
+  | Inferno Streak | Raging fire, a line burned by speed | Exact travelled-path scorch cools yellow to dark red over 0.8 seconds. Rest pixels unchanged. |
+  | Frostbite | Creeping freeze and a predator's bite | Ice fangs grow and snap; branching frost creeps from the travelled path and melts. Smaller blocked bite. |
+  | Plasma Bolt | Barely contained energy released instantly | Contracting head rings, half-duration visual exit, ion line and seeded wisps; blocked arc reaches the blocking cell. |
+  | Void Whisper | Swallowed light and a secret departure | Nearby dots dim; the dart is clipped into a closing dark rift with inward smoke. A blocked dark pulse lasts 0.2 seconds. |
+
+- ArrowSkin.DarkBoardColor: Inferno #0D0F12, Frostbite #0B1620,
+  Plasma #071418, Void #0E0C14. These unsaved board preferences never change
+  Paper/Classic or saved themes. Light fallback uses alpha blending and dark rims;
+  smoke uses alpha absorption on dark boards too. HUD contrast follows the board.
+- State outlines remain independent and restore exactly after 100 cycles. Dense
+  LOD disables ambient particles/optional atmosphere; exits still play. Void uses a brighter violet centerline only in LOD, tested at >=3:1 contrast against its board. All pools
+  share the 600-particle cap including previews and reserved completion confetti.
+  Warmed Update/Tick paths use preallocated buffers and no managed allocations.
+- DotAbsorption captures exact dot colors and uses separate target buffers. Exits
+  ease the remaining field back; clearing, restart, new level and unequip restore
+  exact original values. Existing completion-wave math and DotWavePlayer stay intact.
+  Single-cell tracks use the real AnimationMath exit distance; translation drives
+  the same rift clipping as moving path windows. Single-cell undo keeps its existing
+  immediate placement with cosmetic return effects; path undo reverses travel.
+  Exact-track residue pools are outside the replaceable board root and are cleared
+  on completion/restart/new level and undo. Pause freezes automatic advancement.
+- All four Elemental shop cards use isolated straight live previews inside their
+  OWN rounded masked top area. The name and state rows are always below that area.
+  Details have a bent live mini-board, an italic signature line and Watch it fly.
+- Catalog ids are permanent reservations: retired ids are NEVER reused.
+  thunderbolt_dart is retired. Inventory version 1 adds bounded
+  RefundedRetiredItemIds receipts and PendingRetirementCoins. An owned retired dart
+  refunds 150 exactly once, removes every duplicate ownership entry and falls back
+  to Classic when equipped. Refund and receipt save atomically in inventory.json;
+  failed saves retain the original. Overflow waits until spending creates space.
+  Other owned/unknown ids, attempts, rewards, progress and settings are untouched.
+- Skin Gallery - Capture Elemental saves three reviewed iterations, heroes,
+  comparisons, eight-frame signature strips, bent/dense/blocked views and the
+  elemental_sheet.png contact sheet under Logs/SkinShots. Profile Elemental uses
+  memory-only stores and 100-arrow classic baselines at 1080x1920. Validate GPU
+  timing availability, extra CPU under 3 ms, draws, and phone hardware separately.
+
+
+## Catalog long paths and live themes (Step 14D)
+- CatalogMinArrowLength = 4 and CatalogMaxArrowLength = 10. Shape generation
+  enforces these limits after tail extension. LevelBuilder, ice, legacy fixtures
+  and sandbox continue accepting their existing legal lengths.
+- Starter boxes are Square 6x6 (4-5 arrows), Rectangle 6x8 (5-7), and
+  RightTriangle 8x8 (6-8): at least two free arrows and at most one bend per path.
+  Starter authoring explicitly permits these smaller masks. File names remain
+  unchanged, so progress, best stars and rewards retain their existing keys.
+- Original starter bytes live ONLY in TestLevels/legacy_level_001..003. Gameplay
+  tests inject these fixtures with the original logical IDs; fixtures never enter
+  the real catalog, level select or player progress.
+- The reviewed shape pack keeps its 57 existing shape identities and positions,
+  area bands, width <=24 and height <=36. Reviewed seeds, turn biases and sizes
+  reproduce the installed pack. Scores use the unchanged rater; adjacent dips
+  are at most 15 and jumps at most 45. The dedicated writer still refuses to
+  overwrite existing catalog files. Export to an empty staging folder to rebuild.
+- Six themes are available at their original catalog prices. ThemeDesign holds
+  palettes; ThemeBackdrop draws three procedural GPU parallax layers and a soft
+  35%-black rounded board panel. HUD bars receive matching readability surfaces.
+  ThemeMenuBackground implements IMenuBackground; Paper retains its old renderer.
+- Non-Paper themes take precedence over a skin's DarkBoardColor. Classic uses
+  #E9EEF2 on dark themes and its exact original ink on Paper. Feedback colors
+  pass a 3:1 contrast guard. Themes never change save formats or puzzle logic.
+- Theme recipes: basalt/lava/embers; faceted ice/snow/light shaft; neon
+  skyline/windows/holograms/data; trees/mushrooms/roots/fireflies; sandstone
+  glyphs/torches; rotating nebula/stars/asteroids. Generated noise is cached.
+  Three GPU layers plus the board panel use four draws, with no screen copy.
+  Visible theme instances share at most 150 analytical motes, separate from
+  the 600 arrow-particle budget. Gameplay pause freezes their clock.
+- Live theme cards fill their own clipped preview area. The detail sheet adds
+  a sample board with the equipped arrow. Names and state rows remain outside
+  preview masks. Level select/settings/shop retain their plain screen style.
+
+## Rare skin quality standard (Step 14D)
+- Obsidian, Chromium, Celestial, Emerald and Crimson are procedural recipes in
+  the shared ribbon/head/halo framework. RareThemeProcedural is the one added
+  shader and is explicitly referenced by ArrowSkinResources; it also contains
+  the theme passes. No Shader.Find or reference-image textures are introduced.
+  Reference targets and Emerald's alternate remain Editor-only comparison input.
+- Body silhouette and UV distance stay consistent with path geometry. Narrow
+  highlights and reduced LOD heads keep dense paths distinct. Idle animation is
+  shader-driven; state overlays restore exact rest values. Elemental recipes and
+  Inferno's rest look stay unchanged. Classic and ice keep their existing paths.
+- Signature moments are visual only and use preallocated exact-track residue
+  slots, ring fields and constellation markers. Logic accepts the next tap
+  immediately. Ambient timing, pooled trails and all previews share the 600 cap.
+  Rare particles ease in/out and tumble; reduced LOD disables idle particles.
+- Additional name/signature rows:
+
+  | Skin | Name meaning | Signature |
+  | --- | --- | --- |
+  | Obsidian Shard | Volcanic glass, a razor cutting fragment | Molten hairline cracks cool to glass, a bright thin slice, tumbling glass fragments. |
+  | Chromium Spike | Mirror chrome that pierces | Reflections gather at the tip, a cone ring and rainbow prism trail split into spectral sparks. |
+  | Celestial Quill | A feather pen writing among stars | Golden ink follows the exact path; corner/end stars form a brief constellation. |
+  | Emerald Viper | Jade serpent coiling to strike | The coil tightens, eyes flash, a lunge carries a side wave and shedding green scales. |
+  | Crimson Relic | An ancient artifact with a living heart | A geometric sigil awakens under the arrow, bands light toward the ruby, a star flare and relic dust follow. |
+
+- Dark boards: Obsidian #101218, Chromium #0F1116, Celestial #0E0D18,
+  Emerald #07130D, Crimson #14070A. Equipped themes override these preferences.
+- Flavor synthesis is quiet beneath the unchanged MoveCount pentatonic melody;
+  settings silence both layers. Skin Gallery captures three refinement rounds,
+  heroes, flight comparisons, bent/dense/blocked boards and eight-frame signatures.
+  rare_sheet.png is the set review. Every future skin requires these visual and
+  allocation/budget checks before release. Desktop Editor profiler measurements
+  are evidence for that environment, not claims about physical phone performance.
+- Reviewed starter recipes (all coverage floor 900, turn bias 0, max one bend,
+  min two free, one attempt): Square 6x6 seed 10569 (4-5 arrows), Rectangle
+  6x8 seed 21161 (5-7), RightTriangle 8x8 seed 30966 (6-8). ShapePackPlan uses
+  CatalogShapePlan for the exact 57 reviewed long-path seeds and turn biases;
+  do not sort or renumber this released identity list during a rebuild.
+- A rejected body-growth attempt changes no occupancy. ShapeLevelGenerator
+  therefore caches its ordered PLACE candidates and weights until a placement
+  succeeds. It consumes exactly the previous RNG sequence and preserves golden
+  snapshots; this avoids repeating mask scans during bounded failed attempts.
+
+
+## Rare skin rebuild quality gate (Step 14D-R1)
+- Rebuild and inspect one recipe at a time: Emerald Viper, Celestial Quill,
+  Crimson Relic, Chromium Spike, Obsidian Shard. Save at least three comparison
+  rounds and score silhouette, material shading, color, detail, signature,
+  dense-board readability and both review themes before advancing. Four is a
+  readable premium procedural interpretation, not a claim of photographic identity.
+- RareR1.cginc authors the five analytical materials inside the existing explicit
+  RareThemeProcedural shader. The theme function and Elemental shader recipes are
+  unchanged. Reference images remain Editor comparison targets, never runtime inputs.
+- Opaque rare surfaces have at least 0.30-cell visible width and heads measure
+  1.0-1.2 cells. RareRibbonSurface preserves distance UVs and prepares reusable
+  widened strip buffers. RareCapsSurface batches head and actual feather fletching
+  (curved quill, angled barbs and ragged edges) into one draw. Full detail uses three
+  base draws; dense idle uses two, with fletching retained. Halos sit behind solids.
+- Viper composites an under-coil, wood cylinder and over-coil with jade scales,
+  belly, gloss, eye, jaw and tongue. Quill uses asymmetric split vanes, winding
+  stardust, a visible golden ink stroke and corner/end constellation. Relic uses
+  raised gold collars, a beveled ruby setting with connected side gems, a tall
+  central starburst and awakening sigil. Chromium uses cylindrical reflection bands,
+  four broad spectral ribbons, gathering tip light and a cone shockwave. Obsidian
+  uses six flowing glass strands, molten cracks, a cooling edge flash, a razor cut
+  and twelve analytical tumbling edge fragments. Its small dark feather tail keeps
+  the shared fletching rule even though the target primarily emphasizes strands.
+- Rare anticipation is visual only (about 0.24 seconds within the existing flight
+  duration). Puzzle moves remain instant. State outlines clear exactly; feedback,
+  reverse travel, pause, hidden-board cleanup and restart behavior stay intact.
+- Analytical glass fragments reserve twelve slots per active burst from the shared
+  600-particle allowance. SkinParticlePool reclaims old native motes if necessary;
+  clearing or completing a signature releases its reservation. Existing completion
+  confetti retains its reserved capacity. Dense LOD suppresses optional atmosphere.
+- RareR1Capture saves individual rounds and final hero/flight/bent/dense/blocked/
+  theme/signature renders in Logs/SkinShots/RareR1. Signature captures advance at
+  60 Hz between the eight panels. The final review retains reference-left/render-
+  right rows in Logs/Review/rare_v2_reference_vs_built.png. Review every image.
+- Quality tests measure rendered width and head length, draw count, visible
+  anticipation/action changes, exact state restoration and prepared-buffer reuse.
+  Native particle saturation is additionally observed in the Play Mode benchmark;
+  Edit Mode verifies the shared capacity reservation without assuming native
+  particle simulation is available. Keep existing assertions unchanged.
+
+- Rare R1 fragment reservations also prune destroyed Unity renderers, so a plain
+  C# signature pool cannot hold particle capacity after its host disappears even
+  if a caller omitted Dispose. The fixed reservation table allocates nothing in
+  Tick and shares the same six-hundred limit.

@@ -27,6 +27,7 @@ namespace ArrowEscape.Data
             try{LoadResult=store.Load()??new InventoryLoadResult(null,ProgressLoadStatus.ReadError,"No inventory result.");}
             catch(Exception error){LoadResult=new InventoryLoadResult(null,ProgressLoadStatus.ReadError,error.Message);}
             Shop=new ShopService(LoadResult.Inventory);
+            if(State.ApplyRetirements())Save();
             if(LoadResult.Status!=ProgressLoadStatus.Loaded&&LoadResult.Status!=ProgressLoadStatus.NoFile&&!warnedLoad)
             {warnedLoad=true;warning("ArrowEscape inventory: "+LoadResult.Message);}
         }

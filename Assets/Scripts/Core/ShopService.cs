@@ -67,6 +67,6 @@ namespace ArrowEscape.Core
         /// <summary>Adds development grants or other explicit integer rewards, capped safely.</summary>
         public void AddCoins(int amount){if(amount<0)throw new ArgumentOutOfRangeException(nameof(amount));SetCoins((long)Inventory.Coins+amount);}
         private void SetCoins(long value)
-        {int next=(int)Math.Max(0,Math.Min(EconomyConfig.MaxCoins,value));if(next==Inventory.Coins)return;Inventory.Coins=next;CoinsChanged?.Invoke(next);}
+        {int next=(int)Math.Max(0,Math.Min(EconomyConfig.MaxCoins,value));int previous=Inventory.Coins;Inventory.Coins=next;Inventory.ReleaseRetirementCredit();if(previous!=Inventory.Coins)CoinsChanged?.Invoke(Inventory.Coins);}
     }
 }

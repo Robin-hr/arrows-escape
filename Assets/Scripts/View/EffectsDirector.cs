@@ -33,6 +33,7 @@ namespace ArrowEscape.View
         private void OnExit(Arrow arrow)
         {
             lastExit = arrow; if (effects == null || controller.Session == null) return; Board b = controller.Session.Board;
+            if(arrow.Kind==ArrowKind.Normal&&boardView!=null&&ArrowSkinRegistry.Find(boardView.ArrowSkinId)!=null)return;
             effects.PlayExit(arrow,b.Width,b.Height,controller.MoveCount);
         }
         private void OnComplete()

@@ -112,13 +112,15 @@ namespace ArrowEscape.UI
         private void RefreshMainMenu()
         {
             MainMenu.Refresh(bootstrap.HasAnyProgress,bootstrap.Progress.Tracker.CompletedCount(bootstrap.LevelIds),bootstrap.LevelCount,bootstrap.ContinueIndex);
+            MainMenu.SetTheme(bootstrap.Inventory.State.EquippedThemeId);
             MainMenu.SetEconomy(bootstrap.Inventory.State.Coins,bootstrap.Progress.Tracker.TotalStars,bootstrap.LevelCount*3,false);
         }
         private void BindInventory()
         {
-            if(wallet!=null)wallet.CoinsChanged-=OnCoins;wallet=bootstrap.Inventory.Shop;wallet.CoinsChanged+=OnCoins;
+            if(wallet!=null){wallet.CoinsChanged-=OnCoins;wallet.EquippedChanged-=OnThemeEquipped;}wallet=bootstrap.Inventory.Shop;wallet.CoinsChanged+=OnCoins;wallet.EquippedChanged+=OnThemeEquipped;
             Shop.Bind(bootstrap.Inventory);OnCoins(wallet.Inventory.Coins);
         }
+        private void OnThemeEquipped(ShopSlot slot,string id){if(slot==ShopSlot.Theme)MainMenu.SetTheme(id);}
         private void OnCoins(int amount)=>MainMenu.SetEconomy(amount,bootstrap.Progress.Tracker.TotalStars,bootstrap.LevelCount*3);
         /// <summary>Opens the shop only from the main menu.</summary>
         public void OpenShop(){if(Machine.Current!=ScreenState.MainMenu)return;MainMenu.Root.gameObject.SetActive(false);Shop.Show();}
@@ -181,7 +183,7 @@ namespace ArrowEscape.UI
         }
         private void OnDestroy()
         {
-            if(wallet!=null)wallet.CoinsChanged-=OnCoins;
+            if(wallet!=null){wallet.CoinsChanged-=OnCoins;wallet.EquippedChanged-=OnThemeEquipped;}
             if(Shop!=null)Shop.Closed-=OnShopClosed;
             Machine.StateChanged -= OnStateChanged;
             if (input != null) input.RemoveBlocker(screenBlocker);

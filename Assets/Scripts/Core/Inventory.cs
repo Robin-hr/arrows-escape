@@ -21,6 +21,29 @@ namespace ArrowEscape.Core
         public int NextAttemptId;
         /// <summary>Highest already-paid attempt; zero means none.</summary>
         public int LastPaidAttemptId;
+        /// <summary>Bounded retirement receipts, saved atomically with their refunds.</summary>
+        public List<string> RefundedRetiredItemIds = new List<string>();
+        /// <summary>Refund overflow held until spending makes room under the existing wallet cap.</summary>
+        public int PendingRetirementCoins;
+        /// <summary>Refunds the retired paid arrow once, retaining all unrelated and unknown data.</summary>
+        public bool ApplyRetirements()
+        {
+            RefundedRetiredItemIds=RefundedRetiredItemIds??new List<string>();
+            if(OwnedItemIds==null||!OwnedItemIds.Contains("thunderbolt_dart"))return false;
+            if(!RefundedRetiredItemIds.Contains("thunderbolt_dart"))
+            {
+                int credited=Math.Min(150,EconomyConfig.MaxCoins-Coins);
+                Coins+=credited;PendingRetirementCoins+=150-credited;
+                RefundedRetiredItemIds.Add("thunderbolt_dart");
+            }
+            OwnedItemIds.RemoveAll(IsThunderbolt);
+            if(EquippedArrowId=="thunderbolt_dart")EquippedArrowId="classic";
+            return true;
+        }
+        /// <summary>Transfers reserved refund coins into newly available wallet space, without losing credit.</summary>
+        public void ReleaseRetirementCredit()
+        {int credit=Math.Min(Math.Max(0,PendingRetirementCoins),EconomyConfig.MaxCoins-Coins);Coins+=credit;PendingRetirementCoins-=credit;}
+        private static bool IsThunderbolt(string id)=>id=="thunderbolt_dart";
         /// <summary>Normalizes lists, balance and slots without discarding unknown item ids.</summary>
         public void Sanitize()
         {

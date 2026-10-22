@@ -71,7 +71,7 @@ namespace ArrowEscape.Tests
             board.Remove(conflict); Assert.That(session.TryUndo().Outcome, Is.EqualTo(UndoOutcome.Undone));
         }
         /// <summary>All sample boards survive partial play and unlimited undo.</summary>
-        [TestCase("Levels/level_001")][TestCase("Levels/level_002")][TestCase("Levels/level_003")]
+        [TestCase("TestLevels/legacy_level_001")][TestCase("TestLevels/legacy_level_002")][TestCase("TestLevels/legacy_level_003")]
         public void Samples(string path)
         {
             board = LevelRepository.LoadFromResources(path).Board; Board original = board.Clone(); session.Reset(board);

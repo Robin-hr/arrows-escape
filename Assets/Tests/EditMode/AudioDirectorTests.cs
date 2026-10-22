@@ -155,7 +155,7 @@ namespace ArrowEscape.Tests
         /// <summary>Real samples emit one exit per arrow and one final completion.</summary>
         [TestCase(1)][TestCase(2)][TestCase(3)] public void Samples(int index)
         {
-            Board board = LevelRepository.LoadFromResources("Levels/level_00" + index).Board; scene.Game.StartLevel(board); int count = board.Arrows.Count;
+            Board board = LevelRepository.LoadFromResources("TestLevels/legacy_level_00" + index).Board; scene.Game.StartLevel(board); int count = board.Arrows.Count;
             while (!scene.Game.IsCleared) scene.Tap(HintFinder.Find(board).Arrow);
             SoundEvent[] exits = Cues(SoundCue.Exit); Assert.That(exits.Length, Is.EqualTo(count)); Assert.That(Cues(SoundCue.LevelComplete).Length, Is.EqualTo(1));
             for (int i = 0; i < count; i++) Assert.That(exits[i].ScaleStep, Is.EqualTo(MusicScale.PingPongIndex(i,11)));

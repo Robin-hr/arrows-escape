@@ -24,7 +24,7 @@ namespace ArrowEscape.Tests
         {
             Store = store ?? new FakeProgressStore();
             cameraHost = new GameObject("Progress camera", typeof(Camera)); cameraHost.tag = "MainCamera";
-            host = new GameObject("Progress gameplay"); Bootstrap = host.AddComponent<GameBootstrap>(); Bootstrap.SetLevelCatalog(OriginalTestCatalog.Paths); Game = host.GetComponent<GameController>();
+            host = new GameObject("Progress gameplay"); Bootstrap = host.AddComponent<GameBootstrap>(); Bootstrap.SetLevelCatalog(OriginalTestCatalog.Paths, OriginalTestCatalog.LegacyPaths); Game = host.GetComponent<GameController>();
             if (withUi)
             {
                 uiHost = new GameObject("Progress HUD"); Hud = uiHost.AddComponent<HudController>();

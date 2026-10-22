@@ -6,6 +6,8 @@ namespace ArrowEscape.UI
     public sealed class MainMenuView : MonoBehaviour
     {
         private PaperMenuBackground background;
+        private ThemeMenuBackground themeBackground;
+        private bool hasTheme;
         private MenuEntrance entrance;
         private CoinCounter coins;
         /// <summary>Menu screen root.</summary>
@@ -31,14 +33,14 @@ namespace ArrowEscape.UI
         /// <summary>Best stars out of the catalog's available stars.</summary>
         public UnityEngine.UI.Text StarsText { get; private set; }
         /// <summary>Background replacement seam for Step 14E.</summary>
-        public IMenuBackground Background=>background;
+        public IMenuBackground Background=>hasTheme?(IMenuBackground)themeBackground:background;
         /// <summary>Builds the runtime screen once.</summary>
         public void Build(Transform parent)
         {
             if(Root!=null)return;
             Root=UiFactory.ScreenRoot("MainMenu",parent,UiStyle.Background,out var safe);
             var bg=UiFactory.Rect("MenuBackground",Root,Vector2.zero,Vector2.zero);UiFactory.Stretch(bg);bg.SetAsFirstSibling();
-            background=bg.gameObject.AddComponent<PaperMenuBackground>();background.Build(bg);
+            background=bg.gameObject.AddComponent<PaperMenuBackground>();background.Build(bg);themeBackground=bg.gameObject.AddComponent<ThemeMenuBackground>();themeBackground.Build(bg);
             var header=UiFactory.Rect("Header",safe,new Vector2(900,112),Vector2.zero);
             header.anchorMin=header.anchorMax=header.pivot=new Vector2(.5f,1);header.anchoredPosition=new Vector2(0,-16);
             header.gameObject.AddComponent<MenuFit>().Configure(header,safe,new Vector2(960,150));
@@ -75,11 +77,14 @@ namespace ArrowEscape.UI
             CompletedText.text=$"Completed {completed} / {total}";
             entrance.Restart();background.Restart();
         }
+        /// <summary>Applies the equipped live theme while retaining Paper's exact presentation.</summary>
+        public void SetTheme(string id)
+        {themeBackground.Show(id);bool dark=ThemeDesign.Index(id)>=0;hasTheme=dark;Color ink=dark?Color.white:UiStyle.Ink;StarsText.color=ink;CompletedText.color=dark?new Color(.8f,.85f,.88f):UiStyle.Muted;var texts=Root.GetComponentsInChildren<UnityEngine.UI.Text>(true);for(int i=0;i<texts.Length;i++)if(texts[i].name=="Title")texts[i].color=ink;}
         /// <summary>Updates the safe-area economy counters without restarting entrance motion.</summary>
         public void SetEconomy(int balance,int totalStars,int maximumStars,bool animate=true)
         {if(coins.Value!=balance||!animate)coins.SetValue(balance,animate);string text=totalStars+" / "+maximumStars;if(StarsText.text!=text)StarsText.text=text;}
         /// <summary>Explicit steady-state animation driver for tests and profiling.</summary>
-        public void Tick(float dt){if(Root==null||!Root.gameObject.activeInHierarchy)return;background.Tick(dt);entrance.Tick(dt);}
+        public void Tick(float dt){if(Root==null||!Root.gameObject.activeInHierarchy)return;background.Tick(dt);themeBackground.Tick(dt);entrance.Tick(dt);}
         private void Update(){if(Application.isPlaying)Tick(Time.unscaledDeltaTime);}
     }
 }

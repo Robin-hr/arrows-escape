@@ -20,6 +20,15 @@ namespace ArrowEscape.View
             Path=gameObject.AddComponent<PathArrowView>();Path.Initialize(Arrow,width,height,material);
             SpriteRenderer.enabled=false;transform.rotation=Quaternion.identity;originalScale=Vector3.one;Apply();
         }
+        /// <summary>Optional skin visuals; null keeps the legacy classic renderer exactly.</summary>
+        public SkinVisual Skin { get; private set; }
+        /// <summary>Applies a recipe to Normal arrows only, leaving the legacy base state intact.</summary>
+        public void SetSkin(string id,bool lightBoard)
+        {
+            if(Arrow==null||Arrow.Kind==ArrowKind.Ice)return;var recipe=ArrowSkinRegistry.Find(id);
+            if(recipe!=null&&Skin==null)Skin=gameObject.AddComponent<SkinVisual>();
+            if(Skin!=null){Skin.Configure(this,recipe,lightBoard);Apply();}
+        }
         private Color originalColor;
         private Vector3 originalScale;
         private bool basePositionSet;
@@ -29,6 +38,7 @@ namespace ArrowEscape.View
         private Color flashTint;
         private float flashScale = 1;
         private bool hinted;
+        private BoardView boardStyle;
         private Color hintTint;
         private float hintScale = 1;
         /// <summary>Whether the independent hint layer is active.</summary>
@@ -141,6 +151,7 @@ namespace ArrowEscape.View
             if (SpriteRenderer == null) return;
             Color tint = flashing ? flashTint : highlighted ?
                 (stillOver ? ViewTheme.HighlightColor : ViewTheme.DraggedAwayColor) : hinted ? hintTint : originalColor;
+            if(flashing||highlighted||hinted){if(boardStyle==null)boardStyle=GetComponentInParent<BoardView>();if(boardStyle!=null&&boardStyle.HasDarkTheme)tint=ArrowTint.EnsureContrast(tint,ThemeDesign.Background(boardStyle.ThemeId));}
             tint.a *= alpha;
             float scale = (highlighted ? ViewTheme.HighlightScaleMultiplier : 1) * (flashing ? flashScale : 1) * (hinted ? hintScale : 1);
             transform.position = new Vector3(BaseWorldPosition.x + offset.x, BaseWorldPosition.y + offset.y, 0);
@@ -148,6 +159,7 @@ namespace ArrowEscape.View
             SpriteRenderer.color = tint;
             SpriteRenderer.sortingOrder = sortingOrder;
             if(Path!=null)Path.SetAppearance(tint,sortingOrder);
+            if(Skin!=null)Skin.SetAppearance(tint,flashing||highlighted||hinted,alpha,sortingOrder);
         }
     }
 }

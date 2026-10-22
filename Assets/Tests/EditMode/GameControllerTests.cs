@@ -158,7 +158,7 @@ namespace ArrowEscape.Tests
         [Test]
         public void JsonLevelOneClearsWithoutMistakes()
         {
-            LevelLoadResult loaded = LevelRepository.LoadFromResources("Levels/level_001");
+            LevelLoadResult loaded = LevelRepository.LoadFromResources("TestLevels/legacy_level_001");
             Assert.That(loaded.Success, Is.True);
             game.StartLevel(loaded.Board);
             while (!game.IsCleared)
@@ -195,8 +195,8 @@ namespace ArrowEscape.Tests
         [Test]
         public void RestartReloadsOriginalJson()
         {
-            game.SetLevelInfo("Level 1", "Levels/level_001");
-            game.StartLevel(LevelRepository.LoadFromResources("Levels/level_001").Board);
+            game.SetLevelInfo("Level 1", "TestLevels/legacy_level_001");
+            game.StartLevel(LevelRepository.LoadFromResources("TestLevels/legacy_level_001").Board);
             Board original = game.Session.Board;
             Tap(0, 0);
             Tap(3, 2);

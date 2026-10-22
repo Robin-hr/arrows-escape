@@ -24,6 +24,6 @@ namespace ArrowEscape.Tests
         /// <summary>Isolated Step 14B state or regression check; never accesses player saves.</summary>
         [Test] public void UnknownOwnershipIsRetainedButInactive(){var state=new Inventory();state.OwnedItemIds.Add("future_arrow");var shop=new ShopService(state);Assert.That(state.OwnedItemIds,Does.Contain("future_arrow"));Assert.That(shop.IsOwned("future_arrow"),Is.False);Assert.That(shop.TryEquip("future_arrow"),Is.False);}
         /// <summary>Isolated Step 14B state or regression check; never accesses player saves.</summary>
-        [Test] public void ReleasedCatalogPurchasesStayNonnegative(){var shop=new ShopService(new Inventory{Coins=10000});foreach(var item in ShopCatalog.Items)if(item.IsAvailable&&!shop.IsOwned(item.Id)){Assert.That(shop.TryBuy(item.Id),Is.True);Assert.That(shop.Inventory.Coins,Is.GreaterThanOrEqualTo(0));}}
+        [Test] public void ReleasedCatalogPurchasesStayNonnegative(){var shop=new ShopService(new Inventory{Coins=System.Linq.Enumerable.Sum(ShopCatalog.Items,item=>item.Price)});foreach(var item in ShopCatalog.Items)if(item.IsAvailable&&!shop.IsOwned(item.Id)){Assert.That(shop.TryBuy(item.Id),Is.True);Assert.That(shop.Inventory.Coins,Is.GreaterThanOrEqualTo(0));}}
     }
 }

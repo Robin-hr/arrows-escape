@@ -86,6 +86,11 @@ namespace ArrowEscape.View
         private void Stop() { testingScale = false; if (PlayerExists()) player.StopAll(); }
         /// <summary>Plays economic UI through the same setting gate and six voices.</summary>
         public void PlayUi(UiFeedbackCue cue)=>Play(SoundPlanner.ForUi(cue));
+        /// <summary>Quiet skin texture under the original signature cue; pause and live sound setting are respected.</summary>
+        public void PlaySkin(int index,bool blocked=false)
+        {if((controller==null||!controller.IsPaused)&&index>=0&&index<10)Play(new SoundEvent(blocked?SoundCue.SkinBlocked:SoundCue.SkinExit,index,(blocked?.12f:.18f)*(index==3?.35f:1)));}
+        /// <summary>Shop/gallery demonstration never advances the real move-count melody.</summary>
+        public void PlaySkinPreview(int index){if(index<0||index>=10)return;Play(SoundPlanner.ForPreview());Play(new SoundEvent(SoundCue.SkinExit,index,index==3?.063f:.18f));}
         private void OnExit(Arrow arrow) => Play(SoundPlanner.ForExit(controller.MoveCount));
         private void OnBlocked(Arrow arrow, Arrow blocker) => Play(SoundPlanner.ForBlocked());
         private void OnUndo(Arrow arrow) => Play(SoundPlanner.ForUndo(controller.MoveCount));

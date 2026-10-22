@@ -15,9 +15,9 @@ namespace ArrowEscape.Editor
         public static ShapePackItem Prepare(ShapePackEntry entry)
         {
             var watch=Stopwatch.StartNew();
-            for(int offset=0;offset<50;offset++)
+            for(int offset=0;offset<(entry.Reviewed?1:50);offset++)
             {
-                var settings=new ShapeLevelSettings(entry.Shape,entry.Width,entry.Height);
+                var settings=new ShapeLevelSettings(entry.Shape,entry.Width,entry.Height,4,10,turnBias:entry.TurnBias,coverageTargetPermille:entry.CoverageFloor,maxAttempts:entry.Reviewed?1:30);
                 var result=ShapeLevelGenerator.Generate(settings,checked(entry.BaseSeed+offset));
                 if(result.Success)return new ShapePackItem(entry,result,watch.ElapsedMilliseconds);
             }
@@ -28,7 +28,7 @@ namespace ArrowEscape.Editor
         {
             var items=new List<ShapePackItem>();
             foreach(var entry in ShapePackPlan.CreateRequests())items.Add(Prepare(entry));
-            return ShapePackOrdering.Order(items);
+            return items.AsReadOnly();
         }
         /// <summary>Exact ordered resource paths produced by the current pack.</summary>
         public static IReadOnlyList<string> OrderedResourcePaths()

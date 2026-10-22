@@ -8,6 +8,16 @@ namespace ArrowEscape.UI
     public sealed class HudView : MonoBehaviour
     {
         private RectTransform top, bottom;
+        private bool darkFireBoard;
+        /// <summary>Keeps labels readable over Inferno without restyling any other board or menu.</summary>
+        public void SetBoardContrast(bool dark)=>SetBoardContrast(dark,false);
+        /// <summary>Adds readability surfaces only when a non-Paper theme is equipped.</summary>
+        public void SetBoardContrast(bool dark,bool themed)
+        {darkFireBoard=dark;if(top!=null){SetBarBackground(top,themed);SetBarBackground(bottom,themed);SetThemeButtonColors(themed);}if(LevelText==null)return;Color color=dark?Color.white:ViewTheme.HudText;LevelText.color=LevelPositionText.color=MistakesText.color=color;}
+        private void SetThemeButtonColors(bool themed)
+        {if(UndoButton==null)return;var colors=UndoButton.colors;colors.disabledColor=themed?new Color(.18f,.22f,.25f):ViewTheme.ButtonDisabled;UndoButton.colors=HintButton.colors=RestartButton.colors=colors;}
+        private static void SetBarBackground(RectTransform rect,bool dark)
+        {var image=rect.GetComponent<UnityEngine.UI.Image>();if(image==null&&!dark)return;if(image==null){image=rect.gameObject.AddComponent<UnityEngine.UI.Image>();image.sprite=SpriteFactory.GetUiSprite(UiSpriteShape.RoundedRect);image.type=UnityEngine.UI.Image.Type.Sliced;image.raycastTarget=false;}image.color=new Color(0,0,0,dark?.35f:0);}
         /// <summary>Live potential-star meter.</summary>
         public StarDisplay Stars { get; private set; }
         /// <summary>Freezes the small loss animation while paused.</summary>
@@ -17,7 +27,7 @@ namespace ArrowEscape.UI
         {
             if (Stars == null) return;
             int count = StarRating.StarsIfClearedNow(moves, par);
-            MovesText.color = moves <= par ? ViewTheme.HudText : moves <= StarRating.TwoStarLimit(par) ? ViewTheme.MovesAmber : ViewTheme.MovesRed;
+            MovesText.color = moves <= par ? (darkFireBoard?Color.white:ViewTheme.HudText) : moves <= StarRating.TwoStarLimit(par) ? (darkFireBoard?new Color(1,.76f,.29f):ViewTheme.MovesAmber) : (darkFireBoard?new Color(1,.4f,.3f):ViewTheme.MovesRed);
             if (reset || Stars.Count != count) Stars.SetCount(count, !reset);
         }
         /// <summary>Explicit animation driver for tests.</summary>
@@ -66,6 +76,7 @@ namespace ArrowEscape.UI
             bottom = UiFactory.Rect("BottomBar", safeArea, new Vector2(1000, 120), Vector2.zero);
             bottom.anchorMin = bottom.anchorMax = bottom.pivot = new Vector2(0.5f, 0);
             LevelText = UiFactory.Text("LevelName", top, "", ViewTheme.HudFontSize, new Vector2(320, 65), new Vector2(-260, 40));
+            LevelText.resizeTextForBestFit=true;LevelText.resizeTextMinSize=20;LevelText.resizeTextMaxSize=ViewTheme.HudFontSize;
             LevelPositionText = UiFactory.Text("LevelPosition", top, "", ViewTheme.HudFontSize, new Vector2(300, 65), new Vector2(100, 40));
             MovesText = UiFactory.Text("Moves", top, "", ViewTheme.HudFontSize, new Vector2(300, 65), new Vector2(-290, -30));
             MovesText.resizeTextForBestFit = true; MovesText.resizeTextMinSize = 24; MovesText.resizeTextMaxSize = ViewTheme.HudFontSize;
@@ -97,12 +108,16 @@ namespace ArrowEscape.UI
         public void SetState(string levelName, int moves, int total, int mistakes, bool canUndo)
         {
             if (LevelText == null) return;
-            if (lastName != levelName) { lastName = levelName; LevelText.text = levelName; }
+            if (lastName != levelName) { lastName = levelName; LevelText.text = DisplayName(levelName); }
             if (lastMoves != moves || lastTotal != total)
             { lastMoves = moves; lastTotal = total; MovesText.text = $"Moves {moves} / {total}"; }
             if (lastMistakes != mistakes) { lastMistakes = mistakes; MistakesText.text = $"Mistakes {mistakes}"; }
             SetUndoState(canUndo);
         }
+
+        /// <summary>Removes authoring prefixes while preserving ordinary level names.</summary>
+        public static string DisplayName(string name)
+        {if(string.IsNullOrEmpty(name))return "";if(name.StartsWith("Shape ",System.StringComparison.Ordinal)){int colon=name.IndexOf(':');if(colon>=0)return name.Substring(colon+1).Trim().TrimEnd(':');}return name.TrimEnd(':');}
 
         /// <summary>Sets undo availability and the standard disabled button tint.</summary>
         public void SetUndoState(bool canUndo)

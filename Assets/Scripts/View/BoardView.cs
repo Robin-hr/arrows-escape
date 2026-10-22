@@ -20,6 +20,45 @@ namespace ArrowEscape.View
         private int width;
         private int height;
         private Board currentBoard;
+        private string arrowSkinId="classic";
+        private bool lightBoard=true;
+        /// <summary>Equipped background; visual identity never replaces a progress key.</summary>
+        public string ThemeId {get;private set;}="paper";
+        /// <summary>Non-Paper themes take precedence over skin preferences and debug light fallback.</summary>
+        public bool HasDarkTheme=>ThemeDesign.Index(ThemeId)>=0;
+        /// <summary>Applies the equipped theme before refreshing skins and contrast.</summary>
+        public void SetTheme(string id)
+        {ThemeId=ThemeDesign.Index(id)<0?"paper":id;var backdrop=GetComponent<ThemeBackdrop>();if(backdrop==null&&HasDarkTheme){backdrop=gameObject.AddComponent<ThemeBackdrop>();backdrop.Bind(Camera.main,this,GetComponent<GameController>());}backdrop?.SetTheme(ThemeId);SetArrowSkin(arrowSkinId);ApplyDotStyle();GetComponent<CameraFitter>()?.ApplyBackground();}
+
+        /// <summary>Current visual recipe id, independent of the saved inventory.</summary>
+        public string ArrowSkinId=>arrowSkinId;
+        /// <summary>Resolved board presentation mode; independent of saved Paper theme.</summary>
+        public bool IsLightBoard=>lightBoard;
+        /// <summary>Notifies HUD contrast when equipment changes presentation.</summary>
+        public event Action SkinChanged;
+        /// <summary>Applies only implemented skins, preserving fallback tint and Ice.</summary>
+        public void SetArrowSkin(string id,bool light=true)
+        {
+            GetComponent<SkinDirector>()?.ClearDimming();
+            bool wasFire=ArrowSkinRegistry.Find(arrowSkinId)?.PrefersDarkBoard==true;
+            arrowSkinId=id;
+            var director=GetComponent<SkinDirector>();
+            if(ArrowSkinRegistry.Find(id)!=null&&director==null){director=gameObject.AddComponent<SkinDirector>();director.Bind(this,GetComponent<GameController>());}
+            if(ArrowSkinRegistry.Find(id)?.PrefersDarkBoard==true)light=director?.InfernoLightOverride??false;
+            else if(wasFire){light=true;director?.ResetInfernoOverride();}
+            if(HasDarkTheme)light=false;
+            lightBoard=light;
+            foreach(var pair in arrowViews)if(pair.Value!=null)pair.Value.SetSkin(id,light);
+            foreach(var pair in releasedViews)if(pair.Value!=null)pair.Value.SetSkin(id,light);
+            if(wasFire||ArrowSkinRegistry.Find(id)?.PrefersDarkBoard==true){GetComponent<CameraFitter>()?.ApplyBackground();ApplyDotStyle();}
+            director?.RefreshDimming();SkinChanged?.Invoke();
+        }
+        private void ApplyDotStyle()
+        {
+            bool fire=ArrowSkinRegistry.Find(arrowSkinId)?.PrefersDarkBoard==true&&!lightBoard;Color tint=HasDarkTheme?new Color(233f/255,238f/255,242f/255,.20f):ViewTheme.CellDot;if(fire&&!HasDarkTheme)tint.a=.18f;
+            if(PathDots!=null)PathDots.SetRestColor(tint);
+            else if(root!=null)for(int i=0;i<root.childCount;i++){var child=root.GetChild(i);if(child.name.StartsWith("Cell ",StringComparison.Ordinal)){var dot=child.GetComponent<SpriteRenderer>();if(dot!=null)dot.color=tint;}}
+        }
         private Color normalArrowColor=ViewTheme.ArrowColor;
         /// <summary>Applies equipment to existing arrows and future undo-restored views.</summary>
         public void SetNormalArrowColor(Color color)
@@ -78,6 +117,7 @@ namespace ArrowEscape.View
             }
             root.gameObject.SetActive(IsVisible);
             currentBoard = board;
+            if(HasDarkTheme||ArrowSkinRegistry.Find(arrowSkinId)?.PrefersDarkBoard==true)ApplyDotStyle();
             BoardChanged?.Invoke();
         }
 
@@ -126,6 +166,7 @@ namespace ArrowEscape.View
             view.BaseColor=arrow.Kind==ArrowKind.Ice?ViewTheme.IceArrowColor:normalArrowColor;
             view.SetBaseWorldPosition(CellToWorld(arrow.X, arrow.Y));
             view.ResetVisual();
+            view.SetSkin(arrowSkinId,lightBoard);
             arrowViews[arrow.Id] = view;
             return view;
         }

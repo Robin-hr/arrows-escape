@@ -56,10 +56,22 @@ namespace ArrowEscape.View
         [ContextMenu("Debug: Sandbox Ice 2")]private void SandboxTwo(){if(Application.isPlaying)TryStartSandboxLevel("TestLevels/ice_002");}
         [ContextMenu("Debug: Sandbox Ice 3")]private void SandboxThree(){if(Application.isPlaying)TryStartSandboxLevel("TestLevels/ice_003");}
         private IReadOnlyList<string> catalogOverride;
+        private IReadOnlyList<string> catalogResources;
+        /// <summary>Injects fixture resource paths while retaining the catalog's stable progress identities.</summary>
+        public void SetLevelCatalog(IReadOnlyList<string> resourcePaths, IReadOnlyList<string> fixtureResources)
+        {
+            if (fixtureResources == null || resourcePaths == null || fixtureResources.Count != resourcePaths.Count)
+                throw new ArgumentException("Fixture resources must match the catalog length.");
+            SetLevelCatalog(resourcePaths);
+            var copy = new string[fixtureResources.Count];
+            for (int i = 0; i < copy.Length; i++) copy[i] = fixtureResources[i];
+            catalogResources = Array.AsReadOnly(copy);
+        }
         /// <summary>Optionally injects ordered resource paths before initialization; null restores the real catalog.</summary>
         public void SetLevelCatalog(IReadOnlyList<string> resourcePaths)
         {
             if(IsInitialized)throw new InvalidOperationException("Set the catalog before initialization.");
+            catalogResources=null;
             if(resourcePaths==null){catalogOverride=null;return;}
             var copy=new string[resourcePaths.Count];for(int i=0;i<copy.Length;i++)copy[i]=resourcePaths[i];
             catalogOverride=Array.AsReadOnly(copy);
@@ -158,11 +170,12 @@ namespace ArrowEscape.View
                 Debug.LogError($"ArrowEscape: level index {index} is unavailable ({paths.Count} levels found).", this);
                 return;
             }
-            LevelLoadResult result = LevelRepository.LoadFromResources(paths[index]);
+            string resource = catalogResources == null ? paths[index] : catalogResources[index];
+            LevelLoadResult result = LevelRepository.LoadFromResources(resource);
             if (!result.Success)
             { foreach (string error in result.Errors) Debug.LogError(error, this); return; }
             CurrentLevelIndex = index;
-            controller.SetLevelInfo(result.LevelName, paths[index]);
+            controller.SetLevelInfo(result.LevelName, resource);
             controller.StartLevel(result.Board, result.LevelName);
             GetComponent<CameraFitter>().Fit(result.Board.Width, result.Board.Height);
         }
@@ -261,7 +274,13 @@ namespace ArrowEscape.View
         }
         private void OnEquipped(ShopSlot slot,string id)=>ApplyEquipment();
         private void ApplyEquipment()
-        {if(Inventory!=null)GetComponent<BoardView>().SetNormalArrowColor(ArrowTint.For(Inventory.State.EquippedArrowId,ViewTheme.Background));}
+        {
+            if(Inventory==null)return;
+            var view=GetComponent<BoardView>();view.SetTheme(Inventory.State.EquippedThemeId);
+            Color background=view.HasDarkTheme?ThemeDesign.Background(view.ThemeId):ViewTheme.Background;
+            view.SetNormalArrowColor(Inventory.State.EquippedArrowId=="classic"?ThemeDesign.ClassicInk(view.ThemeId):ArrowTint.For(Inventory.State.EquippedArrowId,background));
+            view.SetArrowSkin(Inventory.State.EquippedArrowId,SkinMaterials.IsLight(background));
+        }
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         /// <summary>Development-only grant persisted with the normal inventory store.</summary>
         [ContextMenu("Debug: Add 1000 coins")]

@@ -36,7 +36,7 @@ namespace ArrowEscape.View
             view.SetSortingOrder(ViewTheme.SlidingSortingOrder);
             entries.Add(new Entry
             {
-                View = view, Kind = Kind.Slide, Duration = view.Path!=null?AnimationMath.PathExitDuration(view.Path.ExitDistance):ViewTheme.SlideDuration,
+                View = view, Kind = Kind.Slide, Duration = (view.Path!=null?AnimationMath.PathExitDuration(view.Path.ExitDistance):ViewTheme.SlideDuration)*(view.Skin?.Skin?.Id=="plasma_bolt"?.5f:1),
                 StartOffset=startOffset, Peak=pathStart,
                 Direction = new Vector2(direction.GetDx(), direction.GetDy()),
                 Distance = view.Path!=null?view.Path.ExitDistance:AnimationMath.SlideDistance(boardWidth, boardHeight, x, y, direction)
@@ -48,7 +48,7 @@ namespace ArrowEscape.View
             if(view==null||view.Path==null)return;
             float distance=startDistance<0?view.Path.ExitDistance:startDistance;
             StopForView(view);view.ResetVisual();view.Path.SetDistance(distance);
-            entries.Add(new Entry{View=view,Kind=Kind.PathReturn,Distance=distance,Duration=AnimationMath.PathExitDuration(distance)});
+            entries.Add(new Entry{View=view,Kind=Kind.PathReturn,Distance=distance,Duration=AnimationMath.PathExitDuration(distance)*(view.Skin?.Skin?.Id=="plasma_bolt"?.5f:1)});
         }
         /// <summary>Animates the current offset back to exact zero without changing the new logical base.</summary>
         public void PlayIceSlide(ArrowView view,float durationSeconds)
@@ -126,17 +126,21 @@ namespace ArrowEscape.View
             entries.Add(new Entry { View = view, Kind = Kind.Flash, Tint = tint, Duration = duration, Peak = peak });
         }
 
+        private static float VisualProgress(ArrowView view,float t,float duration)
+        {var skin=view.Skin?.Skin;if(skin==null||!skin.IsProcedural||skin.Index==1)return t;float delay=Mathf.Min(.8f,(skin.Index==2?.12f:(skin.Index>=5&&skin.Index<=9)?.24f:.1f)/duration);return Mathf.Clamp01((t-delay)/(1-delay));}
+
         private static void Advance(Entry entry, float t)
         {
             switch (entry.Kind)
             {
                 case Kind.Slide:
-                    if(entry.View.Path!=null)entry.View.Path.SetDistance(Mathf.Lerp(entry.Peak,entry.Distance,AnimationMath.EaseInQuad(t)));
-                    else entry.View.SetOffset(entry.StartOffset+entry.Direction * (entry.Distance * AnimationMath.EaseInQuad(t)));
+                    float outgoing=VisualProgress(entry.View,t,entry.Duration);
+                    if(entry.View.Path!=null)entry.View.Path.SetDistance(Mathf.Lerp(entry.Peak,entry.Distance,AnimationMath.EaseInQuad(outgoing)));
+                    else entry.View.SetOffset(entry.StartOffset+entry.Direction * (entry.Distance * AnimationMath.EaseInQuad(outgoing)));
                     if(entry.View.Path==null)entry.View.SetAlpha(AnimationMath.SlideAlpha(t));
                     break;
                 case Kind.PathReturn:
-                    entry.View.Path.SetDistance(entry.Distance*AnimationMath.EaseInQuad(1-t));
+                    entry.View.Path.SetDistance(entry.Distance*AnimationMath.EaseInQuad(VisualProgress(entry.View,1-t,entry.Duration)));
                     break;
                 case Kind.IceSlide:
                     entry.View.SetOffset(entry.StartOffset*AnimationMath.SlideOffsetFactor(t));

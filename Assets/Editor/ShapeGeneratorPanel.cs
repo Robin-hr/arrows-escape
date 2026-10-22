@@ -11,7 +11,7 @@ namespace ArrowEscape.Editor
     public sealed class ShapeGeneratorPanel : IDisposable
     {
         private ShapeKind shape=ShapeKind.Hexagon;
-        private int width=18,height=16,seed=12345,min=2,max=9,turn=45,coverage=900,free=300,attempts=30;
+        private int width=18,height=16,seed=12345,min=4,max=10,turn=45,coverage=900,free=300,attempts=30;
         private bool targetEnabled;
         private DifficultyTier tier=DifficultyTier.Medium;
         private string folder=LevelExportPaths.DefaultFolder,notice="",lastExport;
@@ -23,7 +23,7 @@ namespace ArrowEscape.Editor
         public void Draw()
         {
             shape=(ShapeKind)EditorGUILayout.EnumPopup("Shape",shape);
-            if(GUILayout.Button("Use minimum / default aspect")){Cell size=ShapeMask.DefaultSize(shape,ShapeMask.MinimumSize(shape));width=size.X;height=size.Y;max=Math.Min(12,Math.Max(4,width/2));}
+            if(GUILayout.Button("Use minimum / default aspect")){Cell size=ShapeMask.DefaultSize(shape,ShapeMask.MinimumSize(shape));width=size.X;height=size.Y;min=4;max=10;}
             width=EditorGUILayout.IntField("Requested width",width);height=EditorGUILayout.IntField("Requested height",height);
             seed=EditorGUILayout.IntField("Seed",seed);min=EditorGUILayout.IntField("Minimum length",min);max=EditorGUILayout.IntField("Maximum length",max);
             turn=EditorGUILayout.IntField("Turn bias %",turn);coverage=EditorGUILayout.IntField("Coverage permille",coverage);free=EditorGUILayout.IntField("Maximum free permille",free);attempts=EditorGUILayout.IntField("Attempts",attempts);

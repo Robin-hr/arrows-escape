@@ -16,7 +16,7 @@ namespace ArrowEscape.Tests
                 Assert.That(shop.IsVisible,Is.True);Assert.That(shop.Cards[0].StateText,Is.EqualTo("Equipped"));Assert.That(shop.Cards[1].StateText,Is.EqualTo("150"));
                 shop.OpenDetail(1);Assert.That(shop.Detail.ActionText,Is.EqualTo("Need 150 more"));Assert.That(shop.Detail.MainButton.interactable,Is.False);
                 scene.Bootstrap.Inventory.Shop.AddCoins(300);Assert.That(shop.Detail.ActionText,Is.EqualTo("Buy - 150"));
-                shop.ThemesButton.onClick.Invoke();Assert.That(shop.Cards[0].StateText,Is.EqualTo("Equipped"));shop.OpenDetail(1);Assert.That(shop.Detail.ActionText,Is.EqualTo("Coming soon"));Assert.That(shop.Detail.MainButton.interactable,Is.False);
+                shop.ThemesButton.onClick.Invoke();Assert.That(shop.Cards[0].StateText,Is.EqualTo("Equipped"));shop.OpenDetail(1);Assert.That(shop.Detail.ActionText,Is.EqualTo("Buy - 200"));Assert.That(shop.Detail.MainButton.interactable,Is.True);
             }
         }
         /// <summary>Isolated Step 14B state or regression check; never accesses player saves.</summary>

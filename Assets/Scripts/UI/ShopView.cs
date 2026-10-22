@@ -10,6 +10,9 @@ namespace ArrowEscape.UI
     public sealed class ShopView : MonoBehaviour
     {
         private InventoryService inventory;
+        private ArrowSkinResources skinResources;
+        private readonly LiveSkinPreview[] elementalCards=new LiveSkinPreview[10];
+        private readonly LiveThemePreview[] themeCards=new LiveThemePreview[6];
         private readonly List<ShopCard> cards=new List<ShopCard>(28);
         private readonly List<RectTransform> sections=new List<RectTransform>(7);
         private readonly List<UnityEngine.UI.GridLayoutGroup> grids=new List<UnityEngine.UI.GridLayoutGroup>(7);
@@ -42,7 +45,7 @@ namespace ArrowEscape.UI
         /// <summary>Creates runtime hierarchy without loading previews.</summary>
         public void Build(Transform parent,ConfirmDialog confirm,GameController controller)
         {
-            game=controller;Root=UiFactory.ScreenRoot("Shop",parent,UiStyle.Background,out var safe);
+            game=controller;skinResources=ArrowSkinResources.Load();Root=UiFactory.ScreenRoot("Shop",parent,UiStyle.Background,out var safe);
             var header=UiFactory.Rect("Header",safe,new Vector2(940,220),Vector2.zero);header.anchorMin=header.anchorMax=header.pivot=new Vector2(.5f,1);header.anchoredPosition=new Vector2(0,-16);
             header.gameObject.AddComponent<MenuFit>().Configure(header,safe,new Vector2(1000,240));
             UiFactory.Text("Title",header,"Shop",UiStyle.Heading,new Vector2(350,100),new Vector2(0,-50)).fontStyle=FontStyle.Bold;
@@ -83,6 +86,8 @@ namespace ArrowEscape.UI
         private void ShowThemes(){tab=ShopSlot.Theme;Rebuild();}
         private void Rebuild()
         {
+            for(int n=0;n<elementalCards.Length;n++)if(elementalCards[n]!=null)elementalCards[n].gameObject.SetActive(false);
+            for(int n=0;n<themeCards.Length;n++)if(themeCards[n]!=null)themeCards[n].gameObject.SetActive(false);
             Detail.Hide();for(int i=scroll.content.childCount-1;i>=0;i--)DestroyImmediate(scroll.content.GetChild(i).gameObject);
             cards.Clear();sections.Clear();grids.Clear();sectionCounts.Clear();string previous=null;Transform gridParent=null;int section=-1;
             for(int i=0;i<ShopCatalog.Items.Count;i++)
@@ -100,7 +105,23 @@ namespace ArrowEscape.UI
                 int index=cards.Count;var root=UiFactory.Rect(item.Id,gridParent,new Vector2(360,360),Vector2.zero);root.gameObject.AddComponent<UnityEngine.UI.Image>();root.gameObject.AddComponent<UnityEngine.UI.Button>();root.gameObject.AddComponent<ButtonFeel>();
                 var card=root.gameObject.AddComponent<ShopCard>();card.Build(item,()=>OpenDetail(index));card.Refresh(inventory.Shop);cards.Add(card);sectionCounts[section]++;
             }
-            lastSize=Vector2.zero;Canvas.ForceUpdateCanvases();UpdateLayout();scroll.verticalNormalizedPosition=1;
+            PrepareInfernoCard();PrepareThemeCards();lastSize=Vector2.zero;Canvas.ForceUpdateCanvases();UpdateLayout();scroll.verticalNormalizedPosition=1;
+        }
+        private void PrepareInfernoCard()
+        {
+            for(int i=0;i<cards.Count;i++)if(ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true)
+            {
+                int n=ArrowSkinRegistry.Find(cards[i].Item.Id).Index;
+                var infernoCard=elementalCards[n];if(infernoCard==null){var go=new GameObject("Procedural Inferno card");go.transform.SetParent(transform,false);infernoCard=go.AddComponent<LiveSkinPreview>();infernoCard.Initialize(null,new Vector2(22000+n*1000,22000));infernoCard.AutoReplay=false;infernoCard.SetDark(true);infernoCard.ShowStraight(cards[i].Item.Id);elementalCards[n]=infernoCard;}
+                cards[i].Preview.texture=infernoCard.Texture;
+            }
+        }
+        private void PrepareThemeCards()
+        {
+            for(int i=0;i<cards.Count;i++){int n=ThemeDesign.Index(cards[i].Item.Id);if(n<0)continue;
+                if(themeCards[n]==null){var go=new GameObject("Live theme card "+n);go.transform.SetParent(transform,false);var preview=go.AddComponent<LiveThemePreview>();preview.Initialize(new Vector2(35000+n*100,35000));preview.Show(cards[i].Item.Id);themeCards[n]=preview;}
+                cards[i].Preview.texture=themeCards[n].Texture;cards[i].Preview.GetComponent<UnityEngine.UI.AspectRatioFitter>().aspectMode=UnityEngine.UI.AspectRatioFitter.AspectMode.EnvelopeParent;
+            }
         }
         /// <summary>Opens the chosen card's detail sheet.</summary>
         public void OpenDetail(int index){if(index>=0&&index<cards.Count)Detail.Show(cards[index].Item,inventory);}
@@ -114,6 +135,8 @@ namespace ArrowEscape.UI
         /// <summary>Closes and destroys all cached previews.</summary>
         public void Close()
         {
+            for(int n=0;n<elementalCards.Length;n++)if(elementalCards[n]!=null){DestroyImmediate(elementalCards[n].gameObject);elementalCards[n]=null;}
+            for(int n=0;n<themeCards.Length;n++)if(themeCards[n]!=null){DestroyImmediate(themeCards[n].gameObject);themeCards[n]=null;}
             Detail.Hide();Root.gameObject.SetActive(false);renderer?.Dispose();renderer=null;
             for(int i=0;i<cards.Count;i++)cards[i].Preview.texture=null;Closed?.Invoke();
         }
@@ -131,12 +154,19 @@ namespace ArrowEscape.UI
             for(int i=0;i<cards.Count;i++)
             {
                 cards[i].Rect.GetWorldCorners(corners);
+                int themeIndex=ThemeDesign.Index(cards[i].Item.Id);if(themeIndex>=0){bool shown=corners[2].y>=viewportCorners[0].y&&corners[0].y<=viewportCorners[2].y;themeCards[themeIndex].gameObject.SetActive(shown);continue;}
+                if(ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true)
+                {
+                    var infernoCard=elementalCards[ArrowSkinRegistry.Find(cards[i].Item.Id).Index];
+                    bool shown=corners[2].y>=viewportCorners[0].y&&corners[0].y<=viewportCorners[2].y;
+                    if(infernoCard!=null){infernoCard.gameObject.SetActive(shown);cards[i].Preview.texture=infernoCard.Texture;}continue;
+                }
                 if(corners[2].y>=viewportCorners[0].y&&corners[0].y<=viewportCorners[2].y)renderer.Request(cards[i].Item.Id);
             }
-            if(Detail.IsVisible)renderer.Request(Detail.Item.Id);
+            if(Detail.IsVisible&&ArrowSkinRegistry.Find(Detail.Item.Id)==null)renderer.Request(Detail.Item.Id);
             renderer.Tick();
-            for(int i=0;i<cards.Count;i++){var texture=renderer.GetCached(cards[i].Item.Id);if(cards[i].Preview.texture!=texture)cards[i].Preview.texture=texture;}
-            if(Detail.IsVisible)Detail.Preview.texture=renderer.GetCached(Detail.Item.Id);
+            for(int i=0;i<cards.Count;i++){if(ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true||ThemeDesign.Index(cards[i].Item.Id)>=0)continue;var art=skinResources?.Find(cards[i].Item.Id);var texture=ArrowSkinRegistry.Find(cards[i].Item.Id)!=null&&art?.Full!=null?art.Full.texture:renderer.GetCached(cards[i].Item.Id);if(cards[i].Preview.texture!=texture)cards[i].Preview.texture=texture;}
+            if(Detail.IsVisible&&!Detail.HasLivePreview)Detail.Preview.texture=renderer.GetCached(Detail.Item.Id);
         }
         private void Update(){if(Application.isPlaying)Tick(Time.unscaledDeltaTime);}
         private void OnDestroy(){renderer?.Dispose();if(inventory!=null){inventory.Shop.CoinsChanged-=OnCoins;inventory.Shop.EquippedChanged-=OnEquipped;}}

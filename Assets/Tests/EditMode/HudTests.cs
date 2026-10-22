@@ -19,7 +19,7 @@ namespace ArrowEscape.Tests
         [SetUp] public void SetUp()
         {
             cameraHost = new GameObject("Test camera", typeof(Camera)); cameraHost.tag = "MainCamera";
-            host = new GameObject("Gameplay"); bootstrap = host.AddComponent<GameBootstrap>(); game = host.GetComponent<GameController>(); view = host.GetComponent<BoardView>();
+            host = new GameObject("Gameplay"); bootstrap = host.AddComponent<GameBootstrap>(); bootstrap.SetLevelCatalog(OriginalTestCatalog.Paths, OriginalTestCatalog.LegacyPaths); game = host.GetComponent<GameController>(); view = host.GetComponent<BoardView>();
             uiHost = new GameObject("UI"); hud = uiHost.AddComponent<HudController>();
         }
         /// <summary>Destroys only the objects this test created.</summary>

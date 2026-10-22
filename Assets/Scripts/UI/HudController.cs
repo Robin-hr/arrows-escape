@@ -8,6 +8,7 @@ namespace ArrowEscape.UI
     public sealed class HudController : MonoBehaviour
     {
         private GameController game;
+        private BoardView skinBoard;
         private GameBootstrap bootstrap;
         private PointerInputAdapter input;
         private Canvas canvas;
@@ -57,6 +58,7 @@ namespace ArrowEscape.UI
             bootstrap = levels;
             if (game == null) return;
             bound = true;
+            skinBoard=game.GetComponent<BoardView>();if(skinBoard!=null)skinBoard.SkinChanged+=Refresh;
             canvas.gameObject.SetActive(visible);
             game.MoveCountChanged += Refresh;
             game.UndoStateChanged += Refresh;
@@ -178,6 +180,7 @@ namespace ArrowEscape.UI
         }
         private void Refresh()
         {
+            Hud.SetBoardContrast(skinBoard!=null&&(skinBoard.HasDarkTheme||ArrowSkinRegistry.Find(skinBoard.ArrowSkinId)?.PrefersDarkBoard==true&&!skinBoard.IsLightBoard),skinBoard!=null&&skinBoard.HasDarkTheme);
             Hud.SetState(game.LevelName, game.TapCount, game.Par, game.MistakeCount, game.CanUndo);
             Hud.SetStarState(game.TapCount, game.Par);
             Hud.SetHintState(game.CanHint);
@@ -187,6 +190,7 @@ namespace ArrowEscape.UI
 
         private void Unbind()
         {
+            if(skinBoard!=null)skinBoard.SkinChanged-=Refresh;skinBoard=null;
             if (game != null)
             {
                 game.MoveCountChanged -= Refresh;

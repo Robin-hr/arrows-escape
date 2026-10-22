@@ -148,9 +148,9 @@ namespace ArrowEscape.Tests
         }
 
         /// <summary>Every sample clears through session moves with zero mistakes.</summary>
-        [TestCase("Levels/level_001")]
-        [TestCase("Levels/level_002")]
-        [TestCase("Levels/level_003")]
+        [TestCase("TestLevels/legacy_level_001")]
+        [TestCase("TestLevels/legacy_level_002")]
+        [TestCase("TestLevels/legacy_level_003")]
         public void SamplesClearWithOnlyFreeMoves(string path)
         {
             LevelLoadResult loaded = LevelRepository.LoadFromResources(path);

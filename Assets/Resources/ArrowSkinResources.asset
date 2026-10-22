@@ -1,0 +1,86 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e61a0255efa299b4393c1e20c4ccdbbe, type: 3}
+  m_Name: ArrowSkinResources
+  m_EditorClassIdentifier: ArrowEscape.View::ArrowEscape.View.ArrowSkinResources
+  Ribbon: {fileID: 4800000, guid: 02bad9e4c9fad654b8d3feac95a52f36, type: 3}
+  Glow: {fileID: 4800000, guid: 2012e9719c0e2b14ab736ec18d49ded4, type: 3}
+  Inferno: {fileID: 4800000, guid: 964e55d5ea5f4684b9840382c92df4a4, type: 3}
+  Elemental: {fileID: 4800000, guid: 1e452674900785c4cb76ce1212bb750a, type: 3}
+  RareTheme: {fileID: 4800000, guid: 2db50ddd44d1e624492506aee7652ebb, type: 3}
+  Art:
+  - Id: vortex_harpoon
+    Full: {fileID: 21300000, guid: baf85fe1b2511f84e9fb340bb5834a9e, type: 3}
+    Head: {fileID: 21300000, guid: 23e80ef37f21e7d4382b0d0fd6811567, type: 3}
+    Tail: {fileID: 21300000, guid: c22233077a46e8442a3c1965efe6b40a, type: 3}
+    Shaft: {fileID: 2800000, guid: 9337335f3146c854e9193c442739e397, type: 3}
+    Icon: {fileID: 0}
+  - Id: jade_serpent
+    Full: {fileID: 21300000, guid: 470176d8df0e87441a65bb757b5d07ef, type: 3}
+    Head: {fileID: 21300000, guid: b4781818c9912f74280a666df4bd39d2, type: 3}
+    Tail: {fileID: 21300000, guid: 80e769b098356084aa6ec1699bf531e4, type: 3}
+    Shaft: {fileID: 2800000, guid: c64c1ac5ca2baab43b3db6ec8fe3bb65, type: 3}
+    Icon: {fileID: 0}
+  - Id: sonic_boom
+    Full: {fileID: 21300000, guid: f3fa60e56ab15d84f8b2505e22ca25fa, type: 3}
+    Head: {fileID: 21300000, guid: 51c8bd86fd297764ab3f333d83dafc48, type: 3}
+    Tail: {fileID: 21300000, guid: a64f4eae61f06ac4ca53971da86e6787, type: 3}
+    Shaft: {fileID: 2800000, guid: b6375b720882c0a4c80c48e9f6895112, type: 3}
+    Icon: {fileID: 0}
+  - Id: chronos_needle
+    Full: {fileID: 21300000, guid: 49101a88976218b4a9a97bbbe40c3bd2, type: 3}
+    Head: {fileID: 21300000, guid: cf11d92e5f48b084293d10718fd5e070, type: 3}
+    Tail: {fileID: 21300000, guid: e540a87d22caad944924cac8458bcf5f, type: 3}
+    Shaft: {fileID: 2800000, guid: 19f551578c4827348b6cdd6c185db3df, type: 3}
+    Icon: {fileID: 0}
+  - Id: abyss_fang
+    Full: {fileID: 21300000, guid: 985dbbbdc1144d74d8d9dad82bb39a30, type: 3}
+    Head: {fileID: 21300000, guid: ea2b8b66268f0dc41aec49096c783260, type: 3}
+    Tail: {fileID: 21300000, guid: d379a9b1787feaf4c89255d3122a47f5, type: 3}
+    Shaft: {fileID: 2800000, guid: 9c1fca8b22f91b14880ec43f3be976d4, type: 3}
+    Icon: {fileID: 0}
+  - Id: stealth_phantom
+    Full: {fileID: 21300000, guid: ebd75cddead41174f863268c610ad6ee, type: 3}
+    Head: {fileID: 21300000, guid: eb4a0d1bcd4259241bcda412c2ebb8dd, type: 3}
+    Tail: {fileID: 21300000, guid: dc7227c868adf4949bb99273f9ec21ff, type: 3}
+    Shaft: {fileID: 2800000, guid: 2cf74bc43e5098241999fa9b82412f38, type: 3}
+    Icon: {fileID: 0}
+  - Id: phoenix_wing
+    Full: {fileID: 21300000, guid: 5ebf2a01c73dc0142a8daff4549db5e0, type: 3}
+    Head: {fileID: 21300000, guid: cc0e1ba3177958745b59a26825d06e36, type: 3}
+    Tail: {fileID: 21300000, guid: 7a9201a01c6ea5448bba3dd45cfc6bdf, type: 3}
+    Shaft: {fileID: 2800000, guid: 903fda2f8824d9d408cc4b594cc4d4e9, type: 3}
+    Icon: {fileID: 0}
+  - Id: cyber_pulsar
+    Full: {fileID: 21300000, guid: bc98e13ce3690164f91ebdaf421cf180, type: 3}
+    Head: {fileID: 21300000, guid: 9370b1dffea72ef4f85d8e060634176f, type: 3}
+    Tail: {fileID: 21300000, guid: f0f5d0f185cd5c649a46a2d8c8ae0f7d, type: 3}
+    Shaft: {fileID: 2800000, guid: e34f69dc64cd211438282fe50d4d32eb, type: 3}
+    Icon: {fileID: 21300000, guid: 97b3bc3fbd54a4644963c64d39bc348d, type: 3}
+  - Id: spore_needle
+    Full: {fileID: 21300000, guid: 51946ae024f9b20488257a4c6826d327, type: 3}
+    Head: {fileID: 21300000, guid: 84f6ca5774f8af449837d26832f98a1a, type: 3}
+    Tail: {fileID: 21300000, guid: 7ba82ddced2f2be42803d66f6e564fac, type: 3}
+    Shaft: {fileID: 2800000, guid: 5c1eeb20ed47c3d4799a4af077622cff, type: 3}
+    Icon: {fileID: 21300000, guid: 24af6d36321fc5d439cbb757f3bdf962, type: 3}
+  - Id: bone_carver
+    Full: {fileID: 21300000, guid: 0f426e6fa71c8ae45bf3b55c03afa8d0, type: 3}
+    Head: {fileID: 21300000, guid: 5640376477244754994f5bf753b0ec4d, type: 3}
+    Tail: {fileID: 21300000, guid: 29dc88f187ea14b4a9ae3c4c6fb4ce20, type: 3}
+    Shaft: {fileID: 2800000, guid: 0d7c0933813fe734a95f6230635fbe89, type: 3}
+    Icon: {fileID: 21300000, guid: 1319f19fc370b2747839f502eb560a8c, type: 3}
+  - Id: infinity_core
+    Full: {fileID: 21300000, guid: 9c5c3d30c2b8a284f99769e11bc1a4dd, type: 3}
+    Head: {fileID: 21300000, guid: 501bea37e01e316479f9625cdfc6ba9f, type: 3}
+    Tail: {fileID: 21300000, guid: 66d205f30dd148e4eaea0c0e71fd427c, type: 3}
+    Shaft: {fileID: 2800000, guid: 9686c12692f1fbb40966294368b15f0b, type: 3}
+    Icon: {fileID: 21300000, guid: 1718c02dff6497e49a3ac27834739246, type: 3}

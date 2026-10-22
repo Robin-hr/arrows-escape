@@ -32,7 +32,7 @@ namespace ArrowEscape.Tests
         {
             Inventory=inventory??new FakeInventoryStore();Progress=progress??new FakeProgressStore();
             camera=new GameObject("Economy camera",typeof(Camera));camera.tag="MainCamera";
-            host=new GameObject("Economy gameplay");Bootstrap=host.AddComponent<GameBootstrap>();Bootstrap.SetLevelCatalog(OriginalTestCatalog.Paths);
+            host=new GameObject("Economy gameplay");Bootstrap=host.AddComponent<GameBootstrap>();Bootstrap.SetLevelCatalog(OriginalTestCatalog.Paths, OriginalTestCatalog.LegacyPaths);
             Bootstrap.Initialize(Progress,new FakeSettingsStore(),Inventory);Game=host.GetComponent<GameController>();Board=host.GetComponent<BoardView>();
             if(withUi)
             {

@@ -13,6 +13,9 @@ namespace ArrowEscape.View
         private float[] delays;
         private int width,height,lastX,lastY;
         private float elapsed,total;
+        private Color restColor=ViewTheme.CellDot;
+        /// <summary>Overrides only this board's rest tint; the original wave timing is unchanged.</summary>
+        public void SetRestColor(Color color){restColor=color;ResetWave();}
         private BoardView boardView;
         private GameController game;
         /// <summary>Whether a wave is updating the buffers.</summary>
@@ -21,6 +24,13 @@ namespace ArrowEscape.View
         public Vector3[] Vertices => vertices;
         /// <summary>Persistent colors for tests.</summary>
         public Color[] Colors => colors;
+        /// <summary>Applies a separate reversible Void layer without reallocating buffers or changing wave timing.</summary>
+        public void ApplyAbsorption(Color[] original,float[] factors)
+        {
+            if(mesh==null||IsActive)return;
+            for(int i=0;i<factors.Length;i++){Color c=factors[i]==1?original[i]:original[i]*factors[i];Color shaderColor=QualitySettings.activeColorSpace==ColorSpace.Linear?c.linear:c;for(int j=0;j<13;j++){int v=i*13+j;colors[v]=c;renderColors[v]=shaderColor;}}
+            mesh.colors=renderColors;
+        }
         /// <summary>Builds circular dots once and subscribes through existing gameplay events.</summary>
         public void Initialize(BoardView view,Board board,Material material,GameController controller)
         {
@@ -60,7 +70,7 @@ namespace ArrowEscape.View
             for(int i=0;i<centers.Length;i++)
             {
                 float amount=EffectMath.PulseAmount(EffectMath.DotWaveLocalTime(elapsed,delays[i],ViewTheme.DotWaveDuration));
-                float scale=1+(ViewTheme.DotWavePeakScale-1)*amount;Color color=Color.Lerp(ViewTheme.CellDot,ViewTheme.DotWaveColor,amount);
+                float scale=1+(ViewTheme.DotWavePeakScale-1)*amount;Color color=Color.Lerp(restColor,ViewTheme.DotWaveColor,amount);
                 Color vertexColor=QualitySettings.activeColorSpace==ColorSpace.Linear?color.linear:color;
                 for(int j=0;j<13;j++){int v=i*13+j;vertices[v]=centers[i]+(rest[v]-centers[i])*scale;colors[v]=color;renderColors[v]=vertexColor;}
             }
@@ -71,8 +81,8 @@ namespace ArrowEscape.View
         {
             IsActive=false;elapsed=0;if(mesh==null)return;
             // Keep logical colors exact while sending linear vertex colors to the shader.
-            Color vertexColor=QualitySettings.activeColorSpace==ColorSpace.Linear?ViewTheme.CellDot.linear:ViewTheme.CellDot;
-            for(int i=0;i<vertices.Length;i++){vertices[i]=rest[i];colors[i]=ViewTheme.CellDot;renderColors[i]=vertexColor;}
+            Color vertexColor=QualitySettings.activeColorSpace==ColorSpace.Linear?restColor.linear:restColor;
+            for(int i=0;i<vertices.Length;i++){vertices[i]=rest[i];colors[i]=restColor;renderColors[i]=vertexColor;}
             mesh.vertices=vertices;mesh.colors=renderColors;
         }
         /// <summary>Honors hidden-board and gameplay pause flags.</summary>

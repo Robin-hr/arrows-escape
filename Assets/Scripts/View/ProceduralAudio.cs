@@ -10,6 +10,8 @@ namespace ArrowEscape.View
         private readonly AudioClip[] notes = new AudioClip[MusicScale.NoteCount(SoundDesign.OctaveCount)];
         private readonly bool[] unavailable = new bool[MusicScale.NoteCount(SoundDesign.OctaveCount) + 3];
         private AudioClip thud, jingle,slide;
+        private readonly AudioClip[] skinClips=new AudioClip[20];
+        private readonly bool[] skinUnavailable=new bool[20];
         private readonly AudioClip[] uiClips=new AudioClip[3];
         private readonly bool[] uiUnavailable=new bool[3];
         private readonly AudioClip[] stars = new AudioClip[3];
@@ -21,6 +23,10 @@ namespace ArrowEscape.View
             {
                 switch (sound.Cue)
                 {
+                    case SoundCue.SkinExit:case SoundCue.SkinBlocked:
+                        int skin=Math.Max(0,Math.Min(9,sound.ScaleStep))*2+(sound.Cue==SoundCue.SkinBlocked?1:0);
+                        if(skinUnavailable[skin])return null;
+                        if(skinClips[skin]==null)skinClips[skin]=Create("Skin texture "+skin,SkinSoundSynth.Render(skin/2,skin%2==1));skinUnavailable[skin]=skinClips[skin]==null;return skinClips[skin];
                     case SoundCue.Coin: case SoundCue.Purchase: case SoundCue.Button:
                         int ui=(int)sound.Cue-(int)SoundCue.Coin;
                         if(uiUnavailable[ui])return null;
@@ -65,6 +71,7 @@ namespace ArrowEscape.View
         /// <summary>Prepares all clips during setup, keeping synthesis off the gameplay path.</summary>
         public void Prepare()
         {
+            for(int i=0;i<20;i++)GetClip(new SoundEvent(i%2==0?SoundCue.SkinExit:SoundCue.SkinBlocked,i/2,0));
             for (int i = 0; i < notes.Length; i++) GetClip(new SoundEvent(SoundCue.Exit, i, 0));
             GetClip(SoundPlanner.ForBlocked());
             GetClip(SoundPlanner.ForLevelComplete());
@@ -91,6 +98,7 @@ namespace ArrowEscape.View
             for (int i = 0; i < notes.Length; i++) { DestroyClip(notes[i]); notes[i] = null; }
             for (int i = 0; i < 3; i++) { DestroyClip(stars[i]); stars[i] = null; starUnavailable[i] = false; }
             for(int i=0;i<3;i++){DestroyClip(uiClips[i]);uiClips[i]=null;uiUnavailable[i]=false;}
+            for(int i=0;i<skinClips.Length;i++){DestroyClip(skinClips[i]);skinClips[i]=null;skinUnavailable[i]=false;}
             Array.Clear(unavailable, 0, unavailable.Length);
             DestroyClip(thud); DestroyClip(jingle); thud = null; jingle = null;
             DestroyClip(slide);slide=null;

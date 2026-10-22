@@ -12,6 +12,17 @@ namespace ArrowEscape.View
         private int screenHeight;
         private Rect safeArea;
         private bool missingCameraLogged;
+        private Color SkinBackground
+        {
+            get
+            {
+                var board=GetComponent<BoardView>();if(board!=null&&board.HasDarkTheme)return ThemeDesign.Background(board.ThemeId);if(board!=null&&ArrowSkinRegistry.Find(board.ArrowSkinId)?.PrefersDarkBoard==true)return board.IsLightBoard?ViewTheme.Background:ArrowSkinRegistry.Find(board.ArrowSkinId).DarkBoardColor;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                var skins=GetComponent<SkinDirector>();if(skins!=null&&skins.IsDarkBoard)return new Color32(14,17,22,255);
+#endif
+                return ViewTheme.Background;
+            }
+        }
 
         /// <summary>Fits the centered board, reserving default margins plus safe-area insets.</summary>
         public void Fit(int width, int height)
@@ -38,7 +49,7 @@ namespace ArrowEscape.View
             camera.orthographic = true;
             camera.orthographicSize = fit.OrthographicSize;
             camera.clearFlags = CameraClearFlags.SolidColor;
-            camera.backgroundColor = ViewTheme.Background;
+            camera.backgroundColor = SkinBackground;
             camera.transform.SetPositionAndRotation(new Vector3(fit.CameraX, fit.CameraY, ViewTheme.CameraZ),
                 Quaternion.identity);
             var zoom=GetComponent<BoardZoom>();if(zoom!=null)zoom.ResetFit();
@@ -50,7 +61,7 @@ namespace ArrowEscape.View
             Camera camera = Camera.main;
             if (camera == null) return;
             camera.clearFlags = CameraClearFlags.SolidColor;
-            camera.backgroundColor = ViewTheme.Background;
+            camera.backgroundColor = SkinBackground;
         }
 
         private void Update()

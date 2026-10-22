@@ -39,7 +39,7 @@ namespace ArrowEscape.Tests
         [TestCase(0)][TestCase(1)][TestCase(2)][TestCase(3)][TestCase(4)][TestCase(5)][TestCase(6)][TestCase(7)]
         public void BruteForceScores(int index)
         {
-            Board b = index < 3 ? LevelRepository.LoadFromResources("Levels/level_00" + (index + 1)).Board : HandBoard(index - 3);
+            Board b = index < 3 ? LevelRepository.LoadFromResources("TestLevels/legacy_level_00" + (index + 1)).Board : HandBoard(index - 3);
             // Inspect all private scores rather than widening the production public API just for tests.
             object[] arguments = { b, null, null, null };
             typeof(HintFinder).GetMethod("ScorePaths", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, arguments);
@@ -62,7 +62,7 @@ namespace ArrowEscape.Tests
         /// <summary>Following hints clears every sample without a missing or blocked suggestion.</summary>
         [TestCase(1)][TestCase(2)][TestCase(3)] public void Samples(int index)
         {
-            Board b = LevelRepository.LoadFromResources("Levels/level_00" + index).Board; int count = b.Arrows.Count;
+            Board b = LevelRepository.LoadFromResources("TestLevels/legacy_level_00" + index).Board; int count = b.Arrows.Count;
             while (!b.IsCleared()) { HintResult h = HintFinder.Find(b); Assert.That(h.HasHint, Is.True); Assert.That(b.CanExit(h.Arrow), Is.True); b.Remove(h.Arrow); count--; }
             Assert.That(count, Is.Zero);
         }

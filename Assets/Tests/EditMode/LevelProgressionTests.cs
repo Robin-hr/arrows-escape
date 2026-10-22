@@ -23,7 +23,7 @@ namespace ArrowEscape.Tests
             cameraHost = new GameObject("Progression camera", typeof(Camera));
             cameraHost.tag = "MainCamera";
             host = new GameObject("Progression gameplay");
-            bootstrap = host.AddComponent<GameBootstrap>(); bootstrap.SetLevelCatalog(OriginalTestCatalog.Paths);
+            bootstrap = host.AddComponent<GameBootstrap>(); bootstrap.SetLevelCatalog(OriginalTestCatalog.Paths, OriginalTestCatalog.LegacyPaths);
             game = host.GetComponent<GameController>();
             view = host.GetComponent<BoardView>();
             uiHost = new GameObject("Progression UI");

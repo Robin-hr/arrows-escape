@@ -11,6 +11,13 @@ namespace ArrowEscape.UI
         private InventoryService inventory;
         private ConfirmDialog confirm;
         private GameController game;
+        private LiveSkinPreview live;
+        private LiveThemePreview themePreview;
+        private UnityEngine.UI.Button flyButton,darkButton;
+        private UnityEngine.UI.Text previewNote,signature;
+        private UnityEngine.UI.AspectRatioFitter previewAspect;
+        /// <summary>Whether the selected item uses the live skin board.</summary>
+        public bool HasLivePreview=>live!=null&&live.gameObject.activeSelf||themePreview!=null&&themePreview.gameObject.activeSelf;
         private UnityEngine.UI.Text nameText,category,description,mainLabel;
         /// <summary>Full-screen blocking root.</summary>
         public RectTransform Root { get; private set; }
@@ -37,14 +44,23 @@ namespace ArrowEscape.UI
             BackButton=UiFactory.Button("",card,new Vector2(-340,550));((RectTransform)BackButton.transform).sizeDelta=new Vector2(112,112);UiStyle.Icon("Back",BackButton.transform,UiSpriteShape.Back,Vector2.zero,48,Color.white);BackButton.onClick.AddListener(Hide);
             nameText=UiFactory.Text("Name",card,"",56,new Vector2(820,110),new Vector2(0,425));nameText.fontStyle=FontStyle.Bold;
             category=UiFactory.Text("Category",card,"",UiStyle.Body,new Vector2(820,64),new Vector2(0,330));category.color=UiStyle.Muted;
-            Preview=UiFactory.Rect("LargePreview",card,new Vector2(400,320),new Vector2(0,110)).gameObject.AddComponent<UnityEngine.UI.RawImage>();Preview.raycastTarget=false;
-            description=UiFactory.Text("Description",card,"",UiStyle.Body,new Vector2(780,180),new Vector2(0,-175));
-            var note=UiFactory.Text("PreviewNote",card,"Color preview - full effects coming later",UiStyle.Caption,new Vector2(780,70),new Vector2(0,-315));note.color=UiStyle.Muted;
+            Preview=UiFactory.Rect("LargePreview",card,new Vector2(780,340),new Vector2(0,110)).gameObject.AddComponent<UnityEngine.UI.RawImage>();Preview.raycastTarget=false;previewAspect=Preview.gameObject.AddComponent<UnityEngine.UI.AspectRatioFitter>();previewAspect.aspectMode=UnityEngine.UI.AspectRatioFitter.AspectMode.HeightControlsWidth;
+            description=UiFactory.Text("Description",card,"",UiStyle.Body,new Vector2(780,125),new Vector2(0,-140));
+            signature=UiFactory.Text("Signature",card,"",UiStyle.Caption,new Vector2(780,100),new Vector2(0,-240));signature.fontStyle=FontStyle.Italic;
+            previewNote=UiFactory.Text("PreviewNote",card,"Color preview - full effects coming later",UiStyle.Caption,new Vector2(780,70),new Vector2(0,-315));previewNote.color=UiStyle.Muted;
+            flyButton=UiFactory.Button("Watch it fly",card,new Vector2(-185,-310));darkButton=UiFactory.Button("Light / Dark",card,new Vector2(210,-310));
+            ((RectTransform)flyButton.transform).sizeDelta=new Vector2(340,85);((RectTransform)darkButton.transform).sizeDelta=new Vector2(340,85);
+            flyButton.onClick.AddListener(FlyPreview);darkButton.onClick.AddListener(TogglePreviewDark);
+            var liveGo=new GameObject("Live shop preview");liveGo.transform.SetParent(transform,false);live=liveGo.AddComponent<LiveSkinPreview>();live.Initialize(controller==null?null:controller.GetComponent<AudioDirector>());liveGo.SetActive(false);
+            var themeGo=new GameObject("Live theme detail");themeGo.transform.SetParent(transform,false);themePreview=themeGo.AddComponent<LiveThemePreview>();themePreview.Initialize(new Vector2(39000,39000),640,360);themeGo.SetActive(false);
             MainButton=UiFactory.Button("",card,new Vector2(0,-475));((RectTransform)MainButton.transform).sizeDelta=new Vector2(700,128);mainLabel=MainButton.GetComponentInChildren<UnityEngine.UI.Text>();MainButton.onClick.AddListener(OnMain);Hide();
         }
         /// <summary>Shows catalog text; preview rendering remains lazy.</summary>
         public void Show(ShopItem item,InventoryService service)
-        {Item=item;inventory=service;nameText.text=item.Name;category.text=item.Category;description.text=item.Description;Preview.texture=null;Root.gameObject.SetActive(true);Root.SetAsLastSibling();Refresh();}
+        {Item=item;inventory=service;nameText.text=item.Name;category.text=item.Category;description.text=item.Description;signature.text=ArrowSkinRegistry.Find(item.Id)?.Signature??"";Preview.texture=null;bool implemented=ArrowSkinRegistry.Find(item.Id)!=null;previewAspect.aspectRatio=implemented?640f/360:1;flyButton.gameObject.SetActive(implemented);darkButton.gameObject.SetActive(implemented);previewNote.gameObject.SetActive(!implemented);
+            live.gameObject.SetActive(implemented);if(implemented){if(ArrowSkinRegistry.Find(item.Id)?.PrefersDarkBoard==true)live.SetDark(true);live.Show(item.Id);Preview.texture=live.Texture;}
+            bool themed=ThemeDesign.Index(item.Id)>=0;themePreview.gameObject.SetActive(themed);if(themed){themePreview.Show(item.Id);themePreview.ShowSample(service.State.EquippedArrowId);Preview.texture=themePreview.Texture;previewAspect.aspectRatio=640f/360;previewNote.gameObject.SetActive(false);}
+            Root.gameObject.SetActive(true);Root.SetAsLastSibling();Refresh();}
         /// <summary>Reflects exact ownership and affordability state.</summary>
         public void Refresh()
         {
@@ -61,6 +77,8 @@ namespace ArrowEscape.UI
         private void Buy()
         {if(Item==null||!inventory.TryBuy(Item.Id))return;game.RequestUiFeedback(UiFeedbackCue.Purchase);Changed?.Invoke();Refresh();}
         /// <summary>Closes the sheet before leaving its shop.</summary>
-        public void Hide(){if(Root!=null)Root.gameObject.SetActive(false);}
+        public void Hide(){if(Root!=null)Root.gameObject.SetActive(false);if(live!=null)live.gameObject.SetActive(false);if(themePreview!=null)themePreview.gameObject.SetActive(false);}
+        private void FlyPreview(){if(live!=null)live.Fly();}
+        private void TogglePreviewDark(){if(live!=null)live.SetDark(!live.IsDark);}
     }
 }

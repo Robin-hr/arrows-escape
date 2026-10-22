@@ -11,7 +11,7 @@ namespace ArrowEscape.Tests
     {
         private GameObject host; private GameController game; private BoardView view; private GuideController guide; private TapController taps;
         /// <summary>Creates an optional guide without making it a gameplay requirement.</summary>
-        [SetUp] public void Setup() { host = new GameObject("Guide integration"); game = host.AddComponent<GameController>(); view = host.GetComponent<BoardView>(); taps = host.GetComponent<TapController>(); guide = host.AddComponent<GuideController>(); game.StartLevel(LevelRepository.LoadFromResources("Levels/level_001").Board); }
+        [SetUp] public void Setup() { host = new GameObject("Guide integration"); game = host.AddComponent<GameController>(); view = host.GetComponent<BoardView>(); taps = host.GetComponent<TapController>(); guide = host.AddComponent<GuideController>(); game.StartLevel(LevelRepository.LoadFromResources("TestLevels/legacy_level_001").Board); }
         /// <summary>Removes all runtime resources.</summary>
         [TearDown] public void Cleanup() { Object.DestroyImmediate(host); SpriteFactory.ClearCache(); }
         private void Tap(Arrow a) { Vector2 p = view.CellToWorld(a.X, a.Y); taps.PointerDown(1, p); taps.PointerUp(1, p); }
@@ -61,7 +61,7 @@ namespace ArrowEscape.Tests
         /// <summary>Following hints clears all samples without mistakes or missing suggestions.</summary>
         [TestCase(1)][TestCase(2)][TestCase(3)] public void FollowHints(int index)
         {
-            game.StartLevel(LevelRepository.LoadFromResources("Levels/level_00" + index).Board); int arrows = game.StartingArrowCount;
+            game.StartLevel(LevelRepository.LoadFromResources("TestLevels/legacy_level_00" + index).Board); int arrows = game.StartingArrowCount;
             while (!game.IsCleared) { Assert.That(game.ShowHint(), Is.True); Arrow a = game.Session.Board.GetArrowById(guide.HintArrowId); if (game.Session.Board.Arrows.Count == 1) LogAssert.Expect(LogType.Log, "Level cleared. Mistakes: 0"); Tap(a); }
             Assert.That(game.HintCount, Is.EqualTo(arrows)); Assert.That(game.MistakeCount + game.UndoCount, Is.Zero); Assert.That(game.CanHint, Is.False); Assert.That(game.ShowHint(), Is.False); Assert.That(game.HintCount, Is.EqualTo(arrows));
         }

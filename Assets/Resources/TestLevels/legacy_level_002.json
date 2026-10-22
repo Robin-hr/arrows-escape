@@ -1,0 +1,85 @@
+{
+  "name": "Level 2",
+  "width": 5,
+  "height": 5,
+  "arrows": [
+    {
+      "id": 1,
+      "x": 0,
+      "y": 0,
+      "direction": "Right"
+    },
+    {
+      "id": 2,
+      "x": 2,
+      "y": 0,
+      "direction": "Right"
+    },
+    {
+      "id": 3,
+      "x": 4,
+      "y": 0,
+      "direction": "Up"
+    },
+    {
+      "id": 4,
+      "x": 4,
+      "y": 2,
+      "direction": "Left"
+    },
+    {
+      "id": 5,
+      "x": 2,
+      "y": 2,
+      "direction": "Left"
+    },
+    {
+      "id": 6,
+      "x": 0,
+      "y": 2,
+      "direction": "Up"
+    },
+    {
+      "id": 7,
+      "x": 0,
+      "y": 4,
+      "direction": "Right"
+    },
+    {
+      "id": 8,
+      "x": 2,
+      "y": 4,
+      "direction": "Right"
+    },
+    {
+      "id": 9,
+      "x": 4,
+      "y": 4,
+      "direction": "Up"
+    },
+    {
+      "id": 10,
+      "x": 1,
+      "y": 1,
+      "direction": "Right"
+    },
+    {
+      "id": 11,
+      "x": 3,
+      "y": 1,
+      "direction": "Up"
+    },
+    {
+      "id": 12,
+      "x": 3,
+      "y": 3,
+      "direction": "Left"
+    },
+    {
+      "id": 13,
+      "x": 1,
+      "y": 3,
+      "direction": "Up"
+    }
+  ]
+}
