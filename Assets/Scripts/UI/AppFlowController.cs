@@ -466,6 +466,10 @@ namespace ArrowEscape.UI
             if(Shop!=null&&Shop.IsVisible)return Shop.HandleBack();
             if (Ranking != null && Ranking.IsVisible) { CloseRanking(); return true; }
             if (Profile != null && Profile.IsVisible) { CloseProfile(); return true; }
+#if UNITY_ANDROID && !UNITY_EDITOR
+            // Android system Back on the home page asks before leaving the game (Step 14N).
+            if (Machine.Current == ScreenState.MainMenu) { Confirm.Show("Quit Game", "Leave Arrows Escape?", "Quit", Application.Quit); return true; }
+#endif
             return Machine.Back();
         }
         private void Update()

@@ -41,6 +41,7 @@ namespace ArrowEscape.EditorTools
             Step("splash", ApplySplash);
             Step("brand textures", ApplyBrandImports);
             Step("icons", ApplyIcons);
+            Step("platforms", ApplyPlatforms);
             AssetDatabase.SaveAssets();
         }
 
@@ -66,6 +67,33 @@ namespace ArrowEscape.EditorTools
             PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
             PlayerSettings.allowedAutorotateToLandscapeLeft = false;
             PlayerSettings.allowedAutorotateToLandscapeRight = false;
+        }
+
+        /// <summary>Release version shown in stores and in the APK.</summary>
+        public const string Version = "0.1.0";
+        /// <summary>Android version code (increase for every upload).</summary>
+        public const int AndroidVersionCode = 1;
+
+        // Step 14N cross-platform settings: Android IL2CPP ARM64 with internet (world ranking) and edge-to-edge drawing,
+        // iOS full screen, desktop portrait windows that can be resized.
+        private static void ApplyPlatforms()
+        {
+            PlayerSettings.bundleVersion = Version;
+            PlayerSettings.Android.bundleVersionCode = AndroidVersionCode;
+            PlayerSettings.iOS.buildNumber = AndroidVersionCode.ToString();
+            PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
+            PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64 | AndroidArchitecture.ARMv7;
+            PlayerSettings.Android.forceInternetPermission = true;
+            PlayerSettings.Android.renderOutsideSafeArea = true;
+            PlayerSettings.Android.startInFullscreen = true;
+            if ((int)PlayerSettings.Android.minSdkVersion < 26) PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
+            PlayerSettings.iOS.requiresFullScreen = true;
+            PlayerSettings.statusBarHidden = true;
+            PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
+            PlayerSettings.defaultScreenWidth = 540; PlayerSettings.defaultScreenHeight = 960;
+            PlayerSettings.resizableWindow = true;
+            PlayerSettings.allowFullscreenSwitch = true;
+            PlayerSettings.runInBackground = false;
         }
 
         private static void ApplySplash()

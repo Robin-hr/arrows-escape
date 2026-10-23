@@ -179,8 +179,8 @@ The board is cleared when no arrows remain.
 - Haptic cues (duration/amplitude/minimum interval): Exit 12ms/70/0.04s; Blocked 40ms/200/0.08s;
   Undo 8ms/45/0.04s; Preview 15ms/90/0.2s; Complete 20ms/90, gap60ms, 20ms/130, gap60ms,
   45ms/220 with a 0.5s minimum interval. Throttles are independent and rejected calls do not extend them.
-- AndroidHapticsPlayer is deliberately NOT inside an #if: JNI C# compiles in Editor. The factory
-  constructs it only on Android. API26+ caches VibrationEffects; older versions use cached legacy
+- AndroidHapticsPlayer is compiled only for the Android target (#if UNITY_ANDROID, Step 14N). The factory
+  constructs it only on Android devices. API26+ caches VibrationEffects; older versions use cached legacy
   waveforms. First JNI failure disables haptics for the session and warns once. Test hardware is fake.
 - HapticsEnabled is read for every cue; off cancels, on previews through the throttle. Hint has no
   vibration. Level start/app pause cancel. iOS remains unsupported until a future native plugin.
@@ -837,3 +837,10 @@ The board is cleared when no arrows remain.
 - Level-complete card has a HOME button (`LevelCompletePanel.HomeButton` -> `HomeRequested` -> main menu).
 - `AvatarPulse` only sways/breathes premium frames: no ring light, glow or sparkles, and avatars never animate.
 - Home: Daily Puzzle is teal glass, Daily Rewards blue glass; shop icon is a 3D trolley, Journey icon a hill with a winding road and flag; the "+" sparkles were removed from `home_base.png`.
+
+## Cross-platform pass and builds (Step 14N)
+- Platform code is behind #if: `AndroidHapticsPlayer` (#if UNITY_ANDROID; a failed motor call falls back to `Handheld.Vibrate`, which also makes Unity add the VIBRATE permission), `IosHapticsPlayer` (#if UNITY_IOS; system vibration for blocked/complete), `HapticsPlayerFactory` (#if per platform), `NativeShare` (Android ACTION_SEND chooser, iOS `Plugins/iOS/ArrowEscapeShare.mm`; desktop/editor return false and the daily share falls back to the clipboard), Android Back on the home page asks to quit.
+- Saves stay in `Application.persistentDataPath`; `Data/SafeFile.Replace` falls back to copy+delete where `File.Replace` is unsupported.
+- `FrameRateSetup`: phones 60 fps with vSync off and the screen kept awake; desktop vSync on and normal sleep.
+- `ReleaseSetup` "platforms" step: version 0.1.0 (Android version code 1, iOS build 1), Android IL2CPP ARM64 + ARMv7, min SDK 26, internet permission (world ranking), edge-to-edge (safe areas handled by `SafeAreaPanel`), iOS full screen; Windows/macOS start in a 540x960 resizable window.
+- `Editor/PlayerBuild`: Tools > Arrow Escape > Build Android APK -> `Builds/Android/ArrowsEscape-<version>.apk`; Build Windows -> `Builds/Windows`. Reports go to `Logs/DevBridge/build.txt`. `Builds/` is not committed.

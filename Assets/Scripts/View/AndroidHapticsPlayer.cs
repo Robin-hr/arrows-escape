@@ -1,10 +1,11 @@
+#if UNITY_ANDROID
 using System;
 using ArrowEscape.Core;
 using UnityEngine;
 
 namespace ArrowEscape.View
 {
-    /// <summary>Cached Android vibration effects. Deliberately compiled in Editor to catch C# errors.</summary>
+    /// <summary>Cached Android vibration effects (compiled only for the Android target; Step 14N wraps it in #if UNITY_ANDROID).</summary>
     public sealed class AndroidHapticsPlayer : IHapticsPlayer, IDisposable
     {
         private AndroidJavaObject vibrator;
@@ -64,7 +65,7 @@ namespace ArrowEscape.View
         {
             if (!IsSupported) return;
             try { if ((int)cue < 0 || (int)cue >= arguments.Length) return; vibrator.Call("vibrate",arguments[(int)cue]); }
-            catch (Exception error) { Fail(error); }
+            catch (Exception error) { Fail(error); if (cue == HapticCue.Blocked || cue == HapticCue.LevelComplete) Handheld.Vibrate(); }
         }
         /// <summary>Cancels vibration safely.</summary>
         public void Cancel()
@@ -87,3 +88,4 @@ namespace ArrowEscape.View
         }
     }
 }
+#endif

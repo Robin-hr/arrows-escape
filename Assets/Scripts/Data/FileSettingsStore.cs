@@ -57,7 +57,7 @@ namespace ArrowEscape.Data
                 if (!string.IsNullOrEmpty(folder)) Directory.CreateDirectory(folder);
                 data.version = SettingsData.CurrentVersion;
                 File.WriteAllText(temporary, JsonUtility.ToJson(data, true), new UTF8Encoding(false));
-                if (File.Exists(path)) File.Replace(temporary, path, null);
+                if (File.Exists(path)) SafeFile.Replace(temporary, path);
                 else File.Move(temporary, path);
                 return true;
             }
