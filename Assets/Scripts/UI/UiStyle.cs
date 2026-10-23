@@ -33,7 +33,7 @@ namespace ArrowEscape.UI
         public static Color Category(string category)
         {
             string hex=category=="Elemental & Magic"?"#38BDF8":category=="Rare & Premium"?"#A78BFA":category=="Tactical & Sci-Fi"?"#34D399":category=="Organic & Strange"?"#84CC16":category=="Legendary"?"#F59E0B":
-                category=="Themes"?"#FF5FD2":category=="Gradients"?"#7AA8FF":category=="Live Wallpapers"?"#FFC94A":category=="Cute Crew"?"#FF9CC8":category=="Cosmic Crew"?"#7CF0FF":category=="Metal Frames"?"#E0B080":category=="Magic Frames"?"#B85CFF":category=="Mythic Frames"?"#FFC83C":category=="Premium"?"#FFD86B":"#38E1FF";
+                category=="Themes"?"#FF5FD2":category=="Gradients"?"#7AA8FF":category=="Tap Sounds"?"#7AF0FF":category=="Premium Sounds"?"#FF6B6B":category=="Live Wallpapers"?"#FFC94A":category=="Cute Crew"?"#FF9CC8":category=="Cosmic Crew"?"#7CF0FF":category=="Metal Frames"?"#E0B080":category=="Magic Frames"?"#B85CFF":category=="Mythic Frames"?"#FFC83C":category=="Premium"?"#FFD86B":"#38E1FF";
             ColorUtility.TryParseHtmlString(hex,out Color color);return color;
         }
         /// <summary>Adds a cached glyph without blocking pointer rays.</summary>

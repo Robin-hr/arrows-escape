@@ -98,6 +98,7 @@ namespace ArrowEscape.UI
             Machine.StateChanged += OnStateChanged;
             hud.PauseRequested += OnPauseRequested;
             hud.CompletePanel.LevelsRequested += OnLevelsRequested;
+            hud.CompletePanel.HomeRequested += OnHomeRequested;
             bootstrap.LevelCompleted += OnLevelCompleted;
             bootstrap.ProgressReset += OnProgressReset;
             bootstrap.InventoryReset += BindInventory;
@@ -257,11 +258,18 @@ namespace ArrowEscape.UI
         /// <summary>Spends one Journey life (saved); with none left it opens the lives panel and returns false.</summary>
         public bool SpendJourneyLife()
         {
-            if (!JourneyLifeRules.TrySpend(bootstrap.Inventory.State, UtcNow())) { JourneyLives.Show(); return false; }
+            if (!JourneyLifeRules.TrySpend(bootstrap.Inventory.State, UtcNow()))
+            { JourneyLives.Show(); var audio = game.GetComponent<AudioDirector>(); if (audio != null) audio.PlayLose(); return false; }
             bootstrap.Inventory.Save(); MainMenu.SetJourneyLives(bootstrap.Inventory.State.JourneyLives); Journey.RefreshLives();
             return true;
         }
-        private bool JourneyAttemptAllowed() => !bootstrap.IsJourneyLevel || SpendJourneyLife();
+        private bool JourneyAttemptAllowed()
+        {
+            if (!bootstrap.IsJourneyLevel) return true;
+            if (!SpendJourneyLife()) return false;
+            Toast.Show("-1 JOURNEY LIFE\n" + bootstrap.Inventory.State.JourneyLives + " / " + JourneyLifeRules.Max + " LEFT", "Daily/icon_heart");
+            return true;
+        }
         private void GrantLife()
         {
             JourneyLifeRules.Add(bootstrap.Inventory.State, 1, UtcNow()); bootstrap.Inventory.Save();
@@ -276,7 +284,7 @@ namespace ArrowEscape.UI
         {
             var state = bootstrap.Inventory.State;
             if (JourneyLifeRules.Update(state, UtcNow()) >= JourneyLifeRules.Max || !bootstrap.Inventory.Shop.TrySpendCoins(EconomyConfig.JourneyLifePrice)) return;
-            GrantLife();
+            game.RequestUiFeedback(UiFeedbackCue.Purchase); GrantLife();
         }
         private void SavePlayerName(string name)
         {
@@ -395,6 +403,7 @@ namespace ArrowEscape.UI
             if (bootstrap.TryStartLevel(index)) Machine.StartPlaying();
         }
         private void OnPauseRequested() => Machine.Pause();
+        private void OnHomeRequested() { if (Machine.Current == ScreenState.LevelComplete) Machine.ToMainMenu(); }
         private void OnLevelsRequested()
         {
             // From a Journey level's completion card, "Levels" returns to the Journey map.
@@ -485,7 +494,7 @@ namespace ArrowEscape.UI
             Machine.StateChanged -= OnStateChanged;
             if (input != null) input.RemoveBlocker(screenBlocker);
             if (hud != null)
-            { hud.PauseRequested -= OnPauseRequested; if (hud.CompletePanel != null) hud.CompletePanel.LevelsRequested -= OnLevelsRequested; }
+            { hud.PauseRequested -= OnPauseRequested; if (hud.CompletePanel != null) { hud.CompletePanel.LevelsRequested -= OnLevelsRequested; hud.CompletePanel.HomeRequested -= OnHomeRequested; } }
             if (bootstrap != null) { bootstrap.LevelCompleted -= OnLevelCompleted; bootstrap.ProgressReset -= OnProgressReset; bootstrap.InventoryReset-=BindInventory; }
             if (game != null) game.LevelStarted -= OnLevelStarted;
         }

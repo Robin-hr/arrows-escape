@@ -829,3 +829,11 @@ The board is cleared when no arrows remain.
 - Menu icons are static 3D icons (`art/icon3d.py`, height-field extrusion with bevel lighting) in `Brand/Icons3D` (play, journey, daily, gift, levels, shop, ranking, settings, coin, star, plus, sound). PLAY and JOURNEY share `MainMenuView.PlaySize`.
 - `MenuMusic` (Core, 19.2 s seamless 100 BPM loop) is played by `MenuMusicPlayer` on every menu screen and fades out whenever a board is shown; it follows the Sound setting.
 - Shop slot `Sound`: Classic Chime (free) plus ten tap sounds (Marimba, Kalimba, Music Box, Glass Bell, Synth Pluck, Retro Coin, Bubble Pop, Wood Block, Laser Zap, Space Whoosh; `TapSoundSynth`). The equipped sound (`Inventory.EquippedSoundId`) changes the instrument of the exit/undo melody (`ProceduralAudio.TapInstrument`, pre-generated on equip); the melody notes and hints stay the same. The detail sheet's PLAY SAMPLE plays a six-note phrase.
+
+## Sounds, Journey restart cost, Home on the complete card, frame-only badge (Step 14M)
+- `VictoryMusic` is now a 4.2 s brass fanfare (timpani roll, triplet pickup, high C on a cymbal crash, full chord, sparkle). `GameSounds` adds the sad-trombone `LoseMusic` (cue `SoundCue.Lose`, played when the in-level hearts run out and when a Journey start is refused for lack of lives), the `CashRegister` "ka-ching" (the Purchase cue: shop, boosts, hearts, Journey lives) and the `WrongBuzz` "eh-eh" for blocked moves (replaces the thud).
+- Shop "Premium Sounds": Meme Boom (1000) and Metal Pipe (1200), instruments 11 and 12 of `TapSoundSynth`.
+- Journey: the HUD Restart (like pause Restart, Replay and Next) spends one of the five Journey lives and shows a "-1 JOURNEY LIFE" toast.
+- Level-complete card has a HOME button (`LevelCompletePanel.HomeButton` -> `HomeRequested` -> main menu).
+- `AvatarPulse` only sways/breathes premium frames: no ring light, glow or sparkles, and avatars never animate.
+- Home: Daily Puzzle is teal glass, Daily Rewards blue glass; shop icon is a 3D trolley, Journey icon a hill with a winding road and flag; the "+" sparkles were removed from `home_base.png`.

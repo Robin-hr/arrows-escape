@@ -145,7 +145,8 @@ namespace ArrowEscape.UI
             if (game.UndoCount != before) { wallet.TryUseBoost(BoostKind.Undo); bootstrap.Inventory.Save(); }
             RefreshBoosts();
         }
-        private void Restart() => game.RestartLevel();
+        // Journey restarts cost one of the five Journey lives (Step 14M), like Replay and Next.
+        private void Restart() { if (BeforeNewAttempt != null && !BeforeNewAttempt()) return; game.RestartLevel(); }
         private void Hint()
         {
             if (game == null) return;
@@ -159,7 +160,7 @@ namespace ArrowEscape.UI
         public void OpenOffer(BoostKind kind)
         {
             var wallet = Wallet; if (wallet == null || Offer == null) return;
-            Offer.Show(kind, wallet.Inventory.Coins, () => WatchAdFor(kind), () => { if (wallet.TryBuyBoost(kind)) { bootstrap.Inventory.Save(); RefreshBoosts(); } });
+            Offer.Show(kind, wallet.Inventory.Coins, () => WatchAdFor(kind), () => { if (wallet.TryBuyBoost(kind)) { game.RequestUiFeedback(UiFeedbackCue.Purchase); bootstrap.Inventory.Save(); RefreshBoosts(); } });
         }
         private void WatchAdFor(BoostKind kind)
         {

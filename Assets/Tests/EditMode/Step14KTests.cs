@@ -109,12 +109,13 @@ namespace ArrowEscape.Tests
                 string avatar = ShopCatalog.Items.First(i => i.Slot == ShopSlot.Avatar && i.Category == "Premium").Id;
                 string frame = ShopCatalog.Items.First(i => i.Slot == ShopSlot.Frame && i.Category == "Mythic Frames").Id;
                 inv.TryBuy(avatar); inv.TryEquip(avatar);
-                pulse.Tick(0.3f); Assert.That(pulse.AvatarAnimated, Is.True); Assert.That(pulse.FrameAnimated, Is.False);
+                pulse.Tick(0.3f); Assert.That(pulse.AvatarAnimated, Is.False, "only frames animate (Step 14M)"); Assert.That(pulse.FrameAnimated, Is.False);
+                Assert.That(flow.MainMenu.Avatar.transform.Find("PulseRing"), Is.Null, "no ring light");
                 inv.TryBuy(frame); inv.TryEquip(frame);
                 pulse.Tick(0.3f); var before = flow.MainMenu.Avatar.FrameImage.rectTransform.localScale; pulse.Tick(0.3f);
                 Assert.That(pulse.FrameAnimated, Is.True); Assert.That(flow.MainMenu.Avatar.FrameImage.rectTransform.localScale, Is.Not.EqualTo(before));
                 flow.OpenProfile(); var profilePulse = flow.Profile.Avatar.GetComponent<AvatarPulse>();
-                Assert.That(profilePulse, Is.Not.Null); profilePulse.Tick(0.2f); Assert.That(profilePulse.AvatarAnimated && profilePulse.FrameAnimated, Is.True);
+                Assert.That(profilePulse, Is.Not.Null); profilePulse.Tick(0.2f); Assert.That(profilePulse.FrameAnimated, Is.True);
                 Assert.That(flow.Journey.Avatar.GetComponent<AvatarPulse>(), Is.Not.Null);
                 Assert.That(flow.Ranking.MeRow.Avatar.GetComponent<AvatarPulse>(), Is.Not.Null);
             }

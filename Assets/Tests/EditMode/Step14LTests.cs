@@ -87,13 +87,13 @@ namespace ArrowEscape.Tests
         [Test] public void ShopTapSounds()
         {
             var sounds = ShopCatalog.Items.Where(i => i.Slot == ShopSlot.Sound).ToArray();
-            Assert.That(sounds.Length, Is.EqualTo(11)); Assert.That(sounds.Count(i => i.Price > 0), Is.EqualTo(10));
-            Assert.That(sounds.Select(i => i.Name).Distinct().Count(), Is.EqualTo(11));
+            Assert.That(sounds.Length, Is.EqualTo(13)); Assert.That(sounds.Count(i => i.Price > 0), Is.EqualTo(12));
+            Assert.That(sounds.Select(i => i.Name).Distinct().Count(), Is.EqualTo(13));
             Assert.That(sounds.Select(i => i.Id), Is.EqualTo(TapSoundSynth.Ids));
             using (var scene = new EconomyTestScene(withUi: true))
             {
                 var flow = scene.Flow; flow.OpenShop(); flow.Shop.SoundsButton.onClick.Invoke();
-                Assert.That(flow.Shop.Cards.Count, Is.EqualTo(11)); Assert.That(flow.Shop.Cards.All(c => c.IsSound && c.Preview.texture != null), Is.True);
+                Assert.That(flow.Shop.Cards.Count, Is.EqualTo(13)); Assert.That(flow.Shop.Cards.All(c => c.IsSound && c.Preview.texture != null), Is.True);
                 Assert.That(scene.Bootstrap.Inventory.State.EquippedSoundId, Is.EqualTo(TapSoundSynth.DefaultId));
                 scene.Bootstrap.Inventory.Shop.AddCoins(1000);
                 Assert.That(scene.Bootstrap.Inventory.TryBuy("sound_kalimba"), Is.True); Assert.That(scene.Bootstrap.Inventory.TryEquip("sound_kalimba"), Is.True);

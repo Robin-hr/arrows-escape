@@ -30,7 +30,9 @@ namespace ArrowEscape.Tests
         /// <summary>Thud and jingle match the pure generated data, including lead silence.</summary>
         [Test] public void OtherClips()
         {
-            Check(audio.GetClip(SoundPlanner.ForBlocked()),SynthMath.RenderThud(SoundDesign.ThudSeconds,SoundDesign.SampleRate));
+            Check(audio.GetClip(SoundPlanner.ForBlocked()),GameSounds.WrongBuzz(SoundDesign.SampleRate));
+            Check(audio.GetClip(SoundPlanner.ForLose()),GameSounds.LoseMusic(SoundDesign.SampleRate));
+            Check(audio.GetClip(SoundPlanner.ForUi(UiFeedbackCue.Purchase)),GameSounds.CashRegister(SoundDesign.SampleRate));
             Check(audio.GetClip(SoundPlanner.ForLevelComplete()),VictoryMusic.Render(SoundDesign.SampleRate));
         }
         /// <summary>Tonal cues share cached clips and clamp steps.</summary>

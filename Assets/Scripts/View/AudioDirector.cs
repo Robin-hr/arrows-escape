@@ -85,6 +85,8 @@ namespace ArrowEscape.View
         private bool PlayerExists() => player != null && (!(player is Object unityObject) || unityObject != null);
         private void Play(SoundEvent sound) { if (SoundOn && PlayerExists()) player.Play(sound); }
         private void Stop() { testingScale = false; if (PlayerExists()) player.StopAll(); }
+        /// <summary>Sad trombone when the hearts run out (Step 14M).</summary>
+        public void PlayLose() => Play(SoundPlanner.ForLose());
         /// <summary>Plays economic UI through the same setting gate and six voices.</summary>
         public void PlayUi(UiFeedbackCue cue)=>Play(SoundPlanner.ForUi(cue));
         /// <summary>Quiet skin texture under the original signature cue; pause and live sound setting are respected.</summary>

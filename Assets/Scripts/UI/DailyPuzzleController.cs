@@ -82,7 +82,11 @@ namespace ArrowEscape.UI
             if (count < lastMistakes) { lastMistakes = count; return; }
             if (count > lastMistakes) Hearts = Math.Max(0, Hearts - (count - lastMistakes));
             lastMistakes = count; hud.Hud.SetHearts(Hearts);
-            if (Hearts <= 0 && !game.IsCleared) Fail.Show(bootstrap.Inventory.State.Coins);
+            if (Hearts <= 0 && !game.IsCleared)
+            {
+                Fail.Show(bootstrap.Inventory.State.Coins);
+                var audio = game.GetComponent<AudioDirector>(); if (audio != null) audio.PlayLose();   // sad trombone (Step 14M)
+            }
         }
 
         /// <summary>Starts the puzzle again with full hearts.</summary>
@@ -96,6 +100,7 @@ namespace ArrowEscape.UI
         public void BuyHeart()
         {
             if (!bootstrap.Inventory.Shop.TrySpendCoins(EconomyConfig.HeartPrice)) return;
+            game.RequestUiFeedback(UiFeedbackCue.Purchase);
             bootstrap.Inventory.Save(); Hearts = 1; hud.Hud.SetHearts(Hearts); Fail.Hide();
         }
 

@@ -79,6 +79,8 @@ namespace ArrowEscape.Core
             new ShopItem("sound_woodblock","Wood Block","A hollow knock, crisp and percussive.",ShopSlot.Sound,"Tap Sounds",500,"#D8A070","#603818",true),
             new ShopItem("sound_laserzap","Laser Zap","Sci-fi zaps that dive down to the note.",ShopSlot.Sound,"Tap Sounds",550,"#FF5FD2","#6A1060",true),
             new ShopItem("sound_spacewhoosh","Space Whoosh","Airy cosmic swooshes with a rising tone.",ShopSlot.Sound,"Tap Sounds",600,"#6FA8FF","#141E5A",true),
+            new ShopItem("sound_memeboom","Meme Boom","The viral deep BOOM on every arrow. Dramatic!",ShopSlot.Sound,"Premium Sounds",1000,"#FF4F4F","#3A0A0A",true),
+            new ShopItem("sound_pipeclang","Metal Pipe","CLANG! A steel pipe hits the floor with every move.",ShopSlot.Sound,"Premium Sounds",1200,"#C8D2E0","#2A3240",true),
         });
         /// <summary>Stable display order including the four free defaults.</summary>
         public static IReadOnlyList<ShopItem> Items => items;

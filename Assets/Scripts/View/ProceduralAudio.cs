@@ -9,7 +9,7 @@ namespace ArrowEscape.View
     {
         private readonly AudioClip[] notes = new AudioClip[MusicScale.NoteCount(SoundDesign.OctaveCount)];
         private readonly bool[] unavailable = new bool[MusicScale.NoteCount(SoundDesign.OctaveCount) + 3];
-        private AudioClip thud, jingle,slide;
+        private AudioClip thud, jingle,slide,lose;
         private readonly AudioClip[] skinClips=new AudioClip[20];
         private readonly bool[] skinUnavailable=new bool[20];
         private readonly AudioClip[] uiClips=new AudioClip[3];
@@ -33,7 +33,7 @@ namespace ArrowEscape.View
                     case SoundCue.Coin: case SoundCue.Purchase: case SoundCue.Button:
                         int ui=(int)sound.Cue-(int)SoundCue.Coin;
                         if(uiUnavailable[ui])return null;
-                        if(uiClips[ui]==null)uiClips[ui]=Create("UI "+ui,ui==2?SynthMath.RenderThud(.04f,SoundDesign.SampleRate):
+                        if(uiClips[ui]==null)uiClips[ui]=Create("UI "+ui,ui==2?SynthMath.RenderThud(.04f,SoundDesign.SampleRate):ui==1?GameSounds.CashRegister(SoundDesign.SampleRate):
                             SynthMath.RenderNote(MusicScale.FrequencyHz(ui==0?8:10,SoundDesign.RootHz),ui==0?.18f:.3f,SoundDesign.SampleRate));
                         uiUnavailable[ui]=uiClips[ui]==null;return uiClips[ui];
                     case SoundCue.Star:
@@ -64,9 +64,12 @@ namespace ArrowEscape.View
                         return notes[step];
                     case SoundCue.Blocked:
                         if (unavailable[notes.Length]) return null;
-                        if (thud == null) thud = Create("Blocked", SynthMath.RenderThud(SoundDesign.ThudSeconds, SoundDesign.SampleRate));
+                        if (thud == null) thud = Create("Blocked", GameSounds.WrongBuzz(SoundDesign.SampleRate));
                         unavailable[notes.Length] = thud == null;
                         return thud;
+                    case SoundCue.Lose:
+                        if (lose == null) lose = Create("Lose", GameSounds.LoseMusic(SoundDesign.SampleRate));
+                        return lose;
                     case SoundCue.LevelComplete:
                         if (unavailable[notes.Length + 1]) return null;
                         if (jingle == null) jingle = Create("Victory fanfare", VictoryMusic.Render(SoundDesign.SampleRate));
@@ -85,6 +88,7 @@ namespace ArrowEscape.View
             GetClip(SoundPlanner.ForBlocked());
             GetClip(SoundPlanner.ForLevelComplete());
             GetClip(SoundPlanner.ForSlide());
+            GetClip(SoundPlanner.ForLose());
             for (int i = 0; i < 3; i++) {GetClip(SoundPlanner.ForStar(i));GetClip(SoundPlanner.ForUi((UiFeedbackCue)i));}
         }
         private static AudioClip Create(string name, float[] samples)
@@ -110,7 +114,7 @@ namespace ArrowEscape.View
             for(int i=0;i<skinClips.Length;i++){DestroyClip(skinClips[i]);skinClips[i]=null;skinUnavailable[i]=false;}
             Array.Clear(unavailable, 0, unavailable.Length);
             DestroyClip(thud); DestroyClip(jingle); thud = null; jingle = null;
-            DestroyClip(slide);slide=null;
+            DestroyClip(slide);slide=null;DestroyClip(lose);lose=null;
             for (int a = 0; a < tapNotes.GetLength(0); a++) for (int b = 0; b < tapNotes.GetLength(1); b++) { DestroyClip(tapNotes[a, b]); tapNotes[a, b] = null; }
         }
         /// <summary>Generates every note of a tap instrument ahead of play (equip time), so taps never synthesise.</summary>

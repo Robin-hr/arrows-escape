@@ -122,14 +122,14 @@ namespace ArrowEscape.UI
             BrandArt.Text("Label", PlayButton.transform, "PLAY", 72, new Vector2(440, 90), new Vector2(50, 32), Color.white);
             PlayLevelText = BrandArt.Text("LevelLabel", PlayButton.transform, "LEVEL 1", 30, new Vector2(440, 44), new Vector2(50, -26), new Color32(230, 247, 255, 255));
 
-            DailyButton = GlassButton("Daily", column, GlassKit.Kind.Tile, GlassKit.Orange, new Vector2(430, 140), new Vector2(-222, 95));
+            DailyButton = GlassButton("Daily", column, GlassKit.Kind.Tile, GlassKit.Teal, new Vector2(430, 140), new Vector2(-222, 95));
             BrandArt.Image("Icon", DailyButton.transform, "Icons3D/i3_daily", new Vector2(96, 96), new Vector2(-150, 8));
             BrandArt.Text("Label", DailyButton.transform, "DAILY", 32, new Vector2(170, 44), new Vector2(-30, 22), Color.white);
             BrandArt.Text("Sub", DailyButton.transform, "PUZZLE", 20, new Vector2(170, 30), new Vector2(-30, -16), SubText);
             dailyFire = BrandArt.Image("Fire", DailyButton.transform, "Daily/icon_fire_dim", new Vector2(64, 64), new Vector2(110, 10));
             StreakText = BrandArt.Text("Streak", DailyButton.transform, "0", 30, new Vector2(80, 44), new Vector2(165, 6), Color.white);
             dailyCheck = BrandArt.Image("Solved", DailyButton.transform, "icon_check", new Vector2(56, 56), new Vector2(190, 48)); dailyCheck.gameObject.SetActive(false);
-            RewardsButton = GlassButton("Rewards", column, GlassKit.Kind.Tile, GlassKit.Rose, new Vector2(430, 140), new Vector2(222, 95));
+            RewardsButton = GlassButton("Rewards", column, GlassKit.Kind.Tile, GlassKit.Blue, new Vector2(430, 140), new Vector2(222, 95));
             BrandArt.Image("Icon", RewardsButton.transform, "Icons3D/i3_gift", new Vector2(96, 96), new Vector2(-150, 8));
             BrandArt.Text("Label", RewardsButton.transform, "DAILY", 32, new Vector2(200, 44), new Vector2(10, 22), Color.white);
             BrandArt.Text("Sub", RewardsButton.transform, "REWARDS", 20, new Vector2(200, 30), new Vector2(10, -16), SubText);

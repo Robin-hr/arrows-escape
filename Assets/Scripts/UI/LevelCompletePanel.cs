@@ -124,6 +124,10 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Button LevelsButton { get; private set; }
         /// <summary>Raised when level selection is requested from a visible completion.</summary>
         public event System.Action LevelsRequested;
+        /// <summary>Back to the home page (Step 14M).</summary>
+        public UnityEngine.UI.Button HomeButton { get; private set; }
+        /// <summary>Raised by <see cref="HomeButton"/> while the card is visible.</summary>
+        public event System.Action HomeRequested;
         /// <summary>Builds the initially hidden overlay once.</summary>
         public void Build(RectTransform canvas, RectTransform safe)
         {
@@ -166,6 +170,9 @@ namespace ArrowEscape.UI
             NeonKit.WithIcon(ReplayButton, "icon_restart", 50); NeonKit.WithIcon(NextButton, "icon_next", 50); NeonKit.WithIcon(LevelsButton, "icon_levels", 54);
             FlawlessText.color = new Color32(125, 255, 176, 255); BestNoticeText.color = new Color32(255, 214, 92, 255);
             LevelsButton.onClick.AddListener(() => { if (IsVisible) LevelsRequested?.Invoke(); });
+            HomeButton = UiFactory.Button("Home", card, new Vector2(0, -475));
+            ((RectTransform)HomeButton.transform).sizeDelta = new Vector2(360, 110); NeonKit.WithIcon(HomeButton, "icon_home", 52);
+            HomeButton.onClick.AddListener(() => { if (IsVisible) HomeRequested?.Invoke(); });
             BestText.gameObject.SetActive(false);
             BestNoticeText.gameObject.SetActive(false);
             AllCompleteText.gameObject.SetActive(false);

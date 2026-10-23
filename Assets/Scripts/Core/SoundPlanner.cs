@@ -30,7 +30,7 @@ namespace ArrowEscape.Core
         public const float PreviewVolume = 0.5f;
         /// <summary>Soft presentation cues using cached procedural clips.</summary>
         public static SoundEvent ForUi(UiFeedbackCue cue)=>cue==UiFeedbackCue.Coin ? new SoundEvent(SoundCue.Coin,8,.28f) :
-            cue==UiFeedbackCue.Purchase ? new SoundEvent(SoundCue.Purchase,10,.4f) : new SoundEvent(SoundCue.Button,-1,.12f);
+            cue==UiFeedbackCue.Purchase ? new SoundEvent(SoundCue.Purchase,10,.6f) : new SoundEvent(SoundCue.Button,-1,.12f);
         private static int Step(int value) => MusicScale.PingPongIndex(value, MusicScale.NoteCount(SoundDesign.OctaveCount));
         /// <summary>Plans the note for an exit using the updated move count.</summary>
         public static SoundEvent ForExit(int moveCount) => new SoundEvent(SoundCue.Exit, Step(Math.Max(moveCount, 1) - 1), ExitVolume);
@@ -38,6 +38,8 @@ namespace ArrowEscape.Core
         public static SoundEvent ForUndo(int moveCountAfterUndo) => new SoundEvent(SoundCue.Undo, Step(Math.Max(moveCountAfterUndo, 0)), UndoVolume);
         /// <summary>Plans a low thud.</summary>
         public static SoundEvent ForBlocked() => new SoundEvent(SoundCue.Blocked, -1, BlockedVolume);
+        /// <summary>Plans the sad trombone played when the hearts run out (Step 14M).</summary>
+        public static SoundEvent ForLose() => new SoundEvent(SoundCue.Lose, -1, 0.7f);
         /// <summary>Plans a soft high chime.</summary>
         public static SoundEvent ForHint() => new SoundEvent(SoundCue.Hint, SoundDesign.HintScaleStep, HintVolume);
         /// <summary>Plans the pre-rendered completion arpeggio.</summary>

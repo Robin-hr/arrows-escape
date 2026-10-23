@@ -20,7 +20,8 @@ namespace ArrowEscape.UI
 
         /// <summary>Element colours.</summary>
         public static readonly Color Cyan = new Color32(56, 214, 255, 255), Pink = new Color32(255, 92, 206, 255), Gold = new Color32(255, 196, 64, 255),
-            Violet = new Color32(150, 112, 255, 255), Orange = new Color32(255, 136, 56, 255), Rose = new Color32(255, 88, 132, 255), Green = new Color32(52, 226, 148, 255);
+            Violet = new Color32(150, 112, 255, 255), Orange = new Color32(255, 136, 56, 255), Rose = new Color32(255, 88, 132, 255), Green = new Color32(52, 226, 148, 255),
+            Teal = new Color32(0, 205, 190, 255), Blue = new Color32(56, 120, 255, 255);
 
         /// <summary>Turns <paramref name="image"/> into tinted 3D glass and adds (or reuses) its gloss layer.</summary>
         public static UnityEngine.UI.Image Apply(UnityEngine.UI.Image image, Kind kind, Color tint)

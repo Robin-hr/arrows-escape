@@ -14,6 +14,7 @@ namespace ArrowEscape.Core
         {
             "sound_classic", "sound_marimba", "sound_kalimba", "sound_musicbox", "sound_glassbell", "sound_synthpluck",
             "sound_retrocoin", "sound_bubblepop", "sound_woodblock", "sound_laserzap", "sound_spacewhoosh",
+            "sound_memeboom", "sound_pipeclang",
         };
 
         /// <summary>Number of instruments, including Classic.</summary>
@@ -29,7 +30,7 @@ namespace ArrowEscape.Core
         public static float[] Render(int instrument, float hz, int rate)
         {
             if (instrument <= 0) return SynthMath.RenderNote(hz, SoundDesign.NoteSeconds, rate);
-            float seconds = instrument == 4 ? 1.1f : instrument == 10 ? 0.7f : instrument == 9 ? 0.32f : 0.5f;
+            float seconds = instrument == 4 ? 1.1f : instrument == 10 ? 0.7f : instrument == 9 ? 0.32f : instrument == 11 ? 1.2f : instrument == 12 ? 1.3f : 0.5f;
             int n = (int)(seconds * rate); var s = new float[n];
             uint noise = 22222u + (uint)instrument * 977u;
             float Noise() { noise ^= noise << 13; noise ^= noise >> 17; noise ^= noise << 5; return (noise & 0xFFFF) / 32768f - 1f; }
@@ -84,6 +85,22 @@ namespace ArrowEscape.Core
                         v = (float)((2 * (phase % 1) - 1) * 0.55 * Math.Exp(-t * 9));
                         break;
                     }
+                    case 11: // meme boom: the viral deep "boom" - a sub-bass drop with a punchy click and a long rumble
+                    {
+                        double f = Math.Max(30, hz / 4) * (1 + 1.4 * Math.Exp(-t * 22)); phase += f / rate;
+                        lp += 0.02f * (Noise() - lp);
+                        v = (float)(Math.Sin(2 * Math.PI * phase) * Math.Exp(-t * 2.2) + 0.35 * Math.Tanh(3 * Math.Sin(2 * Math.PI * phase * 2)) * Math.Exp(-t * 6)
+                            + Noise() * Math.Exp(-t * 120) * 0.6 + lp * 3 * Math.Exp(-t * 3));
+                        break;
+                    }
+                    case 12: // metal pipe: the meme "clang" - a hard hit on a ringing steel pipe
+                    {
+                        double b = hz * 1.5;
+                        v = (float)((Math.Sin(2 * Math.PI * b * t) * Math.Exp(-t * 2.5) + 0.8 * Math.Sin(2 * Math.PI * b * 2.32 * t) * Math.Exp(-t * 3.2)
+                            + 0.6 * Math.Sin(2 * Math.PI * b * 4.25 * t) * Math.Exp(-t * 4.5) + 0.45 * Math.Sin(2 * Math.PI * b * 6.63 * t) * Math.Exp(-t * 6)
+                            + 0.3 * Math.Sin(2 * Math.PI * b * 8.9 * t) * Math.Exp(-t * 9)) * (1 + 0.15 * Math.Sin(2 * Math.PI * 7 * t)) + Noise() * Math.Exp(-t * 70) * 1.2);
+                        break;
+                    }
                     default: // 10 space whoosh: airy noise swell under a soft rising tone
                     {
                         lp += 0.08f * (Noise() - lp);
@@ -95,7 +112,7 @@ namespace ArrowEscape.Core
                 s[i] = v;
             }
             float peak = 0; for (int i = 0; i < n; i++) peak = Math.Max(peak, Math.Abs(s[i]));
-            float target = instrument == 6 ? 0.5f : instrument == 9 ? 0.55f : instrument == 10 ? 0.7f : 0.8f;
+            float target = instrument == 6 ? 0.5f : instrument == 9 ? 0.55f : instrument == 10 ? 0.7f : instrument == 12 ? 0.7f : 0.8f;
             if (peak > 1e-6f) { float g = target / peak; for (int i = 0; i < n; i++) s[i] *= g; }
             // short fade-out so no click at the end
             int fade = Math.Min(n, rate / 100); for (int i = 0; i < fade; i++) s[n - 1 - i] *= i / (float)fade;
