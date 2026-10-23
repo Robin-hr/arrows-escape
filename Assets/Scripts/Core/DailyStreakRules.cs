@@ -7,6 +7,9 @@ namespace ArrowEscape.Core
     {
         /// <summary>Badge thresholds: 100, 200 … 1,000 days.</summary>
         public static readonly int[] Badges = { 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000 };
+        private static readonly string[] badgeNames = { "ROOKIE", "APPRENTICE", "SKILLED", "PRO", "EXPERT", "VETERAN", "MASTER", "CHAMPION", "LEGEND", "ELITE" };
+        /// <summary>Rank name of a streak badge, from Rookie (100 days) to Elite (1,000 days).</summary>
+        public static string BadgeName(int days) { int i = System.Array.IndexOf(Badges, days); return i < 0 ? "" : badgeNames[i]; }
 
         /// <summary>Streak still alive today (solved today or yesterday), otherwise 0.</summary>
         public static int CurrentStreak(Inventory inventory, int todayKey)

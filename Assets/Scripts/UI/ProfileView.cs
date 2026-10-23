@@ -92,9 +92,9 @@ namespace ArrowEscape.UI
             NeonKit.Icon("EditBadge", AvatarButton.transform, "icon_plus", 56, new Vector2(84, -84));
             AvatarButton.onClick.AddListener(() => onAvatar?.Invoke());
             AvatarPulse.Attach(Avatar);
-            NameText = BrandArt.NameText("PlayerName", column, 60, new Vector2(700, 80), new Vector2(-30, 458));
+            NameText = BrandArt.NameText("PlayerName", column, 56, new Vector2(560, 80), new Vector2(0, 458));
             NameText.text = PlayerNameRules.DefaultName;
-            var editImage = BrandArt.Image("EditName", column, "ui_pill", new Vector2(96, 96), new Vector2(330, 458), PillBorder);
+            var editImage = BrandArt.Image("EditName", column, "ui_pill", new Vector2(88, 88), new Vector2(370, 458), PillBorder);
             editImage.raycastTarget = true; if (editImage.sprite == null) editImage.color = new Color(0.16f, 0.11f, 0.48f, 0.95f);
             EditNameButton = editImage.gameObject.AddComponent<UnityEngine.UI.Button>(); EditNameButton.targetGraphic = editImage; editImage.gameObject.AddComponent<ButtonFeel>();
             NeonKit.Icon("Icon", editImage.transform, "icon_edit", 54, Vector2.zero);

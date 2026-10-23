@@ -34,6 +34,8 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Button ArrowsButton { get; private set; }
         /// <summary>Theme tab.</summary>
         public UnityEngine.UI.Button ThemesButton { get; private set; }
+        /// <summary>Tap sounds tab (Step 14L).</summary>
+        public UnityEngine.UI.Button SoundsButton { get; private set; }
         /// <summary>Avatar tab.</summary>
         public UnityEngine.UI.Button AvatarsButton { get; private set; }
         /// <summary>Avatar frame tab.</summary>
@@ -71,7 +73,8 @@ namespace ArrowEscape.UI
             for(int i=0;i<header.childCount;i++){var child=(RectTransform)header.GetChild(i);child.anchorMin=child.anchorMax=new Vector2(.5f,1);}
             var tabs=UiFactory.Rect("Tabs",safe,new Vector2(960,110),Vector2.zero);tabs.anchorMin=tabs.anchorMax=tabs.pivot=new Vector2(.5f,1);tabs.anchoredPosition=new Vector2(0,-182);
             tabs.gameObject.AddComponent<MenuFit>().Configure(tabs,safe,new Vector2(1000,120));
-            ArrowsButton=MakeTab(tabs,"Arrows","icon_arrow",-360);ThemesButton=MakeTab(tabs,"Themes","icon_theme",-120);AvatarsButton=MakeTab(tabs,"Avatars","icon_avatar",120);FramesButton=MakeTab(tabs,"Frames","icon_frame",360);
+            ArrowsButton=MakeTab(tabs,"Arrows","icon_arrow",-384);ThemesButton=MakeTab(tabs,"Themes","icon_theme",-192);AvatarsButton=MakeTab(tabs,"Avatars","icon_avatar",0);FramesButton=MakeTab(tabs,"Frames","icon_frame",192);SoundsButton=MakeTab(tabs,"Sounds","Icons3D/i3_sound",384);
+            SoundsButton.onClick.AddListener(()=>ShowTab(ShopSlot.Sound));
             ArrowsButton.onClick.AddListener(ShowArrows);ThemesButton.onClick.AddListener(ShowThemes);AvatarsButton.onClick.AddListener(()=>ShowTab(ShopSlot.Avatar));FramesButton.onClick.AddListener(()=>ShowTab(ShopSlot.Frame));
             scroll=BuildScroll(safe);
             Detail=gameObject.AddComponent<ShopDetailSheet>();Detail.Build(parent,confirm,game);Detail.Changed+=Refresh;
@@ -79,14 +82,16 @@ namespace ArrowEscape.UI
         }
         private static UnityEngine.UI.Button MakeTab(Transform parent,string label,string icon,float x)
         {
-            var button=UiFactory.Button(label,parent,new Vector2(x,0));((RectTransform)button.transform).sizeDelta=new Vector2(232,104);
-            NeonKit.WithIcon(button,icon,46);var text=button.GetComponentInChildren<UnityEngine.UI.Text>();text.resizeTextMaxSize=28;
+            var button=UiFactory.Button(label,parent,new Vector2(x,0));((RectTransform)button.transform).sizeDelta=new Vector2(186,104);
+            NeonKit.WithIcon(button,icon,40);var text=button.GetComponentInChildren<UnityEngine.UI.Text>();text.resizeTextMaxSize=24;text.resizeTextMinSize=14;
+            var r=text.rectTransform;r.offsetMin=new Vector2(64,8);r.offsetMax=new Vector2(-10,-8);
             return button;
         }
         private void SetTabLooks()
         {
             NeonKit.Style(ArrowsButton,tab==ShopSlot.Arrow?NeonButtonStyle.Primary:NeonButtonStyle.Normal);NeonKit.Style(ThemesButton,tab==ShopSlot.Theme?NeonButtonStyle.Primary:NeonButtonStyle.Normal);
             NeonKit.Style(AvatarsButton,tab==ShopSlot.Avatar?NeonButtonStyle.Primary:NeonButtonStyle.Normal);NeonKit.Style(FramesButton,tab==ShopSlot.Frame?NeonButtonStyle.Primary:NeonButtonStyle.Normal);
+            NeonKit.Style(SoundsButton,tab==ShopSlot.Sound?NeonButtonStyle.Primary:NeonButtonStyle.Normal);
         }
         private static UnityEngine.UI.ScrollRect BuildScroll(RectTransform safe)
         {
@@ -170,12 +175,12 @@ namespace ArrowEscape.UI
             for(int n=0;n<elementalCards.Length;n++)if(elementalCards[n]!=null){DestroyImmediate(elementalCards[n].gameObject);elementalCards[n]=null;}
             for(int n=0;n<themeCards.Length;n++)if(themeCards[n]!=null){DestroyImmediate(themeCards[n].gameObject);themeCards[n]=null;}
             Detail.Hide();Root.gameObject.SetActive(false);renderer?.Dispose();renderer=null;
-            for(int i=0;i<cards.Count;i++)if(!cards[i].IsPortrait)cards[i].Preview.texture=null;Closed?.Invoke();
+            for(int i=0;i<cards.Count;i++)if(!cards[i].IsStaticArt)cards[i].Preview.texture=null;Closed?.Invoke();
         }
         private void UpdateLayout()
         {
             Vector2 size=scroll.viewport.rect.size;if(size==lastSize||size.x<=0)return;lastSize=size;
-            int columns=(size.x<1300?2:size.x<1900?3:4)+(tab==ShopSlot.Avatar||tab==ShopSlot.Frame?1:0);float width=(size.x-(columns-1)*24)/columns;
+            int columns=(size.x<1300?2:size.x<1900?3:4)+(tab==ShopSlot.Avatar||tab==ShopSlot.Frame||tab==ShopSlot.Sound?1:0);float width=(size.x-(columns-1)*24)/columns;
             for(int i=0;i<sections.Count;i++){grids[i].constraintCount=columns;grids[i].cellSize=new Vector2(width,360);sections[i].sizeDelta=new Vector2(0,80+((sectionCounts[i]+columns-1)/columns)*384);}
         }
         /// <summary>Processes only visible preview requests, capped at two renders per frame.</summary>
@@ -185,7 +190,7 @@ namespace ArrowEscape.UI
             scroll.viewport.GetWorldCorners(viewportCorners);
             for(int i=0;i<cards.Count;i++)
             {
-                if(cards[i].IsPortrait)continue;
+                if(cards[i].IsStaticArt)continue;
                 cards[i].Rect.GetWorldCorners(corners);
                 int themeIndex=ThemeDesign.Index(cards[i].Item.Id);if(themeIndex>=0){bool shown=corners[2].y>=viewportCorners[0].y&&corners[0].y<=viewportCorners[2].y;themeCards[themeIndex].gameObject.SetActive(shown);continue;}
                 if(ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true)
@@ -198,7 +203,7 @@ namespace ArrowEscape.UI
             }
             if(Detail.IsVisible&&!Detail.HasStaticPreview&&ArrowSkinRegistry.Find(Detail.Item.Id)==null)renderer.Request(Detail.Item.Id);
             renderer.Tick();
-            for(int i=0;i<cards.Count;i++){if(cards[i].IsPortrait||ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true||ThemeDesign.Index(cards[i].Item.Id)>=0)continue;var art=skinResources?.Find(cards[i].Item.Id);var texture=ArrowSkinRegistry.Find(cards[i].Item.Id)!=null&&art?.Full!=null?art.Full.texture:renderer.GetCached(cards[i].Item.Id);if(cards[i].Preview.texture!=texture)cards[i].Preview.texture=texture;}
+            for(int i=0;i<cards.Count;i++){if(cards[i].IsStaticArt||ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true||ThemeDesign.Index(cards[i].Item.Id)>=0)continue;var art=skinResources?.Find(cards[i].Item.Id);var texture=ArrowSkinRegistry.Find(cards[i].Item.Id)!=null&&art?.Full!=null?art.Full.texture:renderer.GetCached(cards[i].Item.Id);if(cards[i].Preview.texture!=texture)cards[i].Preview.texture=texture;}
             if(Detail.IsVisible&&!Detail.HasLivePreview&&!Detail.HasStaticPreview)Detail.Preview.texture=renderer.GetCached(Detail.Item.Id);
         }
         private void Update(){if(Application.isPlaying)Tick(Time.unscaledDeltaTime);}

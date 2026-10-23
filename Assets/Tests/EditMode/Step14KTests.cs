@@ -31,15 +31,17 @@ namespace ArrowEscape.Tests
         [Test] public void JourneyCatalogIsTwoHundredHardSilhouettes()
         {
             var paths = LevelRepository.GetJourneyResourcePaths();
-            Assert.That(paths.Count, Is.EqualTo(200));
+            Assert.That(paths.Count, Is.EqualTo(200)); int longest = 0;
             string[] geometric = { "square", "rectangle", "triangle", "circle", "ellipse", "oval", "hexagon", "pentagon", "octagon", "rhombus", "kite_", "trapezium", "parallelogram", "semicircle", "heptagon", "nonagon", "decagon" };
             foreach (string path in paths)
             {
                 var load = LevelRepository.LoadFromResources(path); Assert.That(load.Success, Is.True, path);
                 Assert.That(load.Board.Arrows.Count, Is.InRange(55, 70), path);
                 Assert.That(geometric.Any(g => path.ToLowerInvariant().Contains("_" + g)), Is.False, path);
-                foreach (Arrow a in load.Board.Arrows) Assert.That(a.Length, Is.InRange(4, 10), path);
+                foreach (Arrow a in load.Board.Arrows) Assert.That(a.Length, Is.InRange(4, 16), path);
+                longest = System.Math.Max(longest, load.Board.Arrows.Max(x => x.Length));
             }
+            Assert.That(longest, Is.GreaterThan(10), "Journey arrows reach past the main-level cap (Step 14L)");
             foreach (int i in new[] { 0, 99, 199 }) Assert.That(LevelSolvability.IsSolvable(LevelRepository.LoadFromResources(paths[i]).Board), Is.True, paths[i]);
         }
 

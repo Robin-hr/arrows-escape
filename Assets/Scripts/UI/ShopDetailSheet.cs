@@ -18,7 +18,9 @@ namespace ArrowEscape.UI
         private UnityEngine.UI.AspectRatioFitter previewAspect;
         private AvatarBadge badge;
         /// <summary>Whether the selected item is an avatar or frame shown as static portrait art.</summary>
-        public bool HasStaticPreview=>badge!=null&&badge.gameObject.activeSelf;
+        public bool HasStaticPreview=>badge!=null&&badge.gameObject.activeSelf||Item!=null&&Item.Slot==ShopSlot.Sound;
+        /// <summary>Plays the tap sound's sample melody (sound items only).</summary>
+        public UnityEngine.UI.Button SampleButton { get; private set; }
         /// <summary>Whether the selected item uses the live skin board.</summary>
         public bool HasLivePreview=>live!=null&&live.gameObject.activeSelf||themePreview!=null&&themePreview.gameObject.activeSelf;
         private UnityEngine.UI.Text nameText,category,description,mainLabel;
@@ -55,6 +57,8 @@ namespace ArrowEscape.UI
             flyButton=UiFactory.Button("Watch it fly",card,new Vector2(-185,-310));darkButton=UiFactory.Button("Light / Dark",card,new Vector2(210,-310));
             ((RectTransform)flyButton.transform).sizeDelta=new Vector2(340,85);((RectTransform)darkButton.transform).sizeDelta=new Vector2(340,85);
             flyButton.onClick.AddListener(FlyPreview);darkButton.onClick.AddListener(TogglePreviewDark);
+            SampleButton=UiFactory.Button("PLAY SAMPLE",card,new Vector2(0,-310));((RectTransform)SampleButton.transform).sizeDelta=new Vector2(460,90);NeonKit.WithIcon(SampleButton,"icon_play",54);
+            SampleButton.onClick.AddListener(PlaySample);SampleButton.gameObject.SetActive(false);
             var liveGo=new GameObject("Live shop preview");liveGo.transform.SetParent(transform,false);live=liveGo.AddComponent<LiveSkinPreview>();live.Initialize(controller==null?null:controller.GetComponent<AudioDirector>());liveGo.SetActive(false);
             var themeGo=new GameObject("Live theme detail");themeGo.transform.SetParent(transform,false);themePreview=themeGo.AddComponent<LiveThemePreview>();themePreview.Initialize(new Vector2(39000,39000),640,360);themeGo.SetActive(false);
             MainButton=UiFactory.Button("",card,new Vector2(0,-475),NeonButtonStyle.Primary);((RectTransform)MainButton.transform).sizeDelta=new Vector2(700,128);mainLabel=MainButton.GetComponentInChildren<UnityEngine.UI.Text>();MainButton.onClick.AddListener(OnMain);Hide();
@@ -66,6 +70,8 @@ namespace ArrowEscape.UI
             bool themed=ThemeDesign.Index(item.Id)>=0;themePreview.gameObject.SetActive(themed);if(themed){themePreview.Show(item.Id);themePreview.ShowSample(service.State.EquippedArrowId);Preview.texture=themePreview.Texture;previewAspect.aspectRatio=640f/360;previewNote.gameObject.SetActive(false);}
             category.color=UiStyle.Category(item.Category);
             bool portrait=item.Slot==ShopSlot.Avatar||item.Slot==ShopSlot.Frame;badge.gameObject.SetActive(portrait);Preview.enabled=!portrait;
+            bool sound=item.Slot==ShopSlot.Sound;SampleButton.gameObject.SetActive(sound);
+            if(sound){previewNote.gameObject.SetActive(false);Preview.texture=BrandArt.Texture("Icons3D/i3_sound");previewAspect.aspectRatio=1;PlaySample();}
             if(portrait){previewNote.gameObject.SetActive(false);badge.Set(item.Slot==ShopSlot.Avatar?item.Id:service.State.EquippedAvatarId,item.Slot==ShopSlot.Frame?item.Id:service.State.EquippedFrameId);}
             Root.gameObject.SetActive(true);Root.SetAsLastSibling();Refresh();}
         /// <summary>Reflects exact ownership and affordability state.</summary>
@@ -86,6 +92,10 @@ namespace ArrowEscape.UI
         /// <summary>Closes the sheet before leaving its shop.</summary>
         public void Hide(){if(Root!=null)Root.gameObject.SetActive(false);if(live!=null)live.gameObject.SetActive(false);if(themePreview!=null)themePreview.gameObject.SetActive(false);}
         private void FlyPreview(){if(live!=null)live.Fly();}
+        /// <summary>Plays a short melody with this tap sound (never changes the equipped sound).</summary>
+        public void PlaySample(){if(Item==null||Item.Slot!=ShopSlot.Sound||game==null)return;var director=game.GetComponent<AudioDirector>();if(director!=null)director.PreviewTapSound(TapSoundSynth.IndexOf(Item.Id));}
+        /// <summary>Instrument of the last sample request (tests).</summary>
+        public int LastSample=>game!=null&&game.GetComponent<AudioDirector>()!=null?game.GetComponent<AudioDirector>().PreviewInstrument:-1;
         private void TogglePreviewDark(){if(live!=null)live.SetDark(!live.IsDark);}
     }
 }

@@ -52,7 +52,7 @@ namespace ArrowEscape.View
             IsJourneyLevel=false;sandboxPath=resourcePath;IsSandboxLevel=true;controller.SetLevelInfo(result.LevelName,resourcePath);
             controller.StartLevel(result.Board,result.LevelName);GetComponent<CameraFitter>().Fit(result.Board.Width,result.Board.Height);return true;
         }
-        private void LeaveSandbox(){LeaveDaily();IsJourneyLevel=false;if(!IsSandboxLevel)return;IsSandboxLevel=false;sandboxPath=null;CurrentLevelIndex=-1;}
+        private void LeaveSandbox(){LeaveDaily();if(IsJourneyLevel){var z=GetComponent<BoardZoom>();if(z!=null)z.Forced=false;}IsJourneyLevel=false;if(!IsSandboxLevel)return;IsSandboxLevel=false;sandboxPath=null;CurrentLevelIndex=-1;}
         private Board dailyBoard;
         /// <summary>True while today's daily puzzle is being played (no level progress, streak on clear).</summary>
         public bool IsDailyLevel { get; private set; }
@@ -143,6 +143,8 @@ namespace ArrowEscape.View
             LevelLoadResult result = LevelRepository.LoadFromResources(journeyPaths[index]);
             if (!result.Success) { foreach (string error in result.Errors) Debug.LogError(error, this); return false; }
             IsJourneyLevel = true; CurrentLevelIndex = index;
+            // Journey boards are big (up to 34 x 44 cells): pinch/drag zoom and the HUD zoom buttons are always on.
+            var zoom = GetComponent<BoardZoom>(); if (zoom == null) zoom = gameObject.AddComponent<BoardZoom>(); zoom.Forced = true;
             controller.SetLevelInfo(result.LevelName, journeyPaths[index]);
             controller.StartLevel(result.Board, result.LevelName);
             GetComponent<CameraFitter>().Fit(result.Board.Width, result.Board.Height);
@@ -377,6 +379,7 @@ namespace ArrowEscape.View
             Color background=view.HasDarkTheme?ThemeDesign.Background(view.ThemeId):ViewTheme.Background;
             view.SetNormalArrowColor(Inventory.State.EquippedArrowId=="classic"?ThemeDesign.ClassicInk(view.ThemeId):ArrowTint.For(Inventory.State.EquippedArrowId,background));
             view.SetArrowSkin(Inventory.State.EquippedArrowId,SkinMaterials.IsLight(background));
+            var audio=GetComponent<AudioDirector>();if(audio!=null)audio.SetTapSound(TapSoundSynth.IndexOf(Inventory.State.EquippedSoundId));
         }
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         /// <summary>Development-only grant persisted with the normal inventory store.</summary>

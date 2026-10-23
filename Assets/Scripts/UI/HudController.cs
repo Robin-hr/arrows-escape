@@ -237,6 +237,7 @@ namespace ArrowEscape.UI
             Hud.SetStuckVisible(game.IsStuck);
             bool daily = bootstrap != null && bootstrap.IsDailyLevel;
             if (Hud.IsDaily != daily) Hud.SetDaily(daily);
+            Hud.SetZoomVisible(daily || (bootstrap != null && bootstrap.IsJourneyLevel));
             if (daily) Hud.SetDailyInfo(DailyCalendar.Pretty(bootstrap.DailyKey), game.TapCount);
             else if (bootstrap != null) Hud.SetLevelPosition(bootstrap.IsSandboxLevel?-1:bootstrap.CurrentLevelIndex, bootstrap.IsSandboxLevel?0:bootstrap.ActiveLevelCount, bootstrap.IsJourneyLevel?"Journey":"Level");
             RefreshBoosts();

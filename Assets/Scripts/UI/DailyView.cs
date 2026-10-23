@@ -6,7 +6,7 @@ namespace ArrowEscape.UI
     /// <summary>Daily puzzle page: today's date and status, the fire streak, best streak and the ten streak badges.</summary>
     public sealed class DailyView : MonoBehaviour
     {
-        private static readonly Color Locked = new Color(0.35f, 0.33f, 0.5f, 0.45f);
+        private static readonly Color Locked = new Color(0.62f, 0.6f, 0.78f, 0.82f);
         /// <summary>Screen root.</summary>
         public RectTransform Root { get; private set; }
         /// <summary>True while open.</summary>
@@ -62,7 +62,8 @@ namespace ArrowEscape.UI
             {
                 int row = i / 5, col = i % 5; var pos = new Vector2((col - 2) * 180, -220 - row * 250);
                 Badges[i] = BrandArt.Image("Badge" + DailyStreakRules.Badges[i], column, "Daily/badge_streak_" + DailyStreakRules.Badges[i], new Vector2(160, 160), pos);
-                BrandArt.Text("Days", Badges[i].transform, DailyStreakRules.Badges[i] + " DAYS", 20, new Vector2(170, 34), new Vector2(0, -102), BrandArt.Lavender);
+                BrandArt.Text("Name", Badges[i].transform, DailyStreakRules.BadgeName(DailyStreakRules.Badges[i]), 20, new Vector2(180, 34), new Vector2(0, -100), new Color32(255, 214, 92, 255));
+                BrandArt.Text("Days", Badges[i].transform, DailyStreakRules.Badges[i] + " DAYS", 18, new Vector2(170, 28), new Vector2(0, -128), BrandArt.Lavender);
             }
             Root.gameObject.SetActive(false);
         }

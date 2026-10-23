@@ -57,7 +57,10 @@ namespace ArrowEscape.UI
         /// <summary>Side of the four home tiles.</summary>
         public const float TileSize = 214;
         /// <summary>Vertical position of the four home tiles in the menu column.</summary>
-        public const float TileY = -500;
+        public const float TileY = -548;
+        /// <summary>PLAY and JOURNEY share this size.</summary>
+        public static readonly Vector2 PlaySize = new Vector2(700, 176);
+        private const float PlayY = -128, JourneyY = -330;
         private static readonly Color SubText = new Color32(255, 246, 236, 255);
         /// <summary>Opens the Journey road map (under PLAY).</summary>
         public UnityEngine.UI.Button JourneyButton { get; private set; }
@@ -68,7 +71,7 @@ namespace ArrowEscape.UI
         /// <summary>Shows the profile name.</summary>
         public void SetPlayerName(string name) { if (PlayerNameText != null) PlayerNameText.text = PlayerNameRules.Display(name); }
         /// <summary>Shows the Journey lives left.</summary>
-        public void SetJourneyLives(int lives) { if (JourneyLivesText != null) JourneyLivesText.text = lives.ToString(); }
+        public void SetJourneyLives(int lives) { if (JourneyLivesText != null) JourneyLivesText.text = lives + " / " + JourneyLifeRules.Max; }
         /// <summary>Animation of premium avatars and frames on the profile badge.</summary>
         public AvatarPulse AvatarMotion { get; private set; }
         /// <summary>Profile button in the header.</summary>
@@ -110,37 +113,39 @@ namespace ArrowEscape.UI
             var logoImage = logo.gameObject.AddComponent<UnityEngine.UI.RawImage>(); logoImage.texture = BrandArt.Texture("arrows_escape_logo"); logoImage.raycastTarget = false;
             if (logoImage.texture == null) { logoImage.color = new Color(1, 1, 1, 0); BrandArt.Text("TitleText", logo, "ARROWS ESCAPE", 72, new Vector2(900, 120), Vector2.zero, BrandArt.Cyan); }
 
-            playGlow = BrandArt.Image("PlayGlow", column, "ui_button_primary", new Vector2(820, 228), new Vector2(0, -138), PrimaryBorder);
+            playGlow = BrandArt.Image("PlayGlow", column, "ui_button_primary", new Vector2(PlaySize.x + 60, PlaySize.y + 28), new Vector2(0, PlayY + 2), PrimaryBorder);
             playGlow.color = new Color(0.31f, 0.85f, 1f, 0.35f);
             NeonKit.Isolate(playGlow.gameObject); NeonKit.Isolate(logo.gameObject);
-            PlayButton = NeonButton("Play", column, "ui_button_primary", PrimaryBorder, new Vector2(760, 200), new Vector2(0, -140));
+            PlayButton = NeonButton("Play", column, "ui_button_primary", PrimaryBorder, PlaySize, new Vector2(0, PlayY));
             // The art's lit face sits 11.5 units above the sprite centre (its drop edge is at the bottom); content is centred on the face.
-            BrandArt.Image("PlayIcon", PlayButton.transform, "icon_play", new Vector2(120, 120), new Vector2(-250, 12));
-            BrandArt.Text("Label", PlayButton.transform, "PLAY", 76, new Vector2(440, 90), new Vector2(60, 36), Color.white);
-            PlayLevelText = BrandArt.Text("LevelLabel", PlayButton.transform, "LEVEL 1", 30, new Vector2(440, 44), new Vector2(60, -24), new Color32(230, 247, 255, 255));
+            BrandArt.Image("PlayIcon", PlayButton.transform, "Icons3D/i3_play", new Vector2(124, 124), new Vector2(-240, 10));
+            BrandArt.Text("Label", PlayButton.transform, "PLAY", 72, new Vector2(440, 90), new Vector2(50, 32), Color.white);
+            PlayLevelText = BrandArt.Text("LevelLabel", PlayButton.transform, "LEVEL 1", 30, new Vector2(440, 44), new Vector2(50, -26), new Color32(230, 247, 255, 255));
 
             DailyButton = GlassButton("Daily", column, GlassKit.Kind.Tile, GlassKit.Orange, new Vector2(430, 140), new Vector2(-222, 95));
-            BrandArt.Image("Icon", DailyButton.transform, "Daily/icon_daily", new Vector2(78, 78), new Vector2(-150, 6));
+            BrandArt.Image("Icon", DailyButton.transform, "Icons3D/i3_daily", new Vector2(96, 96), new Vector2(-150, 8));
             BrandArt.Text("Label", DailyButton.transform, "DAILY", 32, new Vector2(170, 44), new Vector2(-30, 22), Color.white);
             BrandArt.Text("Sub", DailyButton.transform, "PUZZLE", 20, new Vector2(170, 30), new Vector2(-30, -16), SubText);
             dailyFire = BrandArt.Image("Fire", DailyButton.transform, "Daily/icon_fire_dim", new Vector2(64, 64), new Vector2(110, 10));
             StreakText = BrandArt.Text("Streak", DailyButton.transform, "0", 30, new Vector2(80, 44), new Vector2(165, 6), Color.white);
             dailyCheck = BrandArt.Image("Solved", DailyButton.transform, "icon_check", new Vector2(56, 56), new Vector2(190, 48)); dailyCheck.gameObject.SetActive(false);
             RewardsButton = GlassButton("Rewards", column, GlassKit.Kind.Tile, GlassKit.Rose, new Vector2(430, 140), new Vector2(222, 95));
-            BrandArt.Image("Icon", RewardsButton.transform, "Daily/icon_gift", new Vector2(80, 80), new Vector2(-150, 6));
+            BrandArt.Image("Icon", RewardsButton.transform, "Icons3D/i3_gift", new Vector2(96, 96), new Vector2(-150, 8));
             BrandArt.Text("Label", RewardsButton.transform, "DAILY", 32, new Vector2(200, 44), new Vector2(10, 22), Color.white);
             BrandArt.Text("Sub", RewardsButton.transform, "REWARDS", 20, new Vector2(200, 30), new Vector2(10, -16), SubText);
             RewardDot = BrandArt.Image("Dot", RewardsButton.transform, "ui_pill", new Vector2(40, 40), new Vector2(190, 48), PillBorder);
             RewardDot.color = new Color32(255, 70, 110, 255); RewardDot.gameObject.SetActive(false);
-            JourneyButton = GlassButton("Journey", column, GlassKit.Kind.Tile, GlassKit.Green, new Vector2(580, 124), new Vector2(0, -318));
-            BrandArt.Image("Icon", JourneyButton.transform, "icon_journey", new Vector2(76, 76), new Vector2(-190, 4));
-            BrandArt.Text("Label", JourneyButton.transform, "JOURNEY", 40, new Vector2(360, 60), new Vector2(10, 4), Color.white);
-            BrandArt.Image("LivesIcon", JourneyButton.transform, "Daily/icon_heart", new Vector2(54, 54), new Vector2(200, 6));
-            JourneyLivesText = BrandArt.Text("Lives", JourneyButton.transform, "5", 30, new Vector2(60, 44), new Vector2(200, 4), Color.white);
-            LevelsButton = Tile("Levels", "LEVELS", "icon_levels", column, -342, GlassKit.Cyan);
-            ShopButton = Tile("Shop", "SHOP", "icon_shop", column, -114, GlassKit.Pink);
-            RankingButton = Tile("Ranking", "RANKING", "icon_ranking", column, 114, GlassKit.Gold);
-            SettingsButton = Tile("Settings", "SETTINGS", "icon_settings", column, 342, GlassKit.Violet);
+            // JOURNEY matches PLAY exactly in size (Step 14L).
+            JourneyButton = GlassButton("Journey", column, GlassKit.Kind.Tile, GlassKit.Green, PlaySize, new Vector2(0, JourneyY));
+            BrandArt.Image("Icon", JourneyButton.transform, "Icons3D/i3_journey", new Vector2(124, 124), new Vector2(-240, 8));
+            BrandArt.Text("Label", JourneyButton.transform, "JOURNEY", 64, new Vector2(440, 90), new Vector2(30, 30), Color.white);
+            BrandArt.Image("LivesIcon", JourneyButton.transform, "Daily/icon_heart", new Vector2(46, 46), new Vector2(-10, -28));
+            JourneyLivesText = BrandArt.Text("Lives", JourneyButton.transform, "5", 30, new Vector2(240, 44), new Vector2(98, -28), Color.white);
+            JourneyLivesText.alignment = TextAnchor.MiddleLeft;
+            LevelsButton = Tile("Levels", "LEVELS", "Icons3D/i3_levels", column, -342, GlassKit.Cyan);
+            ShopButton = Tile("Shop", "SHOP", "Icons3D/i3_shop", column, -114, GlassKit.Pink);
+            RankingButton = Tile("Ranking", "RANKING", "Icons3D/i3_ranking", column, 114, GlassKit.Gold);
+            SettingsButton = Tile("Settings", "SETTINGS", "Icons3D/i3_settings", column, 342, GlassKit.Violet);
 
             CompletedText = UiFactory.Text("Completed", column, "", UiStyle.Caption, new Vector2(700, 64), new Vector2(0, -690)); CompletedText.gameObject.SetActive(false);
             ContinueText = UiFactory.Text("ContinueLevel", column, "", UiStyle.Caption, new Vector2(500, 48), Vector2.zero); ContinueText.gameObject.SetActive(false);
@@ -159,7 +164,7 @@ namespace ArrowEscape.UI
             header.gameObject.AddComponent<MenuFit>().Configure(header, safe, new Vector2(1000, 170));
 
             StarsButton = GlassButton("Stars", header, GlassKit.Kind.Pill, GlassKit.Violet, new Vector2(330, 96), new Vector2(-315, -62));
-            BrandArt.Image("StarIcon", StarsButton.transform, "icon_star", new Vector2(70, 70), new Vector2(-118, 0));
+            BrandArt.Image("StarIcon", StarsButton.transform, "Icons3D/i3_star", new Vector2(80, 80), new Vector2(-118, 2));
             StarsText = BrandArt.Text("TotalStars", StarsButton.transform, "0 / 0", 34, new Vector2(230, 60), new Vector2(35, 0), Color.white);
 
             var profileHit = UiFactory.Rect("Profile", header, new Vector2(140, 140), new Vector2(0, -62)).gameObject.AddComponent<UnityEngine.UI.Image>();
@@ -172,9 +177,9 @@ namespace ArrowEscape.UI
             PlayerNameText.text = PlayerNameRules.DefaultName;
 
             CoinsButton = GlassButton("Coins", header, GlassKit.Kind.Pill, GlassKit.Gold, new Vector2(330, 96), new Vector2(315, -62));
-            BrandArt.Image("CoinIcon", CoinsButton.transform, "icon_coin", new Vector2(66, 66), new Vector2(-118, 0));
+            BrandArt.Image("CoinIcon", CoinsButton.transform, "Icons3D/i3_coin", new Vector2(78, 78), new Vector2(-118, 2));
             CoinsText = BrandArt.Text("CoinsText", CoinsButton.transform, "0", 36, new Vector2(170, 60), new Vector2(10, 0), Color.white);
-            BrandArt.Image("PlusBadge", CoinsButton.transform, "icon_plus", new Vector2(50, 50), new Vector2(128, 0));
+            BrandArt.Image("PlusBadge", CoinsButton.transform, "Icons3D/i3_plus", new Vector2(58, 58), new Vector2(128, 2));
             coins = CoinsButton.gameObject.AddComponent<CoinCounter>(); coins.Bind(CoinsText);
             for (int i = 0; i < header.childCount; i++) { var child = (RectTransform)header.GetChild(i); child.anchorMin = child.anchorMax = new Vector2(0.5f, 1); }
             return header;
@@ -214,7 +219,7 @@ namespace ArrowEscape.UI
             var button = GlassButton(name, parent, GlassKit.Kind.Tile, tint, new Vector2(TileSize, TileSize), new Vector2(x, TileY));
             // Centred on the tile's lit face so icon and label stay inside the frame (scaled from the 250 design).
             const float k = TileSize / 250f;
-            BrandArt.Image("Icon", button.transform, icon, new Vector2(104, 104) * k, new Vector2(0, 34 * k));
+            BrandArt.Image("Icon", button.transform, icon, new Vector2(128, 128) * k, new Vector2(0, 32 * k));
             var text = BrandArt.Text("Label", button.transform, label, 24, new Vector2(196, 40), new Vector2(0, -46 * k), Color.white);
             text.resizeTextForBestFit = true; text.resizeTextMinSize = 16; text.resizeTextMaxSize = 24;
             return button;

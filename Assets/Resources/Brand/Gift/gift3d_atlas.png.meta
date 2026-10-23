@@ -1,0 +1,1588 @@
+fileFormatVersion: 2
+guid: 32ba4100f858c194c9761a41250013f0
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1188979092363993402
+    second: gift3d_atlas_0
+  - first:
+      213: 3056943839759608356
+    second: gift3d_atlas_1
+  - first:
+      213: -8039000868541016005
+    second: gift3d_atlas_2
+  - first:
+      213: 3102680156166482709
+    second: gift3d_atlas_3
+  - first:
+      213: -7401371062039721774
+    second: gift3d_atlas_4
+  - first:
+      213: -4388911280183928556
+    second: gift3d_atlas_5
+  - first:
+      213: -2078791266573277098
+    second: gift3d_atlas_6
+  - first:
+      213: -5882999702675038140
+    second: gift3d_atlas_7
+  - first:
+      213: -1402591287251171146
+    second: gift3d_atlas_8
+  - first:
+      213: 1436997893225303003
+    second: gift3d_atlas_9
+  - first:
+      213: -7365318487597947188
+    second: gift3d_atlas_10
+  - first:
+      213: -2326814846608762097
+    second: gift3d_atlas_11
+  - first:
+      213: 537795306350298415
+    second: gift3d_atlas_12
+  - first:
+      213: -1974543667694395815
+    second: gift3d_atlas_13
+  - first:
+      213: 6400334513201367212
+    second: gift3d_atlas_14
+  - first:
+      213: 7439995877630461230
+    second: gift3d_atlas_15
+  - first:
+      213: 8417453995823585578
+    second: gift3d_atlas_16
+  - first:
+      213: 4583257358653327873
+    second: gift3d_atlas_17
+  - first:
+      213: 48591594960359976
+    second: gift3d_atlas_18
+  - first:
+      213: 4716570891484797518
+    second: gift3d_atlas_19
+  - first:
+      213: 7942810803863238664
+    second: gift3d_atlas_20
+  - first:
+      213: 9167992424621685401
+    second: gift3d_atlas_21
+  - first:
+      213: 2932454590265996605
+    second: gift3d_atlas_22
+  - first:
+      213: -8233310060443880341
+    second: gift3d_atlas_23
+  - first:
+      213: -147310669121357385
+    second: gift3d_atlas_24
+  - first:
+      213: -220642716801246391
+    second: gift3d_atlas_25
+  - first:
+      213: -5513587143670773383
+    second: gift3d_atlas_26
+  - first:
+      213: -5788116723459339119
+    second: gift3d_atlas_27
+  - first:
+      213: 6498672596350654990
+    second: gift3d_atlas_28
+  - first:
+      213: -26118087383542
+    second: gift3d_atlas_29
+  - first:
+      213: 9116160431837456520
+    second: gift3d_atlas_30
+  - first:
+      213: -5330595180571733089
+    second: gift3d_atlas_31
+  - first:
+      213: -4702786975633886953
+    second: gift3d_atlas_32
+  - first:
+      213: -3807094935451707100
+    second: gift3d_atlas_33
+  - first:
+      213: 8299660270132540708
+    second: gift3d_atlas_34
+  - first:
+      213: 7411784087139760059
+    second: gift3d_atlas_35
+  - first:
+      213: 1341587010547518930
+    second: gift3d_atlas_36
+  - first:
+      213: -4431715994502575123
+    second: gift3d_atlas_37
+  - first:
+      213: -5911905756301365312
+    second: gift3d_atlas_38
+  - first:
+      213: -9106099154714151305
+    second: gift3d_atlas_39
+  - first:
+      213: 1247362250493405988
+    second: gift3d_atlas_40
+  - first:
+      213: -1000877090514809076
+    second: gift3d_atlas_41
+  - first:
+      213: -8900447404847495064
+    second: gift3d_atlas_42
+  - first:
+      213: 687541036539693480
+    second: gift3d_atlas_43
+  - first:
+      213: -4722873356013046652
+    second: gift3d_atlas_44
+  - first:
+      213: -1612167762709626715
+    second: gift3d_atlas_45
+  - first:
+      213: 4286817475616230771
+    second: gift3d_atlas_46
+  - first:
+      213: -4220377716393761919
+    second: gift3d_atlas_47
+  - first:
+      213: 6913888772764886317
+    second: gift3d_atlas_48
+  - first:
+      213: -6034362832702448052
+    second: gift3d_atlas_49
+  - first:
+      213: -7040431417058655089
+    second: gift3d_atlas_50
+  - first:
+      213: 1291334759885393810
+    second: gift3d_atlas_51
+  - first:
+      213: -3866112350652826360
+    second: gift3d_atlas_52
+  - first:
+      213: 1798065130126257400
+    second: gift3d_atlas_53
+  - first:
+      213: -4886879132267441327
+    second: gift3d_atlas_54
+  - first:
+      213: -4967136968421009927
+    second: gift3d_atlas_55
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: gift3d_atlas_0
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 1535
+        width: 175
+        height: 163
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ce1742a0d5ef7fe0800000000000000
+      internalID: -1188979092363993402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_1
+      rect:
+        serializedVersion: 2
+        x: 310
+        y: 1535
+        width: 162
+        height: 162
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42aa033d9327c6a20800000000000000
+      internalID: 3056943839759608356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_2
+      rect:
+        serializedVersion: 2
+        x: 571
+        y: 1535
+        width: 149
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b385e817d4bbf6090800000000000000
+      internalID: -8039000868541016005
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_3
+      rect:
+        serializedVersion: 2
+        x: 816
+        y: 1535
+        width: 148
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51be4ffc92fee0b20800000000000000
+      internalID: 3102680156166482709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_4
+      rect:
+        serializedVersion: 2
+        x: 1064
+        y: 1535
+        width: 163
+        height: 162
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d84444bb3c094990800000000000000
+      internalID: -7401371062039721774
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_5
+      rect:
+        serializedVersion: 2
+        x: 1316
+        y: 1535
+        width: 175
+        height: 163
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4199ee1b1747713c0800000000000000
+      internalID: -4388911280183928556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_6
+      rect:
+        serializedVersion: 2
+        x: 1572
+        y: 1535
+        width: 181
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 65827b16b56a623e0800000000000000
+      internalID: -2078791266573277098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_7
+      rect:
+        serializedVersion: 2
+        x: 1831
+        y: 1535
+        width: 181
+        height: 166
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 440635c90f26b5ea0800000000000000
+      internalID: -5882999702675038140
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_8
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 1279
+        width: 175
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b8065ec7aef88ce0800000000000000
+      internalID: -1402591287251171146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_9
+      rect:
+        serializedVersion: 2
+        x: 310
+        y: 1279
+        width: 162
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bdbcda868fd31f310800000000000000
+      internalID: 1436997893225303003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_10
+      rect:
+        serializedVersion: 2
+        x: 571
+        y: 1279
+        width: 149
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc66b11dbd129c990800000000000000
+      internalID: -7365318487597947188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_11
+      rect:
+        serializedVersion: 2
+        x: 816
+        y: 1279
+        width: 148
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0b97c9993e75bfd0800000000000000
+      internalID: -2326814846608762097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_12
+      rect:
+        serializedVersion: 2
+        x: 1064
+        y: 1279
+        width: 163
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f25c1e45bf1a67700800000000000000
+      internalID: 537795306350298415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_13
+      rect:
+        serializedVersion: 2
+        x: 1316
+        y: 1279
+        width: 175
+        height: 166
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95e149deef20994e0800000000000000
+      internalID: -1974543667694395815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_14
+      rect:
+        serializedVersion: 2
+        x: 1572
+        y: 1279
+        width: 181
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca84a0f445e82d850800000000000000
+      internalID: 6400334513201367212
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_15
+      rect:
+        serializedVersion: 2
+        x: 1831
+        y: 1279
+        width: 181
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e25c888f4dc204760800000000000000
+      internalID: 7439995877630461230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_16
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 1023
+        width: 175
+        height: 162
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a29d146cfcdc0d470800000000000000
+      internalID: 8417453995823585578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_17
+      rect:
+        serializedVersion: 2
+        x: 310
+        y: 1023
+        width: 162
+        height: 161
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10a0ab8d8400b9f30800000000000000
+      internalID: 4583257358653327873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_18
+      rect:
+        serializedVersion: 2
+        x: 571
+        y: 1023
+        width: 149
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8229ea45cc1aca000800000000000000
+      internalID: 48591594960359976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_19
+      rect:
+        serializedVersion: 2
+        x: 816
+        y: 1023
+        width: 148
+        height: 160
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4a16e08c30a47140800000000000000
+      internalID: 4716570891484797518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_20
+      rect:
+        serializedVersion: 2
+        x: 1064
+        y: 1023
+        width: 163
+        height: 161
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8083762e7588a3e60800000000000000
+      internalID: 7942810803863238664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_21
+      rect:
+        serializedVersion: 2
+        x: 1316
+        y: 1023
+        width: 175
+        height: 162
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99a3c0d39804b3f70800000000000000
+      internalID: 9167992424621685401
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_22
+      rect:
+        serializedVersion: 2
+        x: 1572
+        y: 1023
+        width: 181
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d35b4ccb9eb22b820800000000000000
+      internalID: 2932454590265996605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_23
+      rect:
+        serializedVersion: 2
+        x: 1831
+        y: 1023
+        width: 181
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b64b7993f186dbd80800000000000000
+      internalID: -8233310060443880341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_24
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 767
+        width: 175
+        height: 166
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b975671ab5a4fdf0800000000000000
+      internalID: -147310669121357385
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_25
+      rect:
+        serializedVersion: 2
+        x: 310
+        y: 767
+        width: 162
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 94bd8ca3e9e10fcf0800000000000000
+      internalID: -220642716801246391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_26
+      rect:
+        serializedVersion: 2
+        x: 571
+        y: 767
+        width: 149
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 979c75f74bdcb73b0800000000000000
+      internalID: -5513587143670773383
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_27
+      rect:
+        serializedVersion: 2
+        x: 816
+        y: 767
+        width: 148
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 19c45bbb18a7cafa0800000000000000
+      internalID: -5788116723459339119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_28
+      rect:
+        serializedVersion: 2
+        x: 1064
+        y: 767
+        width: 163
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e0adb018b4cef2a50800000000000000
+      internalID: 6498672596350654990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_29
+      rect:
+        serializedVersion: 2
+        x: 1285
+        y: 511
+        width: 206
+        height: 423
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a06eda8ee38effff0800000000000000
+      internalID: -26118087383542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_30
+      rect:
+        serializedVersion: 2
+        x: 1535
+        y: 661
+        width: 218
+        height: 272
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 888a42ffc9b138e70800000000000000
+      internalID: 9116160431837456520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_31
+      rect:
+        serializedVersion: 2
+        x: 1791
+        y: 702
+        width: 221
+        height: 230
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f93dc9c0debe506b0800000000000000
+      internalID: -5330595180571733089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_32
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 486
+        width: 54
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 711320f79285cbeb0800000000000000
+      internalID: -4702786975633886953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_33
+      rect:
+        serializedVersion: 2
+        x: 45
+        y: 511
+        width: 175
+        height: 163
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 429563ab35b7a2bc0800000000000000
+      internalID: -3807094935451707100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_34
+      rect:
+        serializedVersion: 2
+        x: 301
+        y: 511
+        width: 175
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4253cadca015e2370800000000000000
+      internalID: 8299660270132540708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_35
+      rect:
+        serializedVersion: 2
+        x: 557
+        y: 511
+        width: 175
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb7bbd1ab52fbd660800000000000000
+      internalID: 7411784087139760059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_36
+      rect:
+        serializedVersion: 2
+        x: 813
+        y: 511
+        width: 175
+        height: 165
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2dd86fe27464e9210800000000000000
+      internalID: 1341587010547518930
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_37
+      rect:
+        serializedVersion: 2
+        x: 1056
+        y: 511
+        width: 180
+        height: 194
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: debc14288c16f72c0800000000000000
+      internalID: -4431715994502575123
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_38
+      rect:
+        serializedVersion: 2
+        x: 1589
+        y: 511
+        width: 157
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0cfe11a8901b4fda0800000000000000
+      internalID: -5911905756301365312
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_39
+      rect:
+        serializedVersion: 2
+        x: 1845
+        y: 511
+        width: 157
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77637c1a013a0a180800000000000000
+      internalID: -9106099154714151305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_40
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 255
+        width: 157
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42b24e6ab558f4110800000000000000
+      internalID: 1247362250493405988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_41
+      rect:
+        serializedVersion: 2
+        x: 309
+        y: 255
+        width: 157
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0fc90cc69b2c12f0800000000000000
+      internalID: -1000877090514809076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_42
+      rect:
+        serializedVersion: 2
+        x: 565
+        y: 255
+        width: 157
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 868840ced324b7480800000000000000
+      internalID: -8900447404847495064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_43
+      rect:
+        serializedVersion: 2
+        x: 821
+        y: 255
+        width: 157
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a9c3731ee2aa8900800000000000000
+      internalID: 687541036539693480
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_44
+      rect:
+        serializedVersion: 2
+        x: 1077
+        y: 255
+        width: 157
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4847faf94bbf47eb0800000000000000
+      internalID: -4722873356013046652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_45
+      rect:
+        serializedVersion: 2
+        x: 1333
+        y: 255
+        width: 157
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a04b5126fd60a9e0800000000000000
+      internalID: -1612167762709626715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_46
+      rect:
+        serializedVersion: 2
+        x: 1589
+        y: 255
+        width: 157
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37dca0318c5dd7b30800000000000000
+      internalID: 4286817475616230771
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_47
+      rect:
+        serializedVersion: 2
+        x: 1845
+        y: 255
+        width: 157
+        height: 141
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1832064d3d43e65c0800000000000000
+      internalID: -4220377716393761919
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_48
+      rect:
+        serializedVersion: 2
+        x: 53
+        y: 0
+        width: 157
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d25663d153113ff50800000000000000
+      internalID: 6913888772764886317
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_49
+      rect:
+        serializedVersion: 2
+        x: 309
+        y: 0
+        width: 157
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4e53fe99f2a14ca0800000000000000
+      internalID: -6034362832702448052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_50
+      rect:
+        serializedVersion: 2
+        x: 565
+        y: 0
+        width: 157
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8408b09dec5b4e90800000000000000
+      internalID: -7040431417058655089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_51
+      rect:
+        serializedVersion: 2
+        x: 821
+        y: 0
+        width: 157
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29f45115f1ebbe110800000000000000
+      internalID: 1291334759885393810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_52
+      rect:
+        serializedVersion: 2
+        x: 1077
+        y: 0
+        width: 157
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80d7695fc4fc85ac0800000000000000
+      internalID: -3866112350652826360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_53
+      rect:
+        serializedVersion: 2
+        x: 1333
+        y: 0
+        width: 157
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8fc213495b204f810800000000000000
+      internalID: 1798065130126257400
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_54
+      rect:
+        serializedVersion: 2
+        x: 1589
+        y: 0
+        width: 157
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1531eec22515e2cb0800000000000000
+      internalID: -4886879132267441327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: gift3d_atlas_55
+      rect:
+        serializedVersion: 2
+        x: 1845
+        y: 0
+        width: 157
+        height: 140
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f51e868e3f211bb0800000000000000
+      internalID: -4967136968421009927
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      gift3d_atlas_0: -1188979092363993402
+      gift3d_atlas_1: 3056943839759608356
+      gift3d_atlas_10: -7365318487597947188
+      gift3d_atlas_11: -2326814846608762097
+      gift3d_atlas_12: 537795306350298415
+      gift3d_atlas_13: -1974543667694395815
+      gift3d_atlas_14: 6400334513201367212
+      gift3d_atlas_15: 7439995877630461230
+      gift3d_atlas_16: 8417453995823585578
+      gift3d_atlas_17: 4583257358653327873
+      gift3d_atlas_18: 48591594960359976
+      gift3d_atlas_19: 4716570891484797518
+      gift3d_atlas_2: -8039000868541016005
+      gift3d_atlas_20: 7942810803863238664
+      gift3d_atlas_21: 9167992424621685401
+      gift3d_atlas_22: 2932454590265996605
+      gift3d_atlas_23: -8233310060443880341
+      gift3d_atlas_24: -147310669121357385
+      gift3d_atlas_25: -220642716801246391
+      gift3d_atlas_26: -5513587143670773383
+      gift3d_atlas_27: -5788116723459339119
+      gift3d_atlas_28: 6498672596350654990
+      gift3d_atlas_29: -26118087383542
+      gift3d_atlas_3: 3102680156166482709
+      gift3d_atlas_30: 9116160431837456520
+      gift3d_atlas_31: -5330595180571733089
+      gift3d_atlas_32: -4702786975633886953
+      gift3d_atlas_33: -3807094935451707100
+      gift3d_atlas_34: 8299660270132540708
+      gift3d_atlas_35: 7411784087139760059
+      gift3d_atlas_36: 1341587010547518930
+      gift3d_atlas_37: -4431715994502575123
+      gift3d_atlas_38: -5911905756301365312
+      gift3d_atlas_39: -9106099154714151305
+      gift3d_atlas_4: -7401371062039721774
+      gift3d_atlas_40: 1247362250493405988
+      gift3d_atlas_41: -1000877090514809076
+      gift3d_atlas_42: -8900447404847495064
+      gift3d_atlas_43: 687541036539693480
+      gift3d_atlas_44: -4722873356013046652
+      gift3d_atlas_45: -1612167762709626715
+      gift3d_atlas_46: 4286817475616230771
+      gift3d_atlas_47: -4220377716393761919
+      gift3d_atlas_48: 6913888772764886317
+      gift3d_atlas_49: -6034362832702448052
+      gift3d_atlas_5: -4388911280183928556
+      gift3d_atlas_50: -7040431417058655089
+      gift3d_atlas_51: 1291334759885393810
+      gift3d_atlas_52: -3866112350652826360
+      gift3d_atlas_53: 1798065130126257400
+      gift3d_atlas_54: -4886879132267441327
+      gift3d_atlas_55: -4967136968421009927
+      gift3d_atlas_6: -2078791266573277098
+      gift3d_atlas_7: -5882999702675038140
+      gift3d_atlas_8: -1402591287251171146
+      gift3d_atlas_9: 1436997893225303003
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -50,6 +50,12 @@ namespace ArrowEscape.View
             }
             catch (Exception) { }
         }
+        /// <summary>Exit/undo instrument (0 = Classic Chime, 1..10 = shop tap sounds); its notes are generated now.</summary>
+        public int TapInstrument
+        {
+            get => audio != null ? audio.TapInstrument : 0;
+            set { if (audio == null) return; if (value > 0) audio.PrepareTap(value); audio.TapInstrument = value; }
+        }
         /// <summary>Stops all voices without disposing their reusable clips.</summary>
         public void StopAll()
         {

@@ -15,6 +15,9 @@ namespace ArrowEscape.View
         private readonly AudioClip[] uiClips=new AudioClip[3];
         private readonly bool[] uiUnavailable=new bool[3];
         private readonly AudioClip[] stars = new AudioClip[3];
+        private readonly AudioClip[,] tapNotes = new AudioClip[TapSoundSynth.Count, MusicScale.NoteCount(SoundDesign.OctaveCount)];
+        /// <summary>Instrument used for exit and undo notes (0 = Classic Chime; Step 14L shop sounds).</summary>
+        public int TapInstrument { get; set; }
         private readonly bool[] starUnavailable = new bool[3];
         /// <summary>Returns a cached clip, recreating destroyed clips; failures return null quietly.</summary>
         public AudioClip GetClip(SoundEvent sound)
@@ -46,6 +49,13 @@ namespace ArrowEscape.View
                         unavailable[notes.Length+2]=slide==null;return slide;
                     case SoundCue.Exit: case SoundCue.Undo: case SoundCue.Hint: case SoundCue.Preview:
                         int step = Math.Max(0, Math.Min(notes.Length - 1, sound.ScaleStep));
+                        int instrument = Math.Max(0, Math.Min(TapSoundSynth.Count - 1, TapInstrument));
+                        if (instrument > 0 && (sound.Cue == SoundCue.Exit || sound.Cue == SoundCue.Undo))
+                        {
+                            if (tapNotes[instrument, step] == null)
+                                tapNotes[instrument, step] = Create("Tap " + instrument + " " + step, TapSoundSynth.Render(instrument, MusicScale.FrequencyHz(step, SoundDesign.RootHz), SoundDesign.SampleRate));
+                            if (tapNotes[instrument, step] != null) return tapNotes[instrument, step];
+                        }
                         if (unavailable[step]) return null;
                         if (notes[step] == null)
                             notes[step] = Create("Pentatonic " + step, SynthMath.RenderNote(
@@ -101,6 +111,14 @@ namespace ArrowEscape.View
             Array.Clear(unavailable, 0, unavailable.Length);
             DestroyClip(thud); DestroyClip(jingle); thud = null; jingle = null;
             DestroyClip(slide);slide=null;
+            for (int a = 0; a < tapNotes.GetLength(0); a++) for (int b = 0; b < tapNotes.GetLength(1); b++) { DestroyClip(tapNotes[a, b]); tapNotes[a, b] = null; }
+        }
+        /// <summary>Generates every note of a tap instrument ahead of play (equip time), so taps never synthesise.</summary>
+        public void PrepareTap(int instrument)
+        {
+            int keep = TapInstrument; TapInstrument = instrument;
+            for (int i = 0; i < notes.Length; i++) GetClip(new SoundEvent(SoundCue.Exit, i, 0));
+            TapInstrument = keep;
         }
         private static void DestroyClip(AudioClip clip)
         {

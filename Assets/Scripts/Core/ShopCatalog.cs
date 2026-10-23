@@ -68,6 +68,17 @@ namespace ArrowEscape.Core
             new ShopItem("frame_cosmic","Cosmic Loop","A galaxy swirl wrapped by a rainbow arrow.",ShopSlot.Frame,"Mythic Frames",1000,"#D45CFF","#36C8FF",true),
             new ShopItem("frame_dragon","Shadow Dragon","Dragon scales, horns and burning red eyes.",ShopSlot.Frame,"Mythic Frames",1200,"#6E6E8C","#FF3020",true),
             new ShopItem("frame_venom","Venom Thorns","Toxic green thorns guarding two blood-red gems.",ShopSlot.Frame,"Mythic Frames",1500,"#3CD83A","#B00818",true),
+            new ShopItem("sound_classic","Classic Chime","The original soft chime that sings the arrow melody.",ShopSlot.Sound,"Classic",0,"#7FEBFF","#1E3C78",true),
+            new ShopItem("sound_marimba","Marimba","Warm wooden bars, mellow and round.",ShopSlot.Sound,"Tap Sounds",150,"#E8A060","#5A2E14",true),
+            new ShopItem("sound_kalimba","Kalimba","Bright thumb-piano tines with a metal sparkle.",ShopSlot.Sound,"Tap Sounds",200,"#FFD27A","#7A4A10",true),
+            new ShopItem("sound_musicbox","Music Box","A tiny comb plucked inside a wind-up music box.",ShopSlot.Sound,"Tap Sounds",250,"#FFB0E0","#7A2860",true),
+            new ShopItem("sound_glassbell","Glass Bell","Crystal bells that shimmer long after the tap.",ShopSlot.Sound,"Tap Sounds",300,"#B8F4FF","#286E8C",true),
+            new ShopItem("sound_synthpluck","Synth Pluck","A plucked synth string, crisp and modern.",ShopSlot.Sound,"Tap Sounds",350,"#9F8CFF","#2E2280",true),
+            new ShopItem("sound_retrocoin","Retro Coin","8-bit arcade blips that jump up a fifth.",ShopSlot.Sound,"Tap Sounds",400,"#FFE24A","#806010",true),
+            new ShopItem("sound_bubblepop","Bubble Pop","Bubbly pops that rise as they burst.",ShopSlot.Sound,"Tap Sounds",450,"#7AF0FF","#1A6A9A",true),
+            new ShopItem("sound_woodblock","Wood Block","A hollow knock, crisp and percussive.",ShopSlot.Sound,"Tap Sounds",500,"#D8A070","#603818",true),
+            new ShopItem("sound_laserzap","Laser Zap","Sci-fi zaps that dive down to the note.",ShopSlot.Sound,"Tap Sounds",550,"#FF5FD2","#6A1060",true),
+            new ShopItem("sound_spacewhoosh","Space Whoosh","Airy cosmic swooshes with a rising tone.",ShopSlot.Sound,"Tap Sounds",600,"#6FA8FF","#141E5A",true),
         });
         /// <summary>Stable display order including the four free defaults.</summary>
         public static IReadOnlyList<ShopItem> Items => items;

@@ -45,6 +45,8 @@ namespace ArrowEscape.UI
         public ToastView Toast { get; private set; }
         /// <summary>World ranking page.</summary>
         public RankingView Ranking { get; private set; }
+        /// <summary>Menu background music (menus only, never over the board).</summary>
+        public MenuMusicPlayer Music { get; private set; }
         /// <summary>Journey road map: every level as a stop on one winding road.</summary>
         public JourneyView Journey { get; private set; }
         /// <summary>"No lives left" panel for the Journey.</summary>
@@ -115,6 +117,7 @@ namespace ArrowEscape.UI
             var scaler = canvasObject.GetComponent<UnityEngine.UI.CanvasScaler>();
             scaler.uiScaleMode = UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1080, 1920); scaler.matchWidthOrHeight = 0.5f;
+            Music = gameObject.AddComponent<MenuMusicPlayer>(); Music.Bind(bootstrap.Settings.Model);
             MainMenu = gameObject.AddComponent<MainMenuView>(); MainMenu.Build(canvasObject.transform);
             Levels = gameObject.AddComponent<LevelSelectView>(); Levels.Build(canvasObject.transform, StartLevel, Back);
             PauseScreen = gameObject.AddComponent<PauseView>(); PauseScreen.Build(canvasObject.transform);
@@ -180,6 +183,7 @@ namespace ArrowEscape.UI
             game.SetPaused(state != ScreenState.Playing && state != ScreenState.LevelComplete);
             if (state == ScreenState.MainMenu && previous == ScreenState.Paused) game.DiscardAttempt();
             board.SetVisible(showBoard); hud.SetVisible(showBoard);
+            Music.SetWanted(!showBoard && state != ScreenState.Playing && state != ScreenState.LevelComplete);
             if (state != ScreenState.Settings) Confirm.Hide();
             if (state == ScreenState.MainMenu) RefreshMainMenu();
             if (state == ScreenState.LevelSelect) RefreshLevels();

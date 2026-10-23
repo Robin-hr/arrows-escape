@@ -83,7 +83,7 @@ namespace ArrowEscape.Core
                 if(cells.Count<s.MinArrowLength){misses++;continue;}
                 cells.Reverse();board.TryAddArrow(new Arrow(placed.Count+1,cells,directions[choice]),out Arrow arrow);placed.Add(arrow);misses=0;rebuild=true;
             }
-            ExtendTails(board,mask,placed,Math.Min(s.MaxArrowLength,10),s.MaxBends);
+            ExtendTails(board,mask,placed,s.LengthCap,s.MaxBends);
             // Later arrows can only block earlier arrows. Removing in reverse placement order
             // reaches exactly the board on which each clear-ray PLACE was legal.
             placed.Sort((a,b)=>a.Y!=b.Y?b.Y.CompareTo(a.Y):a.X.CompareTo(b.X));var result=new Board(mask.Width,mask.Height);
@@ -93,8 +93,8 @@ namespace ArrowEscape.Core
         private static List<Cell> Grow(ShapeMask mask,Board board,Cell head,Direction direction,ShapeLevelSettings s,SeededRandom random)
         {
             // When both dimensions exceed twice the length cap, favor short targets to avoid sealing large pockets.
-            int target=random.NextInt(s.MinArrowLength,Math.Min(s.MaxArrowLength,10)+1);
-            if(mask.Width>2*s.MaxArrowLength&&mask.Height>2*s.MaxArrowLength)target=Math.Min(target,Math.Min(random.NextInt(s.MinArrowLength,Math.Min(s.MaxArrowLength,10)+1),random.NextInt(s.MinArrowLength,Math.Min(s.MaxArrowLength,10)+1)));var cells=new List<Cell>{head,new Cell(head.X-direction.GetDx(),head.Y-direction.GetDy())};
+            int target=random.NextInt(s.MinArrowLength,s.LengthCap+1);
+            if(!s.LongArrows&&mask.Width>2*s.MaxArrowLength&&mask.Height>2*s.MaxArrowLength)target=Math.Min(target,Math.Min(random.NextInt(s.MinArrowLength,Math.Min(s.MaxArrowLength,10)+1),random.NextInt(s.MinArrowLength,Math.Min(s.MaxArrowLength,10)+1)));var cells=new List<Cell>{head,new Cell(head.X-direction.GetDx(),head.Y-direction.GetDy())};
             while(cells.Count<target)
             {
                 Cell tail=cells[cells.Count-1],previous=cells[cells.Count-2];var choices=new List<Cell>();int fewest=5;

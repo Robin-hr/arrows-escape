@@ -23,6 +23,7 @@ namespace ArrowEscape.View
             controller = game; settings = model;
             player = soundPlayer ?? GetComponent<UnitySoundPlayer>() ?? gameObject.AddComponent<UnitySoundPlayer>();
             initialized = true; testingScale = false; previousSound = SoundOn;
+            if (equippedTap > 0 && player is UnitySoundPlayer tapPlayer && tapPlayer != null) tapPlayer.TapInstrument = equippedTap;
             EnsureAudioListener();
             if (controller == null) { MissingController(); return; }
             enabled = true;
@@ -89,6 +90,35 @@ namespace ArrowEscape.View
         /// <summary>Quiet skin texture under the original signature cue; pause and live sound setting are respected.</summary>
         public void PlaySkin(int index,bool blocked=false)
         {if((controller==null||!controller.IsPaused)&&index>=0&&index<10)Play(new SoundEvent(blocked?SoundCue.SkinBlocked:SoundCue.SkinExit,index,(blocked?.12f:.18f)*(index==3?.35f:1)));}
+        private int equippedTap, previewTap = -1, previewStep;
+        private float previewElapsed;
+        private static readonly int[] samplePhrase = { 0, 2, 4, 5, 7, 9 };
+        /// <summary>Instrument of the running (or last) tap-sound sample, -1 before any.</summary>
+        public int PreviewInstrument { get; private set; } = -1;
+        /// <summary>Equipped tap instrument (Step 14L): the exit/undo melody plays with it.</summary>
+        public void SetTapSound(int instrument)
+        {
+            equippedTap = instrument;
+            if (previewTap < 0 && player is UnitySoundPlayer unity && unity != null) unity.TapInstrument = instrument;
+        }
+        /// <summary>Plays a six-note sample phrase with a tap sound, then restores the equipped one.</summary>
+        public void PreviewTapSound(int instrument)
+        {
+            PreviewInstrument = instrument; previewTap = instrument; previewStep = 0; previewElapsed = 0.2f;
+            if (player is UnitySoundPlayer unity && unity != null) unity.TapInstrument = instrument;
+            if (!Application.isPlaying) { previewTap = -1; SetTapSound(equippedTap); }
+        }
+        private void TickPreview(float dt)
+        {
+            if (previewTap < 0) return;
+            previewElapsed += dt;
+            while (previewElapsed >= 0.2f && previewTap >= 0)
+            {
+                previewElapsed -= 0.2f;
+                if (previewStep < samplePhrase.Length) Play(new SoundEvent(SoundCue.Exit, samplePhrase[previewStep++], SoundPlanner.ExitVolume));
+                else { previewTap = -1; SetTapSound(equippedTap); }
+            }
+        }
         /// <summary>Shop/gallery demonstration never advances the real move-count melody.</summary>
         public void PlaySkinPreview(int index){if(index<0||index>=10)return;Play(SoundPlanner.ForPreview());Play(new SoundEvent(SoundCue.SkinExit,index,index==3?.063f:.18f));}
         private void OnExit(Arrow arrow) => Play(SoundPlanner.ForExit(controller.MoveCount));
@@ -132,7 +162,7 @@ namespace ArrowEscape.View
                 if (testStep == MusicScale.NoteCount(SoundDesign.OctaveCount)) testingScale = false;
             }
         }
-        private void Update() { if (Application.isPlaying) Tick(Time.deltaTime); }
+        private void Update() { if (Application.isPlaying) { Tick(Time.deltaTime); TickPreview(Time.unscaledDeltaTime); } }
         private void OnApplicationPause(bool paused) { if (paused) Stop(); }
         private void Unsubscribe()
         {

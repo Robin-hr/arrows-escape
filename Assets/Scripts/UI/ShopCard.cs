@@ -17,6 +17,10 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.RawImage Preview { get; private set; }
         /// <summary>Avatar and frame cards show static portrait art instead of rendered previews.</summary>
         public bool IsPortrait=>Item!=null&&(Item.Slot==ShopSlot.Avatar||Item.Slot==ShopSlot.Frame);
+        /// <summary>Tap-sound cards (Step 14L) show a 3D speaker icon.</summary>
+        public bool IsSound=>Item!=null&&Item.Slot==ShopSlot.Sound;
+        /// <summary>Cards with fixed art (portraits and sounds) never request rendered previews.</summary>
+        public bool IsStaticArt=>IsPortrait||IsSound;
         /// <summary>The portrait preview for avatar and frame cards, otherwise null.</summary>
         public AvatarBadge Badge=>badge;
         /// <summary>Current state text.</summary>
@@ -41,10 +45,15 @@ namespace ArrowEscape.UI
                 if(item.Slot==ShopSlot.Avatar){badge.Set(item.Id,null);var a=badge.AvatarImage.rectTransform;a.anchorMin=new Vector2(.08f,.08f);a.anchorMax=new Vector2(.92f,.92f);}
                 else badge.Set(Inventory.DefaultAvatarId,item.Id);
             }
-            var resource=IsPortrait?null:ArrowSkinResources.Load();var art=resource==null?null:resource.Find(item.Id);
+            if(IsSound)
+            {
+                Preview.texture=BrandArt.Texture("Icons3D/i3_sound");aspect.aspectRatio=1;
+                ColorUtility.TryParseHtmlString(item.SecondaryColor,out Color well);viewport.GetComponent<UnityEngine.UI.Image>().color=Color.Lerp(well,Color.black,.35f);
+            }
+            var resource=IsStaticArt?null:ArrowSkinResources.Load();var art=resource==null?null:resource.Find(item.Id);
             // Plain colour previews are drawn for the paper board; give them a paper well so dark inks stay visible.
             if(item.Slot==ShopSlot.Arrow&&ArrowSkinRegistry.Find(item.Id)==null)viewport.GetComponent<UnityEngine.UI.Image>().color=ViewTheme.Background;
-            if(!IsPortrait&&(ArrowSkinRegistry.Find(item.Id)?.IsProcedural==true||(ArrowSkinRegistry.Find(item.Id)!=null&&art!=null&&art.Full!=null)))
+            if(!IsStaticArt&&(ArrowSkinRegistry.Find(item.Id)?.IsProcedural==true||(ArrowSkinRegistry.Find(item.Id)!=null&&art!=null&&art.Full!=null)))
             {
                 var display=UiFactory.Panel("Dark display case",face,new Color32(18,22,28,255));display.GetComponent<UnityEngine.UI.Image>().sprite=SkinCardPulse.CaseSprite;display.GetComponent<UnityEngine.UI.Image>().color=Color.white;display.SetSiblingIndex(0);display.anchorMin=new Vector2(.06f,.36f);display.anchorMax=new Vector2(.94f,.95f);display.offsetMin=display.offsetMax=Vector2.zero;
                 aspect.aspectMode=UnityEngine.UI.AspectRatioFitter.AspectMode.FitInParent;aspect.aspectRatio=ArrowSkinRegistry.Find(item.Id)?.IsProcedural==true?640f/360:art.Full.rect.width/art.Full.rect.height;

@@ -31,29 +31,31 @@ namespace ArrowEscape.UI
         }
 
         private static Font nameFont;
-        /// <summary>Blackletter profile-name font (UnifrakturCook Bold, OFL), in the style of the San Andreas logo.</summary>
+        /// <summary>Profile-name font: Titan One (OFL), a bold rounded game display face.</summary>
         public static Font NameFont
         {
             get
             {
-                if (nameFont == null) nameFont = Resources.Load<Font>("UnifrakturCook-Bold");
+                if (nameFont == null) nameFont = Resources.Load<Font>("TitanOne-Regular");
                 return nameFont != null ? nameFont : Display;
             }
         }
 
+        /// <summary>Orange used for the player's name.</summary>
+        public static Color NameOrange => new Color32(255, 150, 28, 255);
+
         /// <summary>
-        /// The player's name in the blackletter style: white letters, a heavy black outline and a thin light outer edge,
-        /// so it stands out on the dark neon backgrounds.
+        /// The player's name: bold orange Titan One letters with a dark brown outline and a soft drop shadow,
+        /// centred in its box so it sits exactly under the avatar on the dark neon backgrounds.
         /// </summary>
         public static UnityEngine.UI.Text NameText(string name, Transform parent, int size, Vector2 box, Vector2 position)
         {
             var text = UiFactory.Text(name, parent, "", size, box, position);
-            text.font = NameFont; text.color = Color.white; text.fontStyle = FontStyle.Normal;
+            text.font = NameFont; text.color = NameOrange; text.fontStyle = FontStyle.Normal;
             text.horizontalOverflow = HorizontalWrapMode.Overflow; text.verticalOverflow = VerticalWrapMode.Overflow;
             text.alignment = TextAnchor.MiddleCenter; text.raycastTarget = false;
-            var inner = text.gameObject.AddComponent<UnityEngine.UI.Outline>(); inner.effectColor = new Color(0, 0, 0, 1); inner.effectDistance = new Vector2(3, -3);
-            var inner2 = text.gameObject.AddComponent<UnityEngine.UI.Outline>(); inner2.effectColor = new Color(0, 0, 0, 1); inner2.effectDistance = new Vector2(2, 2);
-            var edge = text.gameObject.AddComponent<UnityEngine.UI.Outline>(); edge.effectColor = new Color(0.86f, 0.9f, 1f, 0.85f); edge.effectDistance = new Vector2(2, -2);
+            var outline = text.gameObject.AddComponent<UnityEngine.UI.Outline>(); outline.effectColor = new Color32(52, 18, 0, 255); outline.effectDistance = new Vector2(3, -3);
+            var shadow = text.gameObject.AddComponent<UnityEngine.UI.Shadow>(); shadow.effectColor = new Color(0, 0, 0, 0.6f); shadow.effectDistance = new Vector2(0, -5);
             return text;
         }
 

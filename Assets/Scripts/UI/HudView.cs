@@ -101,6 +101,9 @@ namespace ArrowEscape.UI
             lastName = null; lastMoves = lastTotal = lastMistakes = -1; lastLevelIndex = -2;
         }
 
+        /// <summary>Shows the zoom buttons (daily and Journey boards).</summary>
+        public void SetZoomVisible(bool visible) { if (zoomColumn != null && zoomColumn.gameObject.activeSelf != visible) zoomColumn.gameObject.SetActive(visible); }
+
         /// <summary>Daily header: title, date and moves (no par).</summary>
         public void SetDailyInfo(string date, int moves)
         {

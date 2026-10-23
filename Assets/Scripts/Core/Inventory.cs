@@ -10,7 +10,7 @@ namespace ArrowEscape.Core
         /// <summary>Nonnegative integer balance.</summary>
         public int Coins;
         /// <summary>Purchased ids; catalog lookup controls whether they can be used.</summary>
-        public List<string> OwnedItemIds = new List<string> { "classic", "paper", DefaultAvatarId, DefaultFrameId };
+        public List<string> OwnedItemIds = new List<string> { "classic", "paper", DefaultAvatarId, DefaultFrameId, TapSoundSynth.DefaultId };
         /// <summary>Equipped arrow cosmetic.</summary>
         public string EquippedArrowId = "classic";
         /// <summary>Equipped background cosmetic.</summary>
@@ -47,6 +47,8 @@ namespace ArrowEscape.Core
         public string EquippedAvatarId = DefaultAvatarId;
         /// <summary>Equipped profile avatar frame.</summary>
         public string EquippedFrameId = DefaultFrameId;
+        /// <summary>Equipped arrow tap sound (Step 14L shop Sounds section).</summary>
+        public string EquippedSoundId = TapSoundSynth.DefaultId;
         /// <summary>Reward history by stable level id, independent of progress saves.</summary>
         public List<LevelRewardRecord> RewardedStars = new List<LevelRewardRecord>();
         /// <summary>Next id to issue; zero is the legacy uninitialized sentinel.</summary>
@@ -93,18 +95,20 @@ namespace ArrowEscape.Core
             if(!OwnedItemIds.Contains("paper"))OwnedItemIds.Add("paper");
             if(!OwnedItemIds.Contains(DefaultAvatarId))OwnedItemIds.Add(DefaultAvatarId);
             if(!OwnedItemIds.Contains(DefaultFrameId))OwnedItemIds.Add(DefaultFrameId);
+            if(!OwnedItemIds.Contains(TapSoundSynth.DefaultId))OwnedItemIds.Add(TapSoundSynth.DefaultId);
             if(!ValidSlot(EquippedArrowId,ShopSlot.Arrow))EquippedArrowId="classic";
             if(!ValidSlot(EquippedThemeId,ShopSlot.Theme))EquippedThemeId="paper";
             if(!ValidSlot(EquippedAvatarId,ShopSlot.Avatar))EquippedAvatarId=DefaultAvatarId;
             if(!ValidSlot(EquippedFrameId,ShopSlot.Frame))EquippedFrameId=DefaultFrameId;
+            if(!ValidSlot(EquippedSoundId,ShopSlot.Sound))EquippedSoundId=TapSoundSynth.DefaultId;
             JourneyLives=Math.Max(0,Math.Min(JourneyLifeRules.Max,JourneyLives));JourneyRefillTicks=Math.Max(0,JourneyRefillTicks);PlayerName=PlayerNameRules.Clean(PlayerName);
                         NextAttemptId=Math.Max(0,NextAttemptId);LastPaidAttemptId=Math.Max(0,LastPaidAttemptId);
             if(LastPaidAttemptId>0 && NextAttemptId<=LastPaidAttemptId && LastPaidAttemptId<int.MaxValue)NextAttemptId=LastPaidAttemptId+1;
         }
         /// <summary>The equipped id for a slot.</summary>
-        public string EquippedIn(ShopSlot slot)=>slot==ShopSlot.Arrow?EquippedArrowId:slot==ShopSlot.Theme?EquippedThemeId:slot==ShopSlot.Avatar?EquippedAvatarId:EquippedFrameId;
+        public string EquippedIn(ShopSlot slot)=>slot==ShopSlot.Arrow?EquippedArrowId:slot==ShopSlot.Theme?EquippedThemeId:slot==ShopSlot.Avatar?EquippedAvatarId:slot==ShopSlot.Sound?EquippedSoundId:EquippedFrameId;
         /// <summary>Sets the equipped id for a slot without validation.</summary>
-        public void SetEquipped(ShopSlot slot,string id){if(slot==ShopSlot.Arrow)EquippedArrowId=id;else if(slot==ShopSlot.Theme)EquippedThemeId=id;else if(slot==ShopSlot.Avatar)EquippedAvatarId=id;else EquippedFrameId=id;}
+        public void SetEquipped(ShopSlot slot,string id){if(slot==ShopSlot.Arrow)EquippedArrowId=id;else if(slot==ShopSlot.Theme)EquippedThemeId=id;else if(slot==ShopSlot.Avatar)EquippedAvatarId=id;else if(slot==ShopSlot.Sound)EquippedSoundId=id;else EquippedFrameId=id;}
         private bool ValidSlot(string id,ShopSlot slot)
         { ShopItem item=ShopCatalog.Find(id);return item!=null&&item.Slot==slot&&OwnedItemIds.Contains(id); }
     }
