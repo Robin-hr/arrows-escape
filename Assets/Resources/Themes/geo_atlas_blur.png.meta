@@ -1,0 +1,3174 @@
+fileFormatVersion: 2
+guid: 165883bce6d850141983ffff48173b28
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4833385140538823689
+    second: geo_atlas_blur_0
+  - first:
+      213: 5293476948364743268
+    second: geo_atlas_blur_1
+  - first:
+      213: -7968053100211621599
+    second: geo_atlas_blur_2
+  - first:
+      213: 894397259628370436
+    second: geo_atlas_blur_3
+  - first:
+      213: 8001874232325080265
+    second: geo_atlas_blur_4
+  - first:
+      213: -4844182618641301406
+    second: geo_atlas_blur_5
+  - first:
+      213: -2554761499606465645
+    second: geo_atlas_blur_6
+  - first:
+      213: 7681739694945908179
+    second: geo_atlas_blur_7
+  - first:
+      213: 8635197638710086873
+    second: geo_atlas_blur_8
+  - first:
+      213: 6853846401547236448
+    second: geo_atlas_blur_9
+  - first:
+      213: -4963431981301669188
+    second: geo_atlas_blur_10
+  - first:
+      213: -3107464666248956931
+    second: geo_atlas_blur_11
+  - first:
+      213: -4835963449062961872
+    second: geo_atlas_blur_12
+  - first:
+      213: -966037659909461496
+    second: geo_atlas_blur_13
+  - first:
+      213: -6519727527764416406
+    second: geo_atlas_blur_14
+  - first:
+      213: -402949052042393587
+    second: geo_atlas_blur_15
+  - first:
+      213: -1782796303033690922
+    second: geo_atlas_blur_16
+  - first:
+      213: 7741775181211768429
+    second: geo_atlas_blur_17
+  - first:
+      213: 1798780958827868948
+    second: geo_atlas_blur_18
+  - first:
+      213: -6634053964167499437
+    second: geo_atlas_blur_19
+  - first:
+      213: 6485723996667678438
+    second: geo_atlas_blur_20
+  - first:
+      213: 3278501319824679770
+    second: geo_atlas_blur_21
+  - first:
+      213: 6933647664899218211
+    second: geo_atlas_blur_22
+  - first:
+      213: 3483822681383698939
+    second: geo_atlas_blur_23
+  - first:
+      213: 18047625644192686
+    second: geo_atlas_blur_24
+  - first:
+      213: 5902222732962102951
+    second: geo_atlas_blur_25
+  - first:
+      213: -3721023478920262734
+    second: geo_atlas_blur_26
+  - first:
+      213: -5516854259067739356
+    second: geo_atlas_blur_27
+  - first:
+      213: 5598856834413682335
+    second: geo_atlas_blur_28
+  - first:
+      213: -6789223849298707603
+    second: geo_atlas_blur_29
+  - first:
+      213: 9173150337559415785
+    second: geo_atlas_blur_30
+  - first:
+      213: -4977651398906598021
+    second: geo_atlas_blur_31
+  - first:
+      213: -7828845853702958790
+    second: geo_atlas_blur_32
+  - first:
+      213: 4959125523180191732
+    second: geo_atlas_blur_33
+  - first:
+      213: -6054893195491017374
+    second: geo_atlas_blur_34
+  - first:
+      213: 748045540811276602
+    second: geo_atlas_blur_35
+  - first:
+      213: 6917419858119666946
+    second: geo_atlas_blur_36
+  - first:
+      213: 5762713857470649715
+    second: geo_atlas_blur_37
+  - first:
+      213: -1124673853447523002
+    second: geo_atlas_blur_38
+  - first:
+      213: -6051645111057322575
+    second: geo_atlas_blur_39
+  - first:
+      213: -3224215279823551677
+    second: geo_atlas_blur_40
+  - first:
+      213: -2515564641860520626
+    second: geo_atlas_blur_41
+  - first:
+      213: 7968936387073028119
+    second: geo_atlas_blur_42
+  - first:
+      213: -8024293377683974063
+    second: geo_atlas_blur_43
+  - first:
+      213: 8020289525560128307
+    second: geo_atlas_blur_44
+  - first:
+      213: -1348066664639550092
+    second: geo_atlas_blur_45
+  - first:
+      213: -8774321596074694448
+    second: geo_atlas_blur_46
+  - first:
+      213: -1286753304179840856
+    second: geo_atlas_blur_47
+  - first:
+      213: 8902014736274589911
+    second: geo_atlas_blur_48
+  - first:
+      213: 5353142356378517183
+    second: geo_atlas_blur_49
+  - first:
+      213: 5715027652176163467
+    second: geo_atlas_blur_50
+  - first:
+      213: 1251937949793313283
+    second: geo_atlas_blur_51
+  - first:
+      213: -2210015632723050915
+    second: geo_atlas_blur_52
+  - first:
+      213: -8520625296105374552
+    second: geo_atlas_blur_53
+  - first:
+      213: -4201548054462040780
+    second: geo_atlas_blur_54
+  - first:
+      213: -6493554509060139511
+    second: geo_atlas_blur_55
+  - first:
+      213: 6936028518518124542
+    second: geo_atlas_blur_56
+  - first:
+      213: 139719365690122577
+    second: geo_atlas_blur_57
+  - first:
+      213: -2170321716599515375
+    second: geo_atlas_blur_58
+  - first:
+      213: 3267902231771084763
+    second: geo_atlas_blur_59
+  - first:
+      213: -2616096418271755258
+    second: geo_atlas_blur_60
+  - first:
+      213: 855241363930764757
+    second: geo_atlas_blur_61
+  - first:
+      213: 3318956062501405305
+    second: geo_atlas_blur_62
+  - first:
+      213: 3642704895596857535
+    second: geo_atlas_blur_63
+  - first:
+      213: 1712187801797846518
+    second: geo_atlas_blur_64
+  - first:
+      213: 5721188579545000232
+    second: geo_atlas_blur_65
+  - first:
+      213: 4339490834888290938
+    second: geo_atlas_blur_66
+  - first:
+      213: 7451630845565364022
+    second: geo_atlas_blur_67
+  - first:
+      213: 530752353856113375
+    second: geo_atlas_blur_68
+  - first:
+      213: 8969966634185758548
+    second: geo_atlas_blur_69
+  - first:
+      213: -4676938757164198713
+    second: geo_atlas_blur_70
+  - first:
+      213: 6501437389741975862
+    second: geo_atlas_blur_71
+  - first:
+      213: 149206411181824789
+    second: geo_atlas_blur_72
+  - first:
+      213: -3252428723481198717
+    second: geo_atlas_blur_73
+  - first:
+      213: -9062564373737923267
+    second: geo_atlas_blur_74
+  - first:
+      213: 6375902330407847604
+    second: geo_atlas_blur_75
+  - first:
+      213: -6809468171435104064
+    second: geo_atlas_blur_76
+  - first:
+      213: -5744272546188171845
+    second: geo_atlas_blur_77
+  - first:
+      213: -7972745411622460659
+    second: geo_atlas_blur_78
+  - first:
+      213: -5925837768606964333
+    second: geo_atlas_blur_79
+  - first:
+      213: -8511916690934177580
+    second: geo_atlas_blur_80
+  - first:
+      213: 7771848137392995945
+    second: geo_atlas_blur_81
+  - first:
+      213: -7398267578494822512
+    second: geo_atlas_blur_82
+  - first:
+      213: 5970949982671172008
+    second: geo_atlas_blur_83
+  - first:
+      213: 7751984776186429253
+    second: geo_atlas_blur_84
+  - first:
+      213: 1471240436096479288
+    second: geo_atlas_blur_85
+  - first:
+      213: -9117826390585513030
+    second: geo_atlas_blur_86
+  - first:
+      213: -5479913976922434092
+    second: geo_atlas_blur_87
+  - first:
+      213: 9088829042514226393
+    second: geo_atlas_blur_88
+  - first:
+      213: -7012341470727289422
+    second: geo_atlas_blur_89
+  - first:
+      213: 7480455058756256455
+    second: geo_atlas_blur_90
+  - first:
+      213: 9029838069748415483
+    second: geo_atlas_blur_91
+  - first:
+      213: -9168630343045397423
+    second: geo_atlas_blur_92
+  - first:
+      213: 5334311748912545349
+    second: geo_atlas_blur_93
+  - first:
+      213: -8141574725234755840
+    second: geo_atlas_blur_94
+  - first:
+      213: -4609568986783921619
+    second: geo_atlas_blur_95
+  - first:
+      213: 7425316398422052928
+    second: geo_atlas_blur_96
+  - first:
+      213: 4952105461188460244
+    second: geo_atlas_blur_97
+  - first:
+      213: 2859271088317275097
+    second: geo_atlas_blur_98
+  - first:
+      213: -6910184210270409982
+    second: geo_atlas_blur_99
+  - first:
+      213: 6089961794393779593
+    second: geo_atlas_blur_100
+  - first:
+      213: 2402557899522839588
+    second: geo_atlas_blur_101
+  - first:
+      213: -9219705511410132096
+    second: geo_atlas_blur_102
+  - first:
+      213: -4280652072738550190
+    second: geo_atlas_blur_103
+  - first:
+      213: -1919553839399181866
+    second: geo_atlas_blur_104
+  - first:
+      213: -1596910285698708368
+    second: geo_atlas_blur_105
+  - first:
+      213: -5979226310175296878
+    second: geo_atlas_blur_106
+  - first:
+      213: -5314058232972298630
+    second: geo_atlas_blur_107
+  - first:
+      213: 4449158530445442753
+    second: geo_atlas_blur_108
+  - first:
+      213: -6617699065733408670
+    second: geo_atlas_blur_109
+  - first:
+      213: 7639382511452520638
+    second: geo_atlas_blur_110
+  - first:
+      213: 588850587704630519
+    second: geo_atlas_blur_111
+  - first:
+      213: 8743910770862536699
+    second: geo_atlas_blur_112
+  - first:
+      213: 4223428800936266196
+    second: geo_atlas_blur_113
+  - first:
+      213: 1650166507003345222
+    second: geo_atlas_blur_114
+  - first:
+      213: -876657345343045158
+    second: geo_atlas_blur_115
+  - first:
+      213: -5037665428390521260
+    second: geo_atlas_blur_116
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: geo_atlas_blur_0
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 963
+        width: 50
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 904d77c4d22a31340800000000000000
+      internalID: 4833385140538823689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_1
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 962
+        width: 52
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 462dffd0d35367940800000000000000
+      internalID: 5293476948364743268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_2
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 962
+        width: 54
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 121bf620ce9cb6190800000000000000
+      internalID: -7968053100211621599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_3
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 961
+        width: 56
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40a5b34a199896c00800000000000000
+      internalID: 894397259628370436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_4
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 961
+        width: 57
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c48613f73e5c0f60800000000000000
+      internalID: 8001874232325080265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_5
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 960
+        width: 58
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26083cce29106ccb0800000000000000
+      internalID: -4844182618641301406
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_6
+      rect:
+        serializedVersion: 2
+        x: 391
+        y: 960
+        width: 58
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 393cc1aa3f9ab8cd0800000000000000
+      internalID: -2554761499606465645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_7
+      rect:
+        serializedVersion: 2
+        x: 456
+        y: 960
+        width: 57
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d5b44e8d850b9a60800000000000000
+      internalID: 7681739694945908179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_8
+      rect:
+        serializedVersion: 2
+        x: 521
+        y: 959
+        width: 56
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9dc4b9c408266d770800000000000000
+      internalID: 8635197638710086873
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_9
+      rect:
+        serializedVersion: 2
+        x: 586
+        y: 959
+        width: 55
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 064ff4d2df0cd1f50800000000000000
+      internalID: 6853846401547236448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_10
+      rect:
+        serializedVersion: 2
+        x: 648
+        y: 959
+        width: 57
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb263bf09e85e1bb0800000000000000
+      internalID: -4963431981301669188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_11
+      rect:
+        serializedVersion: 2
+        x: 710
+        y: 959
+        width: 58
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: df33720a95110e4d0800000000000000
+      internalID: -3107464666248956931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_12
+      rect:
+        serializedVersion: 2
+        x: 771
+        y: 959
+        width: 60
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03d44d77dd433ecb0800000000000000
+      internalID: -4835963449062961872
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_13
+      rect:
+        serializedVersion: 2
+        x: 834
+        y: 959
+        width: 59
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80a6279ddd1f792f0800000000000000
+      internalID: -966037659909461496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_14
+      rect:
+        serializedVersion: 2
+        x: 897
+        y: 959
+        width: 59
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6824434b564585a0800000000000000
+      internalID: -6519727527764416406
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_15
+      rect:
+        serializedVersion: 2
+        x: 959
+        y: 959
+        width: 59
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d08ce6ad8ff686af0800000000000000
+      internalID: -402949052042393587
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_16
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 895
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d41cc2453c3247e0800000000000000
+      internalID: -1782796303033690922
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_17
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 895
+        width: 54
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d661017728f407b60800000000000000
+      internalID: 7741775181211768429
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_18
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 895
+        width: 53
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 413fbaf60cd86f810800000000000000
+      internalID: 1798780958827868948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_19
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 895
+        width: 55
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 351360d711b1fe3a0800000000000000
+      internalID: -6634053964167499437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_20
+      rect:
+        serializedVersion: 2
+        x: 255
+        y: 896
+        width: 58
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ee8a94bc9be10a50800000000000000
+      internalID: 6485723996667678438
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_21
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 896
+        width: 59
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a53acc384939f7d20800000000000000
+      internalID: 3278501319824679770
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_22
+      rect:
+        serializedVersion: 2
+        x: 385
+        y: 897
+        width: 60
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 32bd800b0d3493060800000000000000
+      internalID: 6933647664899218211
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_23
+      rect:
+        serializedVersion: 2
+        x: 451
+        y: 897
+        width: 59
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf103584546095030800000000000000
+      internalID: 3483822681383698939
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_24
+      rect:
+        serializedVersion: 2
+        x: 517
+        y: 898
+        width: 58
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea3bf8b483e104000800000000000000
+      internalID: 18047625644192686
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_25
+      rect:
+        serializedVersion: 2
+        x: 583
+        y: 899
+        width: 58
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7aef077ed48e8e150800000000000000
+      internalID: 5902222732962102951
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_26
+      rect:
+        serializedVersion: 2
+        x: 649
+        y: 899
+        width: 56
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bbc11a5cd44c5cc0800000000000000
+      internalID: -3721023478920262734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_27
+      rect:
+        serializedVersion: 2
+        x: 713
+        y: 900
+        width: 56
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 423aaaae7423073b0800000000000000
+      internalID: -5516854259067739356
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_28
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 901
+        width: 57
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9ede7b70a223bd40800000000000000
+      internalID: 5598856834413682335
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_29
+      rect:
+        serializedVersion: 2
+        x: 839
+        y: 901
+        width: 58
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6bb0f141e4d7c1a0800000000000000
+      internalID: -6789223849298707603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_30
+      rect:
+        serializedVersion: 2
+        x: 902
+        y: 901
+        width: 59
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9ebcb7d61a39d4f70800000000000000
+      internalID: 9173150337559415785
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_31
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 902
+        width: 57
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7d2278ec64dbeab0800000000000000
+      internalID: -4977651398906598021
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_32
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 838
+        width: 57
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a31deb0dc2a5a5390800000000000000
+      internalID: -7828845853702958790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_33
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 838
+        width: 55
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4ff7ab5836a52d440800000000000000
+      internalID: 4959125523180191732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_34
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 838
+        width: 53
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 26df3d908b2b8fba0800000000000000
+      internalID: -6054893195491017374
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_35
+      rect:
+        serializedVersion: 2
+        x: 199
+        y: 838
+        width: 50
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a310fdfb477916a00800000000000000
+      internalID: 748045540811276602
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_36
+      rect:
+        serializedVersion: 2
+        x: 263
+        y: 838
+        width: 51
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20da47df5bc9fff50800000000000000
+      internalID: 6917419858119666946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_37
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 838
+        width: 54
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37552c0a8b549ff40800000000000000
+      internalID: 5762713857470649715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_38
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 838
+        width: 56
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 645371dc61b5460f0800000000000000
+      internalID: -1124673853447523002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_39
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 838
+        width: 58
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1bde2b0a5dc340ca0800000000000000
+      internalID: -6051645111057322575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_40
+      rect:
+        serializedVersion: 2
+        x: 516
+        y: 838
+        width: 59
+        height: 52
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3430bbe19494143d0800000000000000
+      internalID: -3224215279823551677
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_41
+      rect:
+        serializedVersion: 2
+        x: 580
+        y: 838
+        width: 59
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e45fe58494be61dd0800000000000000
+      internalID: -2515564641860520626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_42
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 838
+        width: 60
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7103c2d3c69579e60800000000000000
+      internalID: 7968936387073028119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_43
+      rect:
+        serializedVersion: 2
+        x: 708
+        y: 837
+        width: 59
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15890a100bbf3a090800000000000000
+      internalID: -8024293377683974063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_44
+      rect:
+        serializedVersion: 2
+        x: 772
+        y: 837
+        width: 58
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3333cc684dacd4f60800000000000000
+      internalID: 8020289525560128307
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_45
+      rect:
+        serializedVersion: 2
+        x: 837
+        y: 837
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47d2d98c284ba4de0800000000000000
+      internalID: -1348066664639550092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_46
+      rect:
+        serializedVersion: 2
+        x: 902
+        y: 836
+        width: 54
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d8ede82ff85b3680800000000000000
+      internalID: -8774321596074694448
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_47
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 836
+        width: 53
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a8ecc6ffa8842ee0800000000000000
+      internalID: -1286753304179840856
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_48
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 770
+        width: 50
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d880fcdc3f4a8b70800000000000000
+      internalID: 8902014736274589911
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_49
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 769
+        width: 52
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fbef9086c9e2a4a40800000000000000
+      internalID: 5353142356378517183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_50
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 768
+        width: 56
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b82be71ce5bdf4f40800000000000000
+      internalID: 5715027652176163467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_51
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 768
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 302e24aaee6cf5110800000000000000
+      internalID: 1251937949793313283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_52
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 768
+        width: 60
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5e7b7fbd727451e0800000000000000
+      internalID: -2210015632723050915
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_53
+      rect:
+        serializedVersion: 2
+        x: 321
+        y: 767
+        width: 62
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ac7e69ff68a0c980800000000000000
+      internalID: -8520625296105374552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_54
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 767
+        width: 64
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4357e032e4a11b5c0800000000000000
+      internalID: -4201548054462040780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_55
+      rect:
+        serializedVersion: 2
+        x: 447
+        y: 767
+        width: 577
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90695dd049242e5a0800000000000000
+      internalID: -6493554509060139511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_56
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 705
+        width: 65
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eff604e5039b14060800000000000000
+      internalID: 6936028518518124542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_57
+      rect:
+        serializedVersion: 2
+        x: 63
+        y: 705
+        width: 65
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 151e338d50260f100800000000000000
+      internalID: 139719365690122577
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_58
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 706
+        width: 64
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11715c9c5e771e1e0800000000000000
+      internalID: -2170321716599515375
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_59
+      rect:
+        serializedVersion: 2
+        x: 193
+        y: 708
+        width: 62
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd7fb6504cbe95d20800000000000000
+      internalID: 3267902231771084763
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_60
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 709
+        width: 60
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6048db21b22c1bbd0800000000000000
+      internalID: -2616096418271755258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_61
+      rect:
+        serializedVersion: 2
+        x: 324
+        y: 708
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d5505e3d7d6edb00800000000000000
+      internalID: 855241363930764757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_62
+      rect:
+        serializedVersion: 2
+        x: 389
+        y: 707
+        width: 54
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 972868a44fc4f0e20800000000000000
+      internalID: 3318956062501405305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_63
+      rect:
+        serializedVersion: 2
+        x: 452
+        y: 706
+        width: 56
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb880ab7dcc7d8230800000000000000
+      internalID: 3642704895596857535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_64
+      rect:
+        serializedVersion: 2
+        x: 515
+        y: 706
+        width: 57
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f5eae2fbb9e2c710800000000000000
+      internalID: 1712187801797846518
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_65
+      rect:
+        serializedVersion: 2
+        x: 578
+        y: 706
+        width: 59
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8292dc073beb56f40800000000000000
+      internalID: 5721188579545000232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_66
+      rect:
+        serializedVersion: 2
+        x: 642
+        y: 705
+        width: 60
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7274973ce7f83c30800000000000000
+      internalID: 4339490834888290938
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_67
+      rect:
+        serializedVersion: 2
+        x: 705
+        y: 705
+        width: 62
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 637644b06c2896760800000000000000
+      internalID: 7451630845565364022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_68
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 704
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fdacb4b247c9d5700800000000000000
+      internalID: 530752353856113375
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_69
+      rect:
+        serializedVersion: 2
+        x: 831
+        y: 703
+        width: 193
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4579fbdf029bb7c70800000000000000
+      internalID: 8969966634185758548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_70
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 639
+        width: 449
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c498f6dafc281fb0800000000000000
+      internalID: -4676938757164198713
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_71
+      rect:
+        serializedVersion: 2
+        x: 447
+        y: 642
+        width: 66
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63963012cdeb93a50800000000000000
+      internalID: 6501437389741975862
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_72
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 643
+        width: 64
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51b14b0c076121200800000000000000
+      internalID: 149206411181824789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_73
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 644
+        width: 64
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38f30afde4d0dd2d0800000000000000
+      internalID: -3252428723481198717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_74
+      rect:
+        serializedVersion: 2
+        x: 641
+        y: 645
+        width: 62
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3d9d35b7bd4b3280800000000000000
+      internalID: -9062564373737923267
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_75
+      rect:
+        serializedVersion: 2
+        x: 706
+        y: 647
+        width: 60
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b68b867361cb7850800000000000000
+      internalID: 6375902330407847604
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_76
+      rect:
+        serializedVersion: 2
+        x: 771
+        y: 645
+        width: 58
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c82844b6c8ef71a0800000000000000
+      internalID: -6809468171435104064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_77
+      rect:
+        serializedVersion: 2
+        x: 836
+        y: 644
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb5ec6fbd8e3840b0800000000000000
+      internalID: -5744272546188171845
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_78
+      rect:
+        serializedVersion: 2
+        x: 901
+        y: 643
+        width: 54
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d032e9f1a4e1b5190800000000000000
+      internalID: -7972745411622460659
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_79
+      rect:
+        serializedVersion: 2
+        x: 966
+        y: 642
+        width: 52
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 395a69522f133cda0800000000000000
+      internalID: -5925837768606964333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_80
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 577
+        width: 257
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d0662f1ed89fd980800000000000000
+      internalID: -8511916690934177580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_81
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 578
+        width: 64
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96e379534b62bdb60800000000000000
+      internalID: 7771848137392995945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_82
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 578
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 097d686c5d2145990800000000000000
+      internalID: -7398267578494822512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_83
+      rect:
+        serializedVersion: 2
+        x: 388
+        y: 578
+        width: 56
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a17db0bf531dd250800000000000000
+      internalID: 5970949982671172008
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_84
+      rect:
+        serializedVersion: 2
+        x: 450
+        y: 579
+        width: 60
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54ff3d80515949b60800000000000000
+      internalID: 7751984776186429253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_85
+      rect:
+        serializedVersion: 2
+        x: 513
+        y: 579
+        width: 62
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 830b8b4b165ea6410800000000000000
+      internalID: 1471240436096479288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_86
+      rect:
+        serializedVersion: 2
+        x: 575
+        y: 579
+        width: 66
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: abbe771c439f67180800000000000000
+      internalID: -9117826390585513030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_87
+      rect:
+        serializedVersion: 2
+        x: 639
+        y: 579
+        width: 66
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d517d5954f63f3b0800000000000000
+      internalID: -5479913976922434092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_88
+      rect:
+        serializedVersion: 2
+        x: 703
+        y: 580
+        width: 321
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9dc60570cd1022e70800000000000000
+      internalID: 9088829042514226393
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_89
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 516
+        width: 63
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b54f89d5982fae90800000000000000
+      internalID: -7012341470727289422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_90
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 516
+        width: 60
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c2c0772e3aefc760800000000000000
+      internalID: 7480455058756256455
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_91
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 516
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bfb37aed1ed605d70800000000000000
+      internalID: 9029838069748415483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_92
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 516
+        width: 56
+        height: 56
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15449edc74b72c080800000000000000
+      internalID: -9168630343045397423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_93
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 515
+        width: 60
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54eff13f548470a40800000000000000
+      internalID: 5334311748912545349
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_94
+      rect:
+        serializedVersion: 2
+        x: 321
+        y: 515
+        width: 62
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 007751e5ce0530f80800000000000000
+      internalID: -8141574725234755840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_95
+      rect:
+        serializedVersion: 2
+        x: 383
+        y: 515
+        width: 66
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2a4617dd658700c0800000000000000
+      internalID: -4609568986783921619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_96
+      rect:
+        serializedVersion: 2
+        x: 447
+        y: 515
+        width: 66
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04054d06ce50c0760800000000000000
+      internalID: 7425316398422052928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_97
+      rect:
+        serializedVersion: 2
+        x: 511
+        y: 515
+        width: 66
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4def868fda969b440800000000000000
+      internalID: 4952105461188460244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_98
+      rect:
+        serializedVersion: 2
+        x: 575
+        y: 515
+        width: 66
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9db12bfd7eb2ea720800000000000000
+      internalID: 2859271088317275097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_99
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 514
+        width: 65
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20ba15e82181a10a0800000000000000
+      internalID: -6910184210270409982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_100
+      rect:
+        serializedVersion: 2
+        x: 705
+        y: 514
+        width: 62
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98daa8a6cf3e38450800000000000000
+      internalID: 6089961794393779593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_101
+      rect:
+        serializedVersion: 2
+        x: 770
+        y: 514
+        width: 60
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4241e592ea9975120800000000000000
+      internalID: 2402557899522839588
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_102
+      rect:
+        serializedVersion: 2
+        x: 836
+        y: 513
+        width: 56
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08b10ba7fa60d0080800000000000000
+      internalID: -9219705511410132096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_103
+      rect:
+        serializedVersion: 2
+        x: 900
+        y: 513
+        width: 56
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25e0165ae911894c0800000000000000
+      internalID: -4280652072738550190
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_104
+      rect:
+        serializedVersion: 2
+        x: 963
+        y: 513
+        width: 58
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d1ef5b04ff5c55e0800000000000000
+      internalID: -1919553839399181866
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_105
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 1024
+        height: 449
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07cc2c25e82a6d9e0800000000000000
+      internalID: -1596910285698708368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_106
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 448
+        width: 62
+        height: 63
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 292f456a955850da0800000000000000
+      internalID: -5979226310175296878
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_107
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 448
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7632f3313ca046b0800000000000000
+      internalID: -5314058232972298630
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_108
+      rect:
+        serializedVersion: 2
+        x: 127
+        y: 448
+        width: 66
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ce799c5c169ebd30800000000000000
+      internalID: 4449158530445442753
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_109
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 448
+        width: 258
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 268968403c53924a0800000000000000
+      internalID: -6617699065733408670
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_110
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 448
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eb085724be9840a60800000000000000
+      internalID: 7639382511452520638
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_111
+      rect:
+        serializedVersion: 2
+        x: 513
+        y: 448
+        width: 62
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7fc1ae95d740c2800800000000000000
+      internalID: 588850587704630519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_112
+      rect:
+        serializedVersion: 2
+        x: 579
+        y: 448
+        width: 58
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf739f4d48c985970800000000000000
+      internalID: 8743910770862536699
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_113
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 448
+        width: 56
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d9c5f52e12ac9a30800000000000000
+      internalID: 4223428800936266196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_114
+      rect:
+        serializedVersion: 2
+        x: 706
+        y: 448
+        width: 59
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6497e26f1b196e610800000000000000
+      internalID: 1650166507003345222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_115
+      rect:
+        serializedVersion: 2
+        x: 769
+        y: 448
+        width: 62
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad147150acc75d3f0800000000000000
+      internalID: -876657345343045158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: geo_atlas_blur_116
+      rect:
+        serializedVersion: 2
+        x: 832
+        y: 448
+        width: 192
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 456548bcbfd961ab0800000000000000
+      internalID: -5037665428390521260
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      geo_atlas_blur_0: 4833385140538823689
+      geo_atlas_blur_1: 5293476948364743268
+      geo_atlas_blur_10: -4963431981301669188
+      geo_atlas_blur_100: 6089961794393779593
+      geo_atlas_blur_101: 2402557899522839588
+      geo_atlas_blur_102: -9219705511410132096
+      geo_atlas_blur_103: -4280652072738550190
+      geo_atlas_blur_104: -1919553839399181866
+      geo_atlas_blur_105: -1596910285698708368
+      geo_atlas_blur_106: -5979226310175296878
+      geo_atlas_blur_107: -5314058232972298630
+      geo_atlas_blur_108: 4449158530445442753
+      geo_atlas_blur_109: -6617699065733408670
+      geo_atlas_blur_11: -3107464666248956931
+      geo_atlas_blur_110: 7639382511452520638
+      geo_atlas_blur_111: 588850587704630519
+      geo_atlas_blur_112: 8743910770862536699
+      geo_atlas_blur_113: 4223428800936266196
+      geo_atlas_blur_114: 1650166507003345222
+      geo_atlas_blur_115: -876657345343045158
+      geo_atlas_blur_116: -5037665428390521260
+      geo_atlas_blur_12: -4835963449062961872
+      geo_atlas_blur_13: -966037659909461496
+      geo_atlas_blur_14: -6519727527764416406
+      geo_atlas_blur_15: -402949052042393587
+      geo_atlas_blur_16: -1782796303033690922
+      geo_atlas_blur_17: 7741775181211768429
+      geo_atlas_blur_18: 1798780958827868948
+      geo_atlas_blur_19: -6634053964167499437
+      geo_atlas_blur_2: -7968053100211621599
+      geo_atlas_blur_20: 6485723996667678438
+      geo_atlas_blur_21: 3278501319824679770
+      geo_atlas_blur_22: 6933647664899218211
+      geo_atlas_blur_23: 3483822681383698939
+      geo_atlas_blur_24: 18047625644192686
+      geo_atlas_blur_25: 5902222732962102951
+      geo_atlas_blur_26: -3721023478920262734
+      geo_atlas_blur_27: -5516854259067739356
+      geo_atlas_blur_28: 5598856834413682335
+      geo_atlas_blur_29: -6789223849298707603
+      geo_atlas_blur_3: 894397259628370436
+      geo_atlas_blur_30: 9173150337559415785
+      geo_atlas_blur_31: -4977651398906598021
+      geo_atlas_blur_32: -7828845853702958790
+      geo_atlas_blur_33: 4959125523180191732
+      geo_atlas_blur_34: -6054893195491017374
+      geo_atlas_blur_35: 748045540811276602
+      geo_atlas_blur_36: 6917419858119666946
+      geo_atlas_blur_37: 5762713857470649715
+      geo_atlas_blur_38: -1124673853447523002
+      geo_atlas_blur_39: -6051645111057322575
+      geo_atlas_blur_4: 8001874232325080265
+      geo_atlas_blur_40: -3224215279823551677
+      geo_atlas_blur_41: -2515564641860520626
+      geo_atlas_blur_42: 7968936387073028119
+      geo_atlas_blur_43: -8024293377683974063
+      geo_atlas_blur_44: 8020289525560128307
+      geo_atlas_blur_45: -1348066664639550092
+      geo_atlas_blur_46: -8774321596074694448
+      geo_atlas_blur_47: -1286753304179840856
+      geo_atlas_blur_48: 8902014736274589911
+      geo_atlas_blur_49: 5353142356378517183
+      geo_atlas_blur_5: -4844182618641301406
+      geo_atlas_blur_50: 5715027652176163467
+      geo_atlas_blur_51: 1251937949793313283
+      geo_atlas_blur_52: -2210015632723050915
+      geo_atlas_blur_53: -8520625296105374552
+      geo_atlas_blur_54: -4201548054462040780
+      geo_atlas_blur_55: -6493554509060139511
+      geo_atlas_blur_56: 6936028518518124542
+      geo_atlas_blur_57: 139719365690122577
+      geo_atlas_blur_58: -2170321716599515375
+      geo_atlas_blur_59: 3267902231771084763
+      geo_atlas_blur_6: -2554761499606465645
+      geo_atlas_blur_60: -2616096418271755258
+      geo_atlas_blur_61: 855241363930764757
+      geo_atlas_blur_62: 3318956062501405305
+      geo_atlas_blur_63: 3642704895596857535
+      geo_atlas_blur_64: 1712187801797846518
+      geo_atlas_blur_65: 5721188579545000232
+      geo_atlas_blur_66: 4339490834888290938
+      geo_atlas_blur_67: 7451630845565364022
+      geo_atlas_blur_68: 530752353856113375
+      geo_atlas_blur_69: 8969966634185758548
+      geo_atlas_blur_7: 7681739694945908179
+      geo_atlas_blur_70: -4676938757164198713
+      geo_atlas_blur_71: 6501437389741975862
+      geo_atlas_blur_72: 149206411181824789
+      geo_atlas_blur_73: -3252428723481198717
+      geo_atlas_blur_74: -9062564373737923267
+      geo_atlas_blur_75: 6375902330407847604
+      geo_atlas_blur_76: -6809468171435104064
+      geo_atlas_blur_77: -5744272546188171845
+      geo_atlas_blur_78: -7972745411622460659
+      geo_atlas_blur_79: -5925837768606964333
+      geo_atlas_blur_8: 8635197638710086873
+      geo_atlas_blur_80: -8511916690934177580
+      geo_atlas_blur_81: 7771848137392995945
+      geo_atlas_blur_82: -7398267578494822512
+      geo_atlas_blur_83: 5970949982671172008
+      geo_atlas_blur_84: 7751984776186429253
+      geo_atlas_blur_85: 1471240436096479288
+      geo_atlas_blur_86: -9117826390585513030
+      geo_atlas_blur_87: -5479913976922434092
+      geo_atlas_blur_88: 9088829042514226393
+      geo_atlas_blur_89: -7012341470727289422
+      geo_atlas_blur_9: 6853846401547236448
+      geo_atlas_blur_90: 7480455058756256455
+      geo_atlas_blur_91: 9029838069748415483
+      geo_atlas_blur_92: -9168630343045397423
+      geo_atlas_blur_93: 5334311748912545349
+      geo_atlas_blur_94: -8141574725234755840
+      geo_atlas_blur_95: -4609568986783921619
+      geo_atlas_blur_96: 7425316398422052928
+      geo_atlas_blur_97: 4952105461188460244
+      geo_atlas_blur_98: 2859271088317275097
+      geo_atlas_blur_99: -6910184210270409982
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

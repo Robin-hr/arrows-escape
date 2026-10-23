@@ -45,6 +45,8 @@ namespace ArrowEscape.UI
         public ToastView Toast { get; private set; }
         /// <summary>World ranking page.</summary>
         public RankingView Ranking { get; private set; }
+        /// <summary>Journey road map: every level as a stop on one winding road.</summary>
+        public JourneyView Journey { get; private set; }
         /// <summary>Daily puzzle page (streak, badges, play).</summary>
         public DailyView DailyPage { get; private set; }
         /// <summary>Seven-day reward calendar.</summary>
@@ -115,6 +117,8 @@ namespace ArrowEscape.UI
             Loading = gameObject.AddComponent<LoadingOverlay>(); Loading.Build(canvasObject.transform);
             DailyPage = gameObject.AddComponent<DailyView>(); DailyPage.Build(canvasObject.transform, PlayDaily, CloseDailyPage);
             Rewards = gameObject.AddComponent<DailyRewardsView>(); Rewards.Build(canvasObject.transform, ClaimReward, CloseRewards);
+            Journey = gameObject.AddComponent<JourneyView>(); Journey.Build(canvasObject.transform, PlayFromJourney, CloseJourney);
+            Journey.DeveloperOpen = EconomyConfig.DeveloperGrantEnabled ? DeveloperOpenFromJourney : (System.Action<int>)null;
             Toast = gameObject.AddComponent<ToastView>(); Toast.Build(canvasObject.transform);
             Daily = gameObject.AddComponent<DailyPuzzleController>(); Daily.Initialize(canvasObject.transform, bootstrap, game, hud, Toast, () => TodayKey(), GoHomeFromDaily);
             Daily.Completed += () => Machine.LevelCompleted();
@@ -123,6 +127,7 @@ namespace ArrowEscape.UI
             Levels.DeveloperOpen = EconomyConfig.DeveloperGrantEnabled ? DeveloperOpenLevel : (System.Action<int>)null;
             MainMenu.DailyButton.onClick.AddListener(OpenDailyPage);
             MainMenu.RewardsButton.onClick.AddListener(OpenRewards);
+            MainMenu.JourneyButton.onClick.AddListener(OpenJourney);
             MainMenu.ProfileButton.onClick.AddListener(OpenProfile);
             MainMenu.StarsButton.onClick.AddListener(OnLevelsRequested);
             MainMenu.ShopButton.onClick.AddListener(OpenShop);MainMenu.CoinsButton.onClick.AddListener(OnCoinsTapped);Shop.CoinsButton.onClick.AddListener(OnCoinsTapped);
@@ -145,8 +150,9 @@ namespace ArrowEscape.UI
             if (state != ScreenState.MainMenu && Ranking.IsVisible) Ranking.Hide();
             if (state != ScreenState.MainMenu && DailyPage.IsVisible) DailyPage.Hide();
             if (state != ScreenState.MainMenu && Rewards.IsVisible) Rewards.Hide();
+            if (state != ScreenState.MainMenu && Journey.IsVisible) Journey.Hide();
             if (state != ScreenState.Playing && state != ScreenState.Paused && state != ScreenState.LevelComplete && state != ScreenState.Settings) { Daily.Fail.Hide(); Daily.Result.Hide(); }
-            MainMenu.Root.gameObject.SetActive(state == ScreenState.MainMenu&&!Shop.IsVisible&&!Profile.IsVisible&&!Ranking.IsVisible&&!DailyPage.IsVisible&&!Rewards.IsVisible);
+            MainMenu.Root.gameObject.SetActive(state == ScreenState.MainMenu&&!Shop.IsVisible&&!Profile.IsVisible&&!Ranking.IsVisible&&!DailyPage.IsVisible&&!Rewards.IsVisible&&!Journey.IsVisible);
             Levels.Root.gameObject.SetActive(state == ScreenState.LevelSelect);
             PauseScreen.Root.gameObject.SetActive(state == ScreenState.Paused);
             SettingsScreen.Root.gameObject.SetActive(state == ScreenState.Settings);
@@ -196,6 +202,31 @@ namespace ArrowEscape.UI
         {
             if (Machine.Current == ScreenState.Playing) Machine.Pause();
             Machine.ToMainMenu();
+        }
+        /// <summary>Opens the Journey road map from home, centred on the player's current level.</summary>
+        public void OpenJourney()
+        {
+            if (Machine.Current != ScreenState.MainMenu || Shop.IsVisible) return;
+            MainMenu.Root.gameObject.SetActive(false);
+            var state = bootstrap.Inventory.State;
+            Journey.Show(LevelSelectModel.Build(bootstrap.LevelIds, bootstrap.Progress.Tracker), bootstrap.ContinueIndex, state.EquippedAvatarId, state.EquippedFrameId);
+        }
+        private void CloseJourney()
+        {
+            if (!Journey.IsVisible) return;
+            Journey.Hide(); MainMenu.Root.gameObject.SetActive(Machine.Current == ScreenState.MainMenu); if (Machine.Current == ScreenState.MainMenu) RefreshMainMenu();
+        }
+        private void PlayFromJourney(int index)
+        {
+            if (Machine.Current != ScreenState.MainMenu) return;
+            if (bootstrap.TryStartLevel(index)) { Journey.Hide(); Machine.StartPlaying(); }
+        }
+        /// <summary>Developer option: opens a locked level from the Journey map (three quick taps).</summary>
+        public void DeveloperOpenFromJourney(int index)
+        {
+            if (Machine.Current != ScreenState.MainMenu || !bootstrap.TryStartLevelIgnoringLock(index)) return;
+            Journey.Hide(); Toast.Show("DEVELOPER MODE\nLEVEL " + (index + 1) + " OPENED", "icon_lock");
+            Machine.StartPlaying();
         }
         /// <summary>Opens the 7-day reward calendar.</summary>
         public void OpenRewards()
@@ -340,6 +371,7 @@ namespace ArrowEscape.UI
             if (Daily != null && Daily.Fail.IsOpen) return true;
             if (Rewards != null && Rewards.IsVisible) { if (!Rewards.IsSpinning) CloseRewards(); return true; }
             if (DailyPage != null && DailyPage.IsVisible) { CloseDailyPage(); return true; }
+            if (Journey != null && Journey.IsVisible) { CloseJourney(); return true; }
             if(Shop!=null&&Shop.IsVisible)return Shop.HandleBack();
             if (Ranking != null && Ranking.IsVisible) { CloseRanking(); return true; }
             if (Profile != null && Profile.IsVisible) { CloseProfile(); return true; }

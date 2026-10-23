@@ -8,6 +8,22 @@ namespace ArrowEscape.UI
     public sealed class LevelCompletePanel : MonoBehaviour
     {
         private RectTransform overlay, card;
+        private float fitScale = 1, popTime = 1;
+        /// <summary>Full-screen party-popper confetti shown with the victory card.</summary>
+        public ConfettiView Confetti { get; private set; }
+        /// <summary>Pops the card in and fires the confetti (victory moment).</summary>
+        public void Celebrate()
+        {
+            if (!IsVisible) return;
+            Confetti.transform.SetAsLastSibling(); Confetti.Burst();
+            popTime = Application.isPlaying ? 0 : 1; ApplyPop();
+        }
+        private void ApplyPop()
+        {
+            float t = Motion.Out(popTime);
+            card.localScale = Vector3.one * fitScale * Motion.BackOut(0.25f, 1f, popTime);
+            card.localRotation = Quaternion.Euler(0, 0, (1 - t) * -8f);
+        }
         private RectTransform safeArea;
         private Vector2 lastSize;
         private CompletionResult presentedRating;
@@ -66,7 +82,12 @@ namespace ArrowEscape.UI
             int current=Mathf.Min(30,Mathf.FloorToInt(elapsed/.6f*30));if(current!=coinFrame){coinFrame=current;CoinsText.text=coinFrames[current];if(trophyFrames!=null)TrophiesText.text=trophyFrames[current];}
             if(promoted&&current==30&&!PromotionText.gameObject.activeSelf){PromotionText.gameObject.SetActive(true);AllCompleteText.gameObject.SetActive(false);}
         }
-        private void Update() { if (Application.isPlaying) Tick(Time.deltaTime); }
+        private void Update()
+        {
+            if (!Application.isPlaying) return;
+            Tick(Time.deltaTime);
+            if (IsVisible && popTime < 1) { popTime = Mathf.Min(1, popTime + Time.unscaledDeltaTime / 0.5f); ApplyPop(); }
+        }
         /// <summary>Adds star results to the unchanged completion actions and paired-best labels.</summary>
         public void ShowRating(CompletionResult result, bool sandbox)
         {
@@ -113,6 +134,8 @@ namespace ArrowEscape.UI
             card.anchorMin = card.anchorMax = card.pivot = new Vector2(0.5f, 0.5f);
             card.sizeDelta = new Vector2(900, 1160);
             card.anchoredPosition = Vector2.zero;
+            Confetti = UiFactory.Rect("Confetti", overlay, Vector2.zero, Vector2.zero).gameObject.AddComponent<ConfettiView>();
+            UiFactory.Stretch(Confetti.rectTransform); Confetti.raycastTarget = false; NeonKit.Isolate(Confetti.gameObject);
             BrandArt.Text("Title", card, "LEVEL COMPLETE", 58, new Vector2(850, 90), new Vector2(0, 490), new Color32(255, 214, 92, 255));
             var starRoot = UiFactory.Rect("EarnedStars", card, new Vector2(450,120), new Vector2(0,380));
             Stars = starRoot.gameObject.AddComponent<StarDisplay>(); Stars.Build(card, 110, 150);
@@ -189,7 +212,7 @@ namespace ArrowEscape.UI
             Vector2 size = safeArea.rect.size;
             if (lastSize == size) return;
             lastSize = size;
-            card.localScale = Vector3.one * Mathf.Min(1, size.x * 0.9f / 900, size.y * 0.9f / 1160);
+            fitScale = Mathf.Min(1, size.x * 0.9f / 900, size.y * 0.9f / 1160); ApplyPop();
             card.position = safeArea.TransformPoint(safeArea.rect.center);
         }
     }

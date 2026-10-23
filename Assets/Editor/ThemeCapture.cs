@@ -17,7 +17,7 @@ namespace ArrowEscape.Editor
         public static void Capture()
         {
             Directory.CreateDirectory("Logs/ThemeShots");Directory.CreateDirectory("Logs/LevelShots");
-            foreach(string id in new[]{"mystic_wood","frozen_cavern","pharaohs_tomb","volcanic_underworld","neon_cyberpunk","cosmic_nebula"}){CaptureOne(id,false);CaptureOne(id,true);}
+            foreach(string id in new[]{"grad_midnight","grad_aurora","grad_sunset","grad_lagoon","grad_emerald","grad_rose","geo_crystal","geo_neon","geo_gold"}){CaptureOne(id,false);CaptureOne(id,true);}
             var grid=new Texture2D(512,384,TextureFormat.RGBA32,false);var paths=LevelRepository.GetLevelResourcePaths();
             for(int i=0;i<12;i++){var tile=LevelThumbnailRenderer.Render(LevelRepository.LoadFromResources(paths[i]).Board);grid.SetPixels32((i%4)*128,(2-i/4)*128,128,128,tile.GetPixels32());Object.DestroyImmediate(tile);}grid.Apply();File.WriteAllBytes("Logs/LevelShots/levels_01_12.png",grid.EncodeToPNG());Object.DestroyImmediate(grid);
         }

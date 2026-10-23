@@ -25,6 +25,8 @@ namespace ArrowEscape.Core
         /// <summary>Buys one hint or undo for EconomyConfig.BoostPrice coins.</summary>
         public bool TryBuyBoost(BoostKind kind){if(!CanAfford(EconomyConfig.BoostPrice)||BoostCount(kind)>=EconomyConfig.MaxBoosts)return false;SetCoins((long)Inventory.Coins-EconomyConfig.BoostPrice);AddBoost(kind,1);return true;}
         private void SetBoost(BoostKind kind,int value){if(kind==BoostKind.Hint)Inventory.Hints=value;else Inventory.Undos=value;BoostsChanged?.Invoke(kind,value);}
+        /// <summary>Spends coins for a non-item purchase (e.g. a heart); false when the balance is too low.</summary>
+        public bool TrySpendCoins(int amount){if(amount<0||!CanAfford(amount))return false;SetCoins((long)Inventory.Coins-amount);return true;}
         /// <summary>Gives a shop item for free (rewards); false when unknown or already owned.</summary>
         public bool GrantItem(string id){var item=ShopCatalog.Find(id);if(item==null||Inventory.OwnedItemIds.Contains(id))return false;Inventory.OwnedItemIds.Add(id);ItemPurchased?.Invoke(id);return true;}
         /// <summary>Raised once when equipment changes in a slot.</summary>

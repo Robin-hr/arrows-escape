@@ -17,7 +17,7 @@ namespace ArrowEscape.View
         private readonly double[] gpuSamples=new double[120];
         private readonly FrameTiming[] timing=new FrameTiming[1];
         private readonly List<Row> rows=new List<Row>(67);
-        private readonly string[] themes={"paper","mystic_wood","frozen_cavern","pharaohs_tomb","volcanic_underworld","neon_cyberpunk","cosmic_nebula"};
+        private readonly string[] themes={"paper","grad_midnight","grad_aurora","grad_sunset","geo_crystal","geo_neon","geo_gold"};
         private ThemeBackdrop backdrop;
         private string phaseName;private bool flightPhase;
         private readonly ArrowView[] moving=new ArrowView[12];

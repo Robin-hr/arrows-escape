@@ -12,7 +12,7 @@ namespace ArrowEscape.UI
         private InventoryService inventory;
         private ArrowSkinResources skinResources;
         private readonly LiveSkinPreview[] elementalCards=new LiveSkinPreview[10];
-        private readonly LiveThemePreview[] themeCards=new LiveThemePreview[6];
+        private readonly LiveThemePreview[] themeCards=new LiveThemePreview[ThemeDesign.Count];
         private readonly List<ShopCard> cards=new List<ShopCard>(28);
         private readonly List<RectTransform> sections=new List<RectTransform>(7);
         private readonly List<UnityEngine.UI.GridLayoutGroup> grids=new List<UnityEngine.UI.GridLayoutGroup>(7);

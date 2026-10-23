@@ -21,8 +21,10 @@ namespace ArrowEscape.Core
         public const int BoostPrice = 300;
         /// <summary>Most hints or undos a player can hold.</summary>
         public const int MaxBoosts = 999;
-        /// <summary>Hearts per daily-puzzle attempt.</summary>
+        /// <summary>Hearts per attempt (every level and the daily puzzle).</summary>
         public const int DailyHearts = 3;
+        /// <summary>Coin price of one extra heart when all hearts are lost.</summary>
+        public const int HeartPrice = 500;
         /// <summary>Set false before a store release to disable the developer options (coin grant, open locked levels).</summary>
         public const bool DeveloperGrantEnabled = true;
     }

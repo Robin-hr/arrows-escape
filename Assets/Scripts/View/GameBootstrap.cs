@@ -212,7 +212,7 @@ namespace ArrowEscape.View
         public void PreviousLevel() { int index=CurrentLevelIndex;bool sandbox=IsSandboxLevel;LeaveSandbox();if(sandbox)TryStartLevel(Math.Max(0,index-1));else if(index>0)TryStartLevel(index-1); }
         /// <summary>Restarts the current level from its JSON resource.</summary>
         [ContextMenu("Restart Level")]
-        public void RestartLevel() { if(IsDailyLevel){StartDailyLevel(dailyBoard,DailyKey);return;}if(IsSandboxLevel){TryStartSandboxLevel(sandboxPath);return;}if (CurrentLevelIndex >= 0) TryStartLevel(CurrentLevelIndex); }
+        public void RestartLevel() { if(IsDailyLevel){StartDailyLevel(dailyBoard,DailyKey);return;}if(IsSandboxLevel){TryStartSandboxLevel(sandboxPath);return;}if (CurrentLevelIndex >= 0 && !TryStartLevel(CurrentLevelIndex)) ShowLevel(CurrentLevelIndex); }
         /// <summary>Inspector-only style jump: wraps around and ignores locks.</summary>
         public void DebugJump(int delta)
         {

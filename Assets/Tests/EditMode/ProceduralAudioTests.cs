@@ -31,7 +31,7 @@ namespace ArrowEscape.Tests
         [Test] public void OtherClips()
         {
             Check(audio.GetClip(SoundPlanner.ForBlocked()),SynthMath.RenderThud(SoundDesign.ThudSeconds,SoundDesign.SampleRate));
-            Check(audio.GetClip(SoundPlanner.ForLevelComplete()),SynthMath.RenderMix(SoundDesign.CreateJingle(),SoundDesign.JingleTotalSeconds,SoundDesign.SampleRate));
+            Check(audio.GetClip(SoundPlanner.ForLevelComplete()),VictoryMusic.Render(SoundDesign.SampleRate));
         }
         /// <summary>Tonal cues share cached clips and clamp steps.</summary>
         [Test] public void Mapping()

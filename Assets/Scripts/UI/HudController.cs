@@ -220,6 +220,7 @@ namespace ArrowEscape.UI
             CompletePanel.ShowRating(result, bootstrap.IsSandboxLevel);
             CompletePanel.ShowRewards(bootstrap.LastCoinReward,bootstrap.LastTrophyReward,bootstrap.LastLeaguePromoted,TrophyRules.LeagueFor(bootstrap.Inventory.State.Trophies),bootstrap.IsSandboxLevel);
             if(bootstrap.IsSandboxLevel)CompletePanel.BestText.text="Sandbox — result not saved";
+            CompletePanel.Celebrate();
         }
         private void Refresh()
         {

@@ -6,8 +6,8 @@ using UnityEngine;
 namespace ArrowEscape.UI
 {
     /// <summary>
-    /// Daily puzzle rules on top of the normal game: three hearts (a mistake costs one; at zero restart or watch an
-    /// ad to continue with one), the streak result panel and the share text copied to the clipboard.
+    /// Three hearts on every level and the daily puzzle (a mistake costs one; at zero: watch an ad or buy a heart
+    /// to continue, restart, or go home), plus the daily puzzle's streak result panel and share text.
     /// </summary>
     public sealed class DailyPuzzleController : MonoBehaviour
     {
@@ -43,11 +43,13 @@ namespace ArrowEscape.UI
             Result = gameObject.AddComponent<DailyResultView>(); Result.Build(canvas);
             Fail.RestartButton.onClick.AddListener(RestartDaily);
             Fail.AdButton.onClick.AddListener(WatchAdToContinue);
+            Fail.BuyButton.onClick.AddListener(BuyHeart);
             Fail.HomeButton.onClick.AddListener(() => { Fail.Hide(); home?.Invoke(); });
             Result.ShareButton.onClick.AddListener(Share);
             Result.HomeButton.onClick.AddListener(() => { Result.Hide(); home?.Invoke(); });
             game.LevelStarted += OnLevelStarted;
             game.MistakeCountChanged += OnMistakes;
+            game.BoardCleared += OnCleared;
             bootstrap.DailyCompleted += OnDailyCompleted;
         }
 
@@ -72,19 +74,28 @@ namespace ArrowEscape.UI
         {
             Fail.Hide(); Result.Hide();
             Hearts = EconomyConfig.DailyHearts; lastMistakes = game.MistakeCount;
-            if (bootstrap.IsDailyLevel) hud.Hud.SetHearts(Hearts);
+            hud.Hud.SetHearts(Hearts);
         }
 
         private void OnMistakes(int count)
         {
-            if (!bootstrap.IsDailyLevel) { lastMistakes = count; return; }
+            if (count < lastMistakes) { lastMistakes = count; return; }
             if (count > lastMistakes) Hearts = Math.Max(0, Hearts - (count - lastMistakes));
             lastMistakes = count; hud.Hud.SetHearts(Hearts);
-            if (Hearts <= 0 && !game.IsCleared) Fail.Show();
+            if (Hearts <= 0 && !game.IsCleared) Fail.Show(bootstrap.Inventory.State.Coins);
         }
 
         /// <summary>Starts the puzzle again with full hearts.</summary>
         public void RestartDaily() { Fail.Hide(); bootstrap.RestartLevel(); }
+
+        private void OnCleared() => Fail.Hide();
+
+        /// <summary>Buys one heart for coins and continues.</summary>
+        public void BuyHeart()
+        {
+            if (!bootstrap.Inventory.Shop.TrySpendCoins(EconomyConfig.HeartPrice)) return;
+            bootstrap.Inventory.Save(); Hearts = 1; hud.Hud.SetHearts(Hearts); Fail.Hide();
+        }
 
         /// <summary>Watches a rewarded ad and continues with one heart.</summary>
         public void WatchAdToContinue()
@@ -112,7 +123,7 @@ namespace ArrowEscape.UI
 
         private void OnDestroy()
         {
-            if (game != null) { game.LevelStarted -= OnLevelStarted; game.MistakeCountChanged -= OnMistakes; }
+            if (game != null) { game.LevelStarted -= OnLevelStarted; game.MistakeCountChanged -= OnMistakes; game.BoardCleared -= OnCleared; }
             if (bootstrap != null) bootstrap.DailyCompleted -= OnDailyCompleted;
         }
     }

@@ -75,7 +75,7 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Button ZoomInButton { get; private set; }
         /// <summary>Daily puzzle: zoom the board out.</summary>
         public UnityEngine.UI.Button ZoomOutButton { get; private set; }
-        /// <summary>Daily puzzle hearts (three).</summary>
+        /// <summary>Hearts left in this attempt (every level and the daily puzzle; replaces the mistakes label).</summary>
         public UnityEngine.UI.Image[] Hearts { get; private set; }
         /// <summary>True while the HUD shows the daily-puzzle layout.</summary>
         public bool IsDaily { get; private set; }
@@ -95,8 +95,8 @@ namespace ArrowEscape.UI
         {
             if (heartRow == null) return;
             IsDaily = daily;
-            heartRow.gameObject.SetActive(daily); zoomColumn.gameObject.SetActive(daily);
-            Stars.gameObject.SetActive(!daily); MistakesText.gameObject.SetActive(!daily);
+            zoomColumn.gameObject.SetActive(daily);
+            Stars.gameObject.SetActive(!daily);
             lastName = null; lastMoves = lastTotal = lastMistakes = -1; lastLevelIndex = -2;
         }
 
@@ -150,7 +150,7 @@ namespace ArrowEscape.UI
             heartRow = UiFactory.Rect("Hearts", top, new Vector2(240, 70), new Vector2(140, -30));
             Hearts = new UnityEngine.UI.Image[EconomyConfig.DailyHearts];
             for (int i = 0; i < Hearts.Length; i++) Hearts[i] = BrandArt.Image("Heart" + i, heartRow, "Daily/icon_heart", new Vector2(64, 64), new Vector2((i - 1) * 74, 0));
-            heartRow.gameObject.SetActive(false);
+            MistakesText.gameObject.SetActive(false);
             zoomColumn = UiFactory.Rect("Zoom", safeArea, new Vector2(120, 260), Vector2.zero);
             zoomColumn.anchorMin = zoomColumn.anchorMax = zoomColumn.pivot = new Vector2(1, 0); zoomColumn.anchoredPosition = new Vector2(-24, 260);
             ZoomInButton = NeonKit.IconButton("ZoomIn", zoomColumn, "Daily/icon_zoom_in", new Vector2(0, 65), 112, 70);

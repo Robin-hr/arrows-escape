@@ -38,7 +38,7 @@ namespace ArrowEscape.Editor
                     if(round>0)File.Copy(folder+"/"+id+"_compare.png",folder+"/"+id+"_round"+round+"_compare.png",true);
                 }
                 finally{Object.DestroyImmediate(host);}
-                CaptureBoard(id,false);CaptureBoard(id,true);CaptureBoard(id,false,"frozen_cavern");CaptureBoard(id,false,"volcanic_underworld");
+                CaptureBoard(id,false);CaptureBoard(id,true);CaptureBoard(id,false,"grad_lagoon");CaptureBoard(id,false,"geo_neon");
             }
             sheet.Apply();File.WriteAllBytes(folder+"/"+selected+"_tile.png",sheet.EncodeToPNG());Object.DestroyImmediate(sheet);
         }
@@ -52,7 +52,7 @@ namespace ArrowEscape.Editor
             if(theme!=null){var backdrop=host.GetComponent<ThemeBackdrop>();if(backdrop==null)backdrop=host.AddComponent<ThemeBackdrop>();backdrop.Bind(camera,board,game);board.SetTheme(theme);backdrop.Tick(2);}
             try
             {
-                Render(camera,target);Save(target,"Logs/SkinShots/RareR1/"+id+(theme!=null?(theme=="frozen_cavern"?"_theme_a.png":"_theme_b.png"):dense?"_dense.png":"_bent.png"));
+                Render(camera,target);Save(target,"Logs/SkinShots/RareR1/"+id+(theme!=null?(theme=="grad_lagoon"?"_theme_a.png":"_theme_b.png"):dense?"_dense.png":"_bent.png"));
                 if(!dense&&theme==null){var guide=host.AddComponent<GuideController>();game.BindGuide(guide);Vector2 point=board.CellToWorld(5,3);var taps=host.GetComponent<TapController>();taps.PointerDown(1,point);taps.PointerUp(1,point);host.GetComponent<ArrowAnimator>().Tick(.05f);director.Tick(.05f);Render(camera,target);Save(target,"Logs/SkinShots/RareR1/"+id+"_blocked.png");}
             }
             finally{camera.targetTexture=null;target.Release();Object.DestroyImmediate(target);Object.DestroyImmediate(cameraHost);Object.DestroyImmediate(host);}

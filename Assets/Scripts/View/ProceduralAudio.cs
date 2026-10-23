@@ -59,8 +59,7 @@ namespace ArrowEscape.View
                         return thud;
                     case SoundCue.LevelComplete:
                         if (unavailable[notes.Length + 1]) return null;
-                        if (jingle == null) jingle = Create("Level complete", SynthMath.RenderMix(
-                            SoundDesign.CreateJingle(), SoundDesign.JingleTotalSeconds, SoundDesign.SampleRate));
+                        if (jingle == null) jingle = Create("Victory fanfare", VictoryMusic.Render(SoundDesign.SampleRate));
                         unavailable[notes.Length + 1] = jingle == null;
                         return jingle;
                     default: return null;

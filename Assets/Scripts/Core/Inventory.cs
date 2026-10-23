@@ -51,25 +51,31 @@ namespace ArrowEscape.Core
         public List<string> RefundedRetiredItemIds = new List<string>();
         /// <summary>Refund overflow held until spending makes room under the existing wallet cap.</summary>
         public int PendingRetirementCoins;
-        /// <summary>Refunds the retired paid arrow once, retaining all unrelated and unknown data.</summary>
+        /// <summary>Retired paid items and their refunds (the thunderbolt arrow and the Step 14H scenic themes).</summary>
+        public static readonly string[] RetiredIds={"thunderbolt_dart","mystic_wood","frozen_cavern","pharaohs_tomb","volcanic_underworld","neon_cyberpunk","cosmic_nebula"};
+        private static readonly int[] RetiredRefunds={150,200,250,350,400,500,800};
+        /// <summary>Refunds each retired paid item once and removes it, retaining all unrelated and unknown data.</summary>
         public bool ApplyRetirements()
         {
             RefundedRetiredItemIds=RefundedRetiredItemIds??new List<string>();
-            if(OwnedItemIds==null||!OwnedItemIds.Contains("thunderbolt_dart"))return false;
-            if(!RefundedRetiredItemIds.Contains("thunderbolt_dart"))
+            if(OwnedItemIds==null)return false;bool changed=false;
+            for(int i=0;i<RetiredIds.Length;i++)
             {
-                int credited=Math.Min(150,EconomyConfig.MaxCoins-Coins);
-                Coins+=credited;PendingRetirementCoins+=150-credited;
-                RefundedRetiredItemIds.Add("thunderbolt_dart");
+                string id=RetiredIds[i];if(!OwnedItemIds.Contains(id))continue;changed=true;
+                if(!RefundedRetiredItemIds.Contains(id))
+                {
+                    int refund=RetiredRefunds[i],credited=Math.Min(refund,EconomyConfig.MaxCoins-Coins);
+                    Coins+=credited;PendingRetirementCoins+=refund-credited;RefundedRetiredItemIds.Add(id);
+                }
+                OwnedItemIds.RemoveAll(x=>x==id);
+                if(EquippedArrowId==id)EquippedArrowId="classic";
+                if(EquippedThemeId==id)EquippedThemeId="paper";
             }
-            OwnedItemIds.RemoveAll(IsThunderbolt);
-            if(EquippedArrowId=="thunderbolt_dart")EquippedArrowId="classic";
-            return true;
+            return changed;
         }
         /// <summary>Transfers reserved refund coins into newly available wallet space, without losing credit.</summary>
         public void ReleaseRetirementCredit()
         {int credit=Math.Min(Math.Max(0,PendingRetirementCoins),EconomyConfig.MaxCoins-Coins);Coins+=credit;PendingRetirementCoins-=credit;}
-        private static bool IsThunderbolt(string id)=>id=="thunderbolt_dart";
         /// <summary>Normalizes lists, balance and slots without discarding unknown item ids.</summary>
         public void Sanitize()
         {

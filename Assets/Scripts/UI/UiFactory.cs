@@ -65,6 +65,7 @@ namespace ArrowEscape.UI
             safe = Rect("SafeArea", root, Vector2.zero, Vector2.zero);
             Stretch(safe);
             safe.gameObject.AddComponent<SafeAreaPanel>().Apply();
+            ScreenAppear.Attach(root, safe);
             return root;
         }
         /// <summary>Creates a centered column with cached responsive fitting.</summary>

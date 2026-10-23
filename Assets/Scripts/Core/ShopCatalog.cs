@@ -27,12 +27,15 @@ namespace ArrowEscape.Core
             new ShopItem("infinity_core","Infinity Core","A reality-bending golden artifact arrow.",ShopSlot.Arrow,"Legendary",1000,"#FFC300","#FFF3B0",true),
             new ShopItem("phoenix_wing","Phoenix Wing","A majestic arrow enveloped completely in bright orange flames.",ShopSlot.Arrow,"Legendary",1000,"#FF7A00","#FFD000",true),
             new ShopItem("chronos_needle","Chronos Needle","A glowing silver arrow that looks like a ticking clock hand.",ShopSlot.Arrow,"Legendary",1000,"#D9E2EC","#7DD3FC",true),
-            new ShopItem("mystic_wood","Enchanted Forest","Violet magic glows between deep forest greens.",ShopSlot.Theme,"Themes",200,"#9B5DE5","#0F2418",true),
-            new ShopItem("frozen_cavern","Frozen Cavern","Pale ice lights a deep blue cavern.",ShopSlot.Theme,"Themes",250,"#7FDBFF","#0B2540",true),
-            new ShopItem("pharaohs_tomb","Pharaoh's Tomb","Warm gold illuminates ancient sandstone shadows.",ShopSlot.Theme,"Themes",350,"#E0B04B","#3B2A14",true),
-            new ShopItem("volcanic_underworld","Volcanic Underworld","Molten orange lava glows against dark rock.",ShopSlot.Theme,"Themes",400,"#FF5A1F","#2A0E06",true),
-            new ShopItem("neon_cyberpunk","Neon Cyberpunk","Magenta neon shines through midnight city blues.",ShopSlot.Theme,"Themes",500,"#FF2BD6","#0D0221",true),
-            new ShopItem("cosmic_nebula","Cosmic Nebula","Violet stardust drifts through deep space.",ShopSlot.Theme,"Themes",800,"#C77DFF","#0B0A24",true),
+            new ShopItem("grad_midnight","Midnight Blue","A deep navy gradient that fades into steel blue.",ShopSlot.Theme,"Gradients",150,"#2E5A88","#141E30",true),
+            new ShopItem("grad_aurora","Aurora Violet","Indigo flowing into violet like the northern lights.",ShopSlot.Theme,"Gradients",200,"#8E3C8F","#1D2B64",true),
+            new ShopItem("grad_sunset","Sunset Ember","Plum dusk warming into a glowing ember sunset.",ShopSlot.Theme,"Gradients",250,"#C2553A","#2B1331",true),
+            new ShopItem("grad_lagoon","Deep Lagoon","Cool ocean blues rising to a bright lagoon teal.",ShopSlot.Theme,"Gradients",300,"#1A8A86","#062B3A",true),
+            new ShopItem("grad_emerald","Emerald Night","Forest shadows lifting into calm emerald green.",ShopSlot.Theme,"Gradients",350,"#2E7D5B","#04241A",true),
+            new ShopItem("grad_rose","Rose Velvet","Rich velvet purple blooming into rose pink.",ShopSlot.Theme,"Gradients",400,"#A3336F","#2A0F33",true),
+            new ShopItem("geo_crystal","Crystal Drift","Live 3D crystals float upward through pastel sky.",ShopSlot.Theme,"Live Wallpapers",900,"#D68CDE","#62B2F2",true),
+            new ShopItem("geo_neon","Neon Prism","Glowing 3D prisms orbit slowly in midnight space.",ShopSlot.Theme,"Live Wallpapers",1200,"#FF4FD8","#07091F",true),
+            new ShopItem("geo_gold","Golden Facets","Gold and teal 3D gems drift down through the deep.",ShopSlot.Theme,"Live Wallpapers",1500,"#FFC94A","#061A1E",true),
             new ShopItem("avatar_player","Player","The classic neon player badge.",ShopSlot.Avatar,"Classic",0,"#38E1FF","#2A1F86",true),
             new ShopItem("avatar_fox","Swift Fox","A quick-witted fox who always finds the way out.",ShopSlot.Avatar,"Cute Crew",100,"#FF8A3D","#2D1A6E",true),
             new ShopItem("avatar_cat","Neon Cat","A curious violet cat with glowing green eyes.",ShopSlot.Avatar,"Cute Crew",100,"#B79CFF","#1E2A7A",true),
@@ -69,7 +72,7 @@ namespace ArrowEscape.Core
         /// <summary>Stable display order including the four free defaults.</summary>
         public static IReadOnlyList<ShopItem> Items => items;
         /// <summary>Retired ids stay reserved forever and are never reused for another item.</summary>
-        public static IReadOnlyList<string> RetiredItemIds { get; } = Array.AsReadOnly(new[] { "thunderbolt_dart" });
+        public static IReadOnlyList<string> RetiredItemIds { get; } = Array.AsReadOnly((string[])Inventory.RetiredIds.Clone());
         /// <summary>Returns a known released entry, or null.</summary>
         public static ShopItem Find(string id){for(int i=0;i<items.Count;i++)if(items[i].Id==id)return items[i];return null;}
     }

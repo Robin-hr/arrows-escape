@@ -8,7 +8,7 @@ namespace ArrowEscape.Tests
     /// <summary>Live themes remain cosmetic, bounded and independent of player-file formats.</summary>
     public sealed class LiveThemeTests
     {
-        private static readonly string[] ids={"mystic_wood","frozen_cavern","pharaohs_tomb","volcanic_underworld","neon_cyberpunk","cosmic_nebula"};
+        private static readonly string[] ids={"grad_midnight","grad_aurora","grad_sunset","grad_lagoon","grad_emerald","grad_rose","geo_crystal","geo_neon","geo_gold"};
         /// <summary>Every released theme can be bought and equipped at its unchanged price.</summary>
         [TestCaseSource(nameof(ids))]public void PurchaseAndPresentation(string id)
         {
@@ -28,7 +28,7 @@ namespace ArrowEscape.Tests
         /// <summary>Prepared parallax updates allocate no managed memory.</summary>
         [Test]public void TickIsAllocationFree()
         {
-            var host=new GameObject("Theme allocation fixture");try{var camera=host.AddComponent<Camera>();var theme=host.AddComponent<ThemeBackdrop>();theme.Bind(camera);theme.SetTheme("cosmic_nebula");theme.Tick(.01f);long before=System.GC.GetAllocatedBytesForCurrentThread();for(int i=0;i<120;i++)theme.Tick(.01f);Assert.That(System.GC.GetAllocatedBytesForCurrentThread()-before,Is.Zero);}finally{Object.DestroyImmediate(host);}
+            var host=new GameObject("Theme allocation fixture");try{var camera=host.AddComponent<Camera>();var theme=host.AddComponent<ThemeBackdrop>();theme.Bind(camera);theme.SetTheme("geo_neon");theme.Tick(.01f);long before=System.GC.GetAllocatedBytesForCurrentThread();for(int i=0;i<120;i++)theme.Tick(.01f);Assert.That(System.GC.GetAllocatedBytesForCurrentThread()-before,Is.Zero);}finally{Object.DestroyImmediate(host);}
         }
         /// <summary>Paper keeps its exact baseline colors.</summary>
         [Test]public void PaperIsUnchanged(){Assert.That(ThemeDesign.Background("paper"),Is.EqualTo(ViewTheme.Background));Assert.That(ThemeDesign.ClassicInk("paper"),Is.EqualTo(ViewTheme.ArrowColor));}
