@@ -21,6 +21,22 @@ namespace ArrowEscape.Core
         public const string DefaultFrameId = "frame_bronze";
         /// <summary>Total trophies; decides the player's league.</summary>
         public int Trophies;
+        /// <summary>Hints left (limited helper).</summary>
+        public int Hints = EconomyConfig.StartingHints;
+        /// <summary>Undos left (limited helper).</summary>
+        public int Undos = EconomyConfig.StartingUndos;
+        /// <summary>Next day (0..6) of the 7-day reward calendar.</summary>
+        public int DailyRewardDay;
+        /// <summary>yyyymmdd of the last reward claim (0 = never).</summary>
+        public int DailyRewardLastKey;
+        /// <summary>Daily-puzzle streak as of the last solve.</summary>
+        public int DailyStreak;
+        /// <summary>Best daily-puzzle streak ever (badges).</summary>
+        public int DailyBestStreak;
+        /// <summary>yyyymmdd of the last solved daily puzzle (0 = never).</summary>
+        public int DailyLastSolvedKey;
+        /// <summary>Daily puzzles solved in total.</summary>
+        public int DailySolvedCount;
         /// <summary>Equipped profile avatar.</summary>
         public string EquippedAvatarId = DefaultAvatarId;
         /// <summary>Equipped profile avatar frame.</summary>
@@ -58,6 +74,8 @@ namespace ArrowEscape.Core
         public void Sanitize()
         {
             Coins=Math.Max(0,Math.Min(EconomyConfig.MaxCoins,Coins));Trophies=Math.Max(0,Trophies);
+            Hints=Math.Max(0,Math.Min(EconomyConfig.MaxBoosts,Hints));Undos=Math.Max(0,Math.Min(EconomyConfig.MaxBoosts,Undos));
+            DailyRewardDay=((DailyRewardDay%7)+7)%7;DailyStreak=Math.Max(0,DailyStreak);DailyBestStreak=Math.Max(DailyStreak,DailyBestStreak);DailySolvedCount=Math.Max(0,DailySolvedCount);
             OwnedItemIds=OwnedItemIds??new List<string>(); RewardedStars=RewardedStars??new List<LevelRewardRecord>();
             if(!OwnedItemIds.Contains("classic"))OwnedItemIds.Add("classic");
             if(!OwnedItemIds.Contains("paper"))OwnedItemIds.Add("paper");

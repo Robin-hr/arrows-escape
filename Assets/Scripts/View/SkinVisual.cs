@@ -8,7 +8,7 @@ namespace ArrowEscape.View
         private ArrowView owner;
         private Transform visuals;
         private MeshRenderer body,halo;
-        private SpriteRenderer head,tail;
+        private SpriteRenderer head,tail,uniformHead;
         private Mesh singleMesh;
         private PathRibbon single;
         private InfernoVisual inferno;
@@ -25,6 +25,19 @@ namespace ArrowEscape.View
         private bool activeState,light,lod;
         private Color stateTint;
         private int order;
+        /// <summary>Heads draw above board effects so no board layer can cover them.</summary>
+        public const int HeadSortingOffset=50;
+        private static Material headMaterial;
+        // Plain sprite material of its own: previews give the path a glow material that cannot draw sprite art.
+        private static Material HeadMaterial(Sprite sprite)
+        {
+            if(headMaterial==null)headMaterial=new Material(Shader.Find("Sprites/Default")){name="Uniform head sprites",hideFlags=HideFlags.HideAndDontSave};
+            if(sprite!=null)headMaterial.mainTexture=sprite.texture;return headMaterial;
+        }
+        /// <summary>The classic painted head every skin wears, so all arrows share one head shape and size (Step 14I).</summary>
+        public SpriteRenderer UniformHead=>uniformHead;
+        /// <summary>Head colour for a skin: its body colour, lifted slightly so the shaded head reads on dark boards.</summary>
+        public static Color HeadColor(ArrowSkin skin){if(skin==null)return Color.white;float l=skin.Primary.r*.3f+skin.Primary.g*.59f+skin.Primary.b*.11f;return Color.Lerp(skin.Primary,skin.Secondary,l<.3f?.65f:.2f);}
         /// <summary>Current recipe; null leaves Classic or tint fallback intact.</summary>
         public ArrowSkin Skin { get; private set; }
         /// <summary>Whether the light-board alpha blend is selected.</summary>
@@ -67,6 +80,8 @@ namespace ArrowEscape.View
             }
             halo=MeshChild("Soft halo",mesh);body=MeshChild("Patterned body",mesh);
             head=SpriteChild("Reference head");tail=SpriteChild("Reference tail");
+            var classicHead=owner.Path!=null?owner.Path.HeadArt:null;
+            if(classicHead!=null){uniformHead=SpriteChild("Uniform classic head");uniformHead.sprite=classicHead.sprite;uniformHead.sharedMaterial=HeadMaterial(classicHead.sprite);}
         }
         private MeshRenderer MeshChild(string name,Mesh mesh)
         {var go=new GameObject(name);go.transform.SetParent(visuals,false);go.AddComponent<MeshFilter>().sharedMesh=mesh;return go.AddComponent<MeshRenderer>();}
@@ -93,7 +108,8 @@ namespace ArrowEscape.View
         private void Apply()
         {
             if(Skin==null||body==null)return;
-            bool procedural=Skin.IsProcedural;body.enabled=halo.enabled=head.enabled=tail.enabled=!procedural;
+            ApplyUniformHead();
+            bool procedural=Skin.IsProcedural;body.enabled=halo.enabled=!procedural;head.enabled=tail.enabled=false;
             if(inferno!=null)inferno.SetVisible(Skin.Index==1);
             if(elemental!=null)elemental.SetVisible(Skin.IsElemental&&Skin.Index!=1);
             if(rare!=null)rare.SetVisible(Skin.IsRare);
@@ -102,8 +118,17 @@ namespace ArrowEscape.View
             if(procedural){inferno.Apply(HeadLocal(),HeadDirection(),owner.Path!=null?owner.Path.Distance:0,owner.Path!=null?owner.Path.Ribbon.BodyLength:.84f,owner.Path!=null&&inferno.IsFlying?Mathf.Max(flight,Mathf.Sqrt(Mathf.Clamp01(owner.Path.Distance/owner.Path.ExitDistance))):flight,clock,light,lod,activeState,stateTint,opacity,order);return;}
             bodyProperties.SetFloat("_State",activeState?1:0);bodyProperties.SetColor("_StateTint",stateTint);bodyProperties.SetFloat("_Opacity",opacity);bodyProperties.SetFloat("_Flight",flight);bodyProperties.SetFloat("_Lod",lod?1:0);bodyProperties.SetFloat("_Seed",SkinEffectRules.Lightning(owner.Arrow.Id,0,0));bodyProperties.SetFloat("_SkinClock",clock);body.SetPropertyBlock(bodyProperties);body.sortingOrder=order;
             haloProperties.SetFloat("_Seed",SkinEffectRules.Lightning(owner.Arrow.Id,0,0));haloProperties.SetFloat("_Shape",Skin.Index);haloProperties.SetFloat("_BodyLength",owner.Path!=null?owner.Path.Ribbon.BodyLength:.84f);haloProperties.SetColor("_Tint",Color.Lerp(Skin.Primary,Skin.Secondary,.4f));haloProperties.SetFloat("_Expansion",activeState?.085f:.11f);haloProperties.SetFloat("_Opacity",opacity*(light?.20f:.30f));haloProperties.SetFloat("_Pulse",Skin.Period);haloProperties.SetFloat("_State",activeState?1:0);haloProperties.SetColor("_StateTint",stateTint);haloProperties.SetFloat("_SkinClock",clock);halo.SetPropertyBlock(haloProperties);halo.sortingOrder=order;halo.enabled=!lod||activeState||flight>0;
-            ApplyCap(head,headProperties,HeadLocal(),HeadDirection(),1.05f);
-            ApplyCap(tail,tailProperties,TailLocal()+TailDirection()*.18f,TailDirection(),.60f);tail.enabled=(!lod||flight>0)&&tail.sprite!=null;
+            // Skin-specific head and tail art stay hidden: every skin wears the classic head and the ribbon's round tail.
+            head.enabled=tail.enabled=false;
+        }
+        private void ApplyUniformHead()
+        {
+            if(uniformHead==null||owner.Path==null)return;
+            Vector2 tip=HeadLocal(),direction=HeadDirection();
+            uniformHead.transform.localPosition=new Vector3(tip.x,tip.y,-.001f);
+            uniformHead.transform.localRotation=Quaternion.Euler(0,0,Mathf.Atan2(direction.y,direction.x)*Mathf.Rad2Deg);
+            Color color=activeState?stateTint:HeadColor(Skin);color.a*=opacity;
+            uniformHead.color=color;uniformHead.sortingOrder=order+HeadSortingOffset;uniformHead.enabled=true;
         }
         private void ApplyCap(SpriteRenderer renderer,MaterialPropertyBlock block,Vector2 point,Vector2 direction,float width)
         {

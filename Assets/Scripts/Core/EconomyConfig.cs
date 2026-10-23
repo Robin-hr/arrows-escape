@@ -13,7 +13,17 @@ namespace ArrowEscape.Core
         public const int MaxCoins = 9999999;
         /// <summary>Developer grant for five rapid taps on the coin counter.</summary>
         public const int DeveloperGrant = 50000;
-        /// <summary>Set false before a store release to disable the five-tap developer grant.</summary>
+        /// <summary>Hints every new player starts with.</summary>
+        public const int StartingHints = 3;
+        /// <summary>Undos every new player starts with.</summary>
+        public const int StartingUndos = 3;
+        /// <summary>Coin price of one extra hint or undo.</summary>
+        public const int BoostPrice = 300;
+        /// <summary>Most hints or undos a player can hold.</summary>
+        public const int MaxBoosts = 999;
+        /// <summary>Hearts per daily-puzzle attempt.</summary>
+        public const int DailyHearts = 3;
+        /// <summary>Set false before a store release to disable the developer options (coin grant, open locked levels).</summary>
         public const bool DeveloperGrantEnabled = true;
     }
 }

@@ -81,11 +81,12 @@ namespace ArrowEscape.UI
         public bool IsBlocked(Vector2 screenPosition)
         {
             if (CompletePanel == null) return false;
-            if (CompletePanel.IsVisible) return true;
+            if (CompletePanel.IsVisible || (Offer != null && Offer.IsOpen)) return true;
             Camera camera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
             return Contains(Hud.PauseButton.transform as RectTransform, screenPosition, camera) || Contains(Hud.UndoButton.transform as RectTransform, screenPosition, camera) ||
                 Contains(Hud.HintButton.transform as RectTransform, screenPosition, camera) ||
-                Contains(Hud.RestartButton.transform as RectTransform, screenPosition, camera);
+                Contains(Hud.RestartButton.transform as RectTransform, screenPosition, camera) ||
+                (Hud.IsDaily && (Contains(Hud.ZoomInButton.transform as RectTransform, screenPosition, camera) || Contains(Hud.ZoomOutButton.transform as RectTransform, screenPosition, camera)));
         }
 
         private static bool Contains(RectTransform rect, Vector2 point, Camera camera)
@@ -123,13 +124,54 @@ namespace ArrowEscape.UI
             Hud.RestartButton.onClick.AddListener(Restart);
             Hud.HintButton.onClick.AddListener(Hint);
             Hud.PauseButton.onClick.AddListener(() => PauseRequested?.Invoke());
+            Hud.ZoomInButton.onClick.AddListener(() => Zoom(0.8f));
+            Hud.ZoomOutButton.onClick.AddListener(() => Zoom(1.25f));
+            Offer = gameObject.AddComponent<BoostOfferView>(); Offer.Build(root.transform);
             CompletePanel.ReplayButton.onClick.AddListener(Replay);
             CompletePanel.NextButton.onClick.AddListener(Next);
         }
 
-        private void Undo() => game.Undo();
+        /// <summary>"Out of hints/undos" offer.</summary>
+        public BoostOfferView Offer { get; private set; }
+        private ShopService Wallet => bootstrap != null && bootstrap.Inventory != null ? bootstrap.Inventory.Shop : null;
+        // Undo and Hint use the limited helpers when an inventory is bound; with none left they open the offer.
+        private void Undo()
+        {
+            if (game == null) return;
+            var wallet = Wallet; if (wallet == null) { game.Undo(); return; }
+            if (!game.CanUndo) return;
+            if (wallet.BoostCount(BoostKind.Undo) <= 0) { OpenOffer(BoostKind.Undo); return; }
+            int before = game.UndoCount; game.Undo();
+            if (game.UndoCount != before) { wallet.TryUseBoost(BoostKind.Undo); bootstrap.Inventory.Save(); }
+            RefreshBoosts();
+        }
         private void Restart() => game.RestartLevel();
-        private void Hint() => game.ShowHint();
+        private void Hint()
+        {
+            if (game == null) return;
+            var wallet = Wallet; if (wallet == null) { game.ShowHint(); return; }
+            if (!game.CanHint) return;
+            if (wallet.BoostCount(BoostKind.Hint) <= 0) { OpenOffer(BoostKind.Hint); return; }
+            if (game.ShowHint()) { wallet.TryUseBoost(BoostKind.Hint); bootstrap.Inventory.Save(); }
+            RefreshBoosts();
+        }
+        /// <summary>Shows the offer for a helper that ran out.</summary>
+        public void OpenOffer(BoostKind kind)
+        {
+            var wallet = Wallet; if (wallet == null || Offer == null) return;
+            Offer.Show(kind, wallet.Inventory.Coins, () => WatchAdFor(kind), () => { if (wallet.TryBuyBoost(kind)) { bootstrap.Inventory.Save(); RefreshBoosts(); } });
+        }
+        private void WatchAdFor(BoostKind kind)
+        {
+            void Grant(bool earned) { if (!earned || Wallet == null) return; Wallet.AddBoost(kind, 1); bootstrap.Inventory.Save(); RefreshBoosts(); }
+            if (RewardedAds.Service == null) Grant(true); else RewardedAds.Service.Show(kind == BoostKind.Hint ? "hint" : "undo", Grant);
+        }
+        private void RefreshBoosts() { var wallet = Wallet; if (wallet != null && Hud != null) Hud.SetBoosts(wallet.BoostCount(BoostKind.Hint), wallet.BoostCount(BoostKind.Undo)); }
+        private void Zoom(float factor)
+        {
+            var zoom = game != null ? game.GetComponent<BoardZoom>() : null;
+            if (zoom != null) zoom.ZoomAt(new Vector2(Screen.width * 0.5f, Screen.height * 0.5f), factor);
+        }
         private void Replay()
         {
             if (!ConsumeCompletion()) return;
@@ -159,6 +201,7 @@ namespace ArrowEscape.UI
         private void OnCleared()
         {
             if (!visible) return;
+            if (bootstrap != null && bootstrap.IsDailyLevel) { Refresh(); return; }
             Refresh();
             if (bootstrap != null && bootstrap.LastCompletion != null) OnLevelCompleted(bootstrap.LastCompletion);
             else
@@ -170,7 +213,7 @@ namespace ArrowEscape.UI
         }
         private void OnLevelCompleted(CompletionResult result)
         {
-            if (!visible) return;
+            if (!visible || bootstrap.IsDailyLevel) return;
             if (CompletePanel.IsVisible && ReferenceEquals(CompletePanel.Rating, result)) return;
             CompletePanel.Show(game.MistakeCount, game.UndoCount, result, bootstrap.IsLastLevel,
                 bootstrap.AllLevelsCompleted, bootstrap.CanGoNext);
@@ -185,7 +228,11 @@ namespace ArrowEscape.UI
             Hud.SetStarState(game.TapCount, game.Par);
             Hud.SetHintState(game.CanHint);
             Hud.SetStuckVisible(game.IsStuck);
-            if (bootstrap != null) Hud.SetLevelPosition(bootstrap.IsSandboxLevel?-1:bootstrap.CurrentLevelIndex, bootstrap.IsSandboxLevel?0:bootstrap.LevelCount);
+            bool daily = bootstrap != null && bootstrap.IsDailyLevel;
+            if (Hud.IsDaily != daily) Hud.SetDaily(daily);
+            if (daily) Hud.SetDailyInfo(DailyCalendar.Pretty(bootstrap.DailyKey), game.TapCount);
+            else if (bootstrap != null) Hud.SetLevelPosition(bootstrap.IsSandboxLevel?-1:bootstrap.CurrentLevelIndex, bootstrap.IsSandboxLevel?0:bootstrap.LevelCount);
+            RefreshBoosts();
         }
 
         private void Unbind()

@@ -67,6 +67,61 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Button HintButton { get; private set; }
         /// <summary>Restart attempt control.</summary>
         public UnityEngine.UI.Button RestartButton { get; private set; }
+        /// <summary>Hints left ("+" when none), on the Hint button.</summary>
+        public UnityEngine.UI.Text HintCountText { get; private set; }
+        /// <summary>Undos left ("+" when none), on the Undo button.</summary>
+        public UnityEngine.UI.Text UndoCountText { get; private set; }
+        /// <summary>Daily puzzle: zoom the board in.</summary>
+        public UnityEngine.UI.Button ZoomInButton { get; private set; }
+        /// <summary>Daily puzzle: zoom the board out.</summary>
+        public UnityEngine.UI.Button ZoomOutButton { get; private set; }
+        /// <summary>Daily puzzle hearts (three).</summary>
+        public UnityEngine.UI.Image[] Hearts { get; private set; }
+        /// <summary>True while the HUD shows the daily-puzzle layout.</summary>
+        public bool IsDaily { get; private set; }
+        private RectTransform heartRow, zoomColumn;
+
+        /// <summary>Shows hint and undo counts; zero shows a "+" (tap to get more).</summary>
+        public void SetBoosts(int hints, int undos)
+        {
+            if (HintCountText == null) return;
+            string h = hints > 0 ? hints.ToString() : "+", u = undos > 0 ? undos.ToString() : "+";
+            if (HintCountText.text != h) HintCountText.text = h;
+            if (UndoCountText.text != u) UndoCountText.text = u;
+        }
+
+        /// <summary>Switches between the level layout (stars, mistakes) and the daily layout (hearts, zoom).</summary>
+        public void SetDaily(bool daily)
+        {
+            if (heartRow == null) return;
+            IsDaily = daily;
+            heartRow.gameObject.SetActive(daily); zoomColumn.gameObject.SetActive(daily);
+            Stars.gameObject.SetActive(!daily); MistakesText.gameObject.SetActive(!daily);
+            lastName = null; lastMoves = lastTotal = lastMistakes = -1; lastLevelIndex = -2;
+        }
+
+        /// <summary>Daily header: title, date and moves (no par).</summary>
+        public void SetDailyInfo(string date, int moves)
+        {
+            if (LevelText == null) return;
+            LevelText.text = "DAILY PUZZLE"; LevelPositionText.text = date; MovesText.text = "Moves " + moves; MovesText.color = TextColor;
+        }
+
+        /// <summary>Fills the first <paramref name="count"/> hearts.</summary>
+        public void SetHearts(int count)
+        {
+            if (Hearts == null) return;
+            for (int i = 0; i < Hearts.Length; i++) { var sprite = BrandArt.SpriteOf(i < count ? "Daily/icon_heart" : "Daily/icon_heart_empty"); if (Hearts[i].sprite != sprite) Hearts[i].sprite = sprite; }
+        }
+
+        private static UnityEngine.UI.Text CountBadge(UnityEngine.UI.Button button)
+        {
+            var badge = BrandArt.Image("Count", button.transform, "ui_pill", new Vector2(64, 64), Vector2.zero, NeonKit.PillBorder);
+            var rect = badge.rectTransform; rect.anchorMin = rect.anchorMax = new Vector2(1, 1); rect.anchoredPosition = new Vector2(-14, -12);
+            badge.color = new Color32(255, 95, 175, 255);
+            var text = BrandArt.Text("Value", badge.transform, "3", 32, new Vector2(64, 64), Vector2.zero, Color.white);
+            return text;
+        }
 
         /// <summary>Creates the HUD once under a safe-area rectangle.</summary>
         public void Build(RectTransform safeArea)
@@ -91,6 +146,16 @@ namespace ArrowEscape.UI
             UndoButton = UiFactory.Button("Undo", bottom, new Vector2(-step, 0)); NeonKit.WithIcon(UndoButton, "icon_undo", 58);
             HintButton = UiFactory.Button("Hint", bottom, Vector2.zero); NeonKit.WithIcon(HintButton, "icon_hint", 62);
             RestartButton = UiFactory.Button("Restart", bottom, new Vector2(step, 0)); NeonKit.WithIcon(RestartButton, "icon_restart", 58);
+            UndoCountText = CountBadge(UndoButton); HintCountText = CountBadge(HintButton);
+            heartRow = UiFactory.Rect("Hearts", top, new Vector2(240, 70), new Vector2(140, -30));
+            Hearts = new UnityEngine.UI.Image[EconomyConfig.DailyHearts];
+            for (int i = 0; i < Hearts.Length; i++) Hearts[i] = BrandArt.Image("Heart" + i, heartRow, "Daily/icon_heart", new Vector2(64, 64), new Vector2((i - 1) * 74, 0));
+            heartRow.gameObject.SetActive(false);
+            zoomColumn = UiFactory.Rect("Zoom", safeArea, new Vector2(120, 260), Vector2.zero);
+            zoomColumn.anchorMin = zoomColumn.anchorMax = zoomColumn.pivot = new Vector2(1, 0); zoomColumn.anchoredPosition = new Vector2(-24, 260);
+            ZoomInButton = NeonKit.IconButton("ZoomIn", zoomColumn, "Daily/icon_zoom_in", new Vector2(0, 65), 112, 70);
+            ZoomOutButton = NeonKit.IconButton("ZoomOut", zoomColumn, "Daily/icon_zoom_out", new Vector2(0, -65), 112, 70);
+            zoomColumn.gameObject.SetActive(false);
             undoRect = (RectTransform)UndoButton.transform;
             hintRect = (RectTransform)HintButton.transform;
             restartRect = (RectTransform)RestartButton.transform;

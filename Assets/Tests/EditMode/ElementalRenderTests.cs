@@ -20,17 +20,6 @@ namespace ArrowEscape.Tests
                 preview.View.SetSkin("classic",true);preview.View.SetSkin(id,false);preview.View.Skin.SetClock(2);preview.RenderNow();Assert.That(Read(preview.Texture),Is.EqualTo(original));
             }finally{Object.DestroyImmediate(host);}
         }
-        /// <summary>Mirrored head silhouettes remain symmetric independently of internal moving detail.</summary>
-        [TestCase("frostbite")][TestCase("plasma_bolt")][TestCase("void_whisper")]
-        public void ProceduralHeadSilhouetteIsMirrored(string id)
-        {
-            var host=new GameObject("Head mirror render");try
-            {
-                var preview=host.AddComponent<LiveSkinPreview>();Vector2 origin=Vector2.zero;preview.Initialize(null,origin);preview.AutoReplay=false;preview.SetDark(true);preview.ShowStraight(id);preview.SetResolution(256,256);preview.SetFraming(preview.View.Skin.HeadWorld-new Vector2(.55f,0),.85f);preview.SetCaptureBackground(Color.clear);preview.View.Skin.SetClock(0);
-                foreach(var renderer in host.GetComponentsInChildren<Renderer>())renderer.enabled=renderer.name=="Elemental SDF head";preview.RenderNow();var data=Read(preview.Texture);int occupied=0;
-                for(int y=0;y<128;y++){int upper=0,lower=0;for(int x=0;x<256;x++){if(data[y*256+x].a>128)lower++;if(data[(255-y)*256+x].a>128)upper++;}occupied+=upper+lower;Assert.That(upper,Is.EqualTo(lower).Within(2),id+" row "+y);}Assert.That(occupied,Is.GreaterThan(100));
-            }finally{Object.DestroyImmediate(host);}
-        }
         /// <summary>All three recipes reuse deterministic generated noise and never import bitmaps.</summary>
         [Test] public void GeneratedNoiseCacheIsDeterministic()
         {

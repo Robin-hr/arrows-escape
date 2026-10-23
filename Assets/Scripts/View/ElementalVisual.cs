@@ -43,7 +43,7 @@ namespace ArrowEscape.View
             var feathers=new GameObject("Frozen crystal fletching");feathers.transform.SetParent(transform,false);feathers.AddComponent<MeshFilter>().sharedMesh=quad;tail=feathers.AddComponent<MeshRenderer>();tail.enabled=false;
         }
         /// <summary>Hides all recipe layers when equipment changes.</summary>
-        public void SetVisible(bool value){if(visible==value)return;visible=value;for(int i=0;i<renderers.Length;i++)if(renderers[i]!=null)renderers[i].enabled=value;if(tail!=null&&!value)tail.enabled=false;}
+        public void SetVisible(bool value){if(visible==value)return;visible=value;for(int i=0;i<renderers.Length;i++)if(renderers[i]!=null)renderers[i].enabled=value&&i!=1;if(tail!=null&&!value)tail.enabled=false;}
         /// <summary>One appearance writer for every procedural layer and state overlay.</summary>
         public void Apply(ArrowSkin skin,Vector2 head,Vector2 direction,float distance,float length,float clock,bool light,bool lod,bool feedback,Color tint,float alpha,int sorting,float translation=0)
         {
@@ -58,8 +58,8 @@ namespace ArrowEscape.View
             if(rebuilt){Vector2 tailPoint=ribbon.Point(distance),tailDirection=(ribbon.Point(distance+.01f)-tailPoint).normalized;rareCaps.Build(head,direction,tailPoint,tailDirection,false);/* Rare arrows have no fletching tail. */filters[1].sharedMesh=rareCaps.Mesh;renderers[1].transform.localPosition=Vector3.zero;renderers[1].transform.localRotation=Quaternion.identity;}else filters[1].sharedMesh=quad;
 
             if(rebuilt)renderers[2].transform.localPosition=new Vector3(0,0,.015f);else renderers[2].transform.localPosition=Vector3.zero;
-            for(int i=0;i<4;i++){renderers[i].enabled=rebuilt?i<2||i==2&&(!lod||flying||feedback):i<2||!lod||flying||feedback;renderers[i].sharedMaterial=skin.IsRare?RareMaterials.Get(skin.Index,i,light):ElementalMaterials.Get(skin.Index,i,light);renderers[i].SetPropertyBlock(properties);renderers[i].sortingOrder=sorting;}
-            tail.enabled=skin.Index==0&&!lod;if(tail.enabled){Vector2 p=ribbon.Point(distance),d=(ribbon.Point(distance+.01f)-p).normalized;tail.transform.localPosition=p+d*.7f;tail.transform.localRotation=Quaternion.Euler(0,0,Mathf.Atan2(d.y,d.x)*Mathf.Rad2Deg);tail.transform.localScale=new Vector3(.7f,.65f,1);properties.SetFloat("_Tail",1);tail.sharedMaterial=ElementalMaterials.Get(0,1,light);tail.SetPropertyBlock(properties);tail.sortingOrder=sorting;}
+            for(int i=0;i<4;i++){renderers[i].enabled=i!=1&&(rebuilt?i<2||i==2&&(!lod||flying||feedback):i<2||!lod||flying||feedback);/* i==1 is the skin head: replaced by the uniform classic head. */renderers[i].sharedMaterial=skin.IsRare?RareMaterials.Get(skin.Index,i,light):ElementalMaterials.Get(skin.Index,i,light);renderers[i].SetPropertyBlock(properties);renderers[i].sortingOrder=sorting;}
+            tail.enabled=false;/* No fletching tails: every skin keeps the classic round tail. */if(tail.enabled){Vector2 p=ribbon.Point(distance),d=(ribbon.Point(distance+.01f)-p).normalized;tail.transform.localPosition=p+d*.7f;tail.transform.localRotation=Quaternion.Euler(0,0,Mathf.Atan2(d.y,d.x)*Mathf.Rad2Deg);tail.transform.localScale=new Vector3(.7f,.65f,1);properties.SetFloat("_Tail",1);tail.sharedMaterial=ElementalMaterials.Get(0,1,light);tail.SetPropertyBlock(properties);tail.sortingOrder=sorting;}
         }
         private void UpdateGeometry(float distance)
         {

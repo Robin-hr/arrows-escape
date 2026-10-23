@@ -182,6 +182,21 @@ namespace ArrowEscape.DevBridge
                     method?.Invoke(flow, args);
                     Append("play-log.txt", Now + " " + action + (method == null || flow == null ? " (not found)" : ""));
                 }
+                else if (action == "dump")
+                {
+                    // Lists every renderer under the first arrow view (debugging presentation in Play mode).
+                    var text = new StringBuilder();
+                    Type viewType = Type.GetType("ArrowEscape.View.ArrowView, ArrowEscape.View");
+                    var views = UnityEngine.Object.FindObjectsByType(viewType, FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+                    text.AppendLine("views " + views.Length);
+                    if (views.Length > 0)
+                        foreach (var r in ((Component)views[0]).GetComponentsInChildren<Renderer>(true))
+                        {
+                            string extra = r is SpriteRenderer sr ? " col=" + sr.color + " sprite=" + (sr.sprite != null ? sr.sprite.name : "null") : "";
+                            text.AppendLine(r.name + " en=" + r.enabled + " act=" + r.gameObject.activeInHierarchy + " ord=" + r.sortingOrder + " layer=" + r.gameObject.layer + " mat=" + (r.sharedMaterial != null ? r.sharedMaterial.name : "null") + " pos=" + r.transform.position + " bounds=" + r.bounds.size + extra);
+                        }
+                    Write("dump.txt", text.ToString());
+                }
                 else if (action == "solve")
                 {
                     // Taps hinted arrows until the level is cleared (screenshots of the completion screen).

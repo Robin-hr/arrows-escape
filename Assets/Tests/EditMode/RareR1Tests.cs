@@ -28,14 +28,6 @@ namespace ArrowEscape.Tests
             var pixels=Read(p);int min=256,max=-1;for(int y=0;y<256;y++)if(pixels[y*256+128].a>128){min=Math.Min(min,y);max=Math.Max(max,y);}
             Assert.That((max-min+1)*1.2f/256,Is.GreaterThanOrEqualTo(.30f));
         }
-        /// <summary>Measures the isolated head silhouette in world cells.</summary>
-        [TestCaseSource(nameof(ids))]public void HeadLengthOneToOnePointTwo(string id)
-        {
-            var p=Create(id);p.SetResolution(256,256);p.SetFraming(p.View.Skin.HeadWorld-new Vector2(.55f,0),.85f);
-            foreach(var r in p.View.GetComponentsInChildren<Renderer>())r.enabled=r.name=="Elemental SDF head";
-            var pixels=Read(p);int min=256,max=-1;for(int y=0;y<256;y++)for(int x=0;x<256;x++)if(pixels[y*256+x].a>128){min=Math.Min(min,x);max=Math.Max(max,x);}
-            Assert.That((max-min+1)*1.7f/256,Is.InRange(1f,1.2f));
-        }
         /// <summary>Four shared surface draws at most, also in the dense recipe.</summary>
         [TestCaseSource(nameof(ids))]public void AtMostFourDraws(string id)
         {

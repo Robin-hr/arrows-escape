@@ -10,6 +10,7 @@ namespace ArrowEscape.UI
         private float remaining;
         /// <summary>Toast rectangle.</summary>
         public RectTransform Root { get; private set; }
+        private UnityEngine.UI.Image icon;
         /// <summary>Message text.</summary>
         public UnityEngine.UI.Text Message { get; private set; }
         /// <summary>Whether the toast is on screen.</summary>
@@ -22,15 +23,18 @@ namespace ArrowEscape.UI
             Root = pill.rectTransform; Root.anchorMin = Root.anchorMax = new Vector2(0.5f, 0.78f);
             if (pill.sprite == null) pill.color = new Color(0.06f, 0.04f, 0.23f, 0.95f);
             group = pill.gameObject.AddComponent<CanvasGroup>(); group.blocksRaycasts = false; group.interactable = false;
-            NeonKit.Icon("Coin", Root, "icon_coin", 92, new Vector2(-320, 0));
+            icon = NeonKit.Icon("Coin", Root, "icon_coin", 92, new Vector2(-320, 0));
             Message = BrandArt.Text("Message", Root, "", 38, new Vector2(620, 140), new Vector2(50, 0), new Color32(255, 220, 110, 255));
             Root.gameObject.SetActive(false);
         }
 
         /// <summary>Shows a message for about two seconds.</summary>
-        public void Show(string text)
+        public void Show(string text) => Show(text, "icon_coin");
+        /// <summary>Shows a message with a different Brand icon (e.g. "Daily/icon_share").</summary>
+        public void Show(string text, string iconArt)
         {
             if (Root == null) return;
+            var sprite = BrandArt.SpriteOf(iconArt); if (sprite != null) icon.sprite = sprite;
             Message.text = text; remaining = Duration; group.alpha = 1;
             Root.gameObject.SetActive(true); Root.SetAsLastSibling();
         }

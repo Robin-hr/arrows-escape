@@ -52,7 +52,29 @@ namespace ArrowEscape.View
             sandboxPath=resourcePath;IsSandboxLevel=true;controller.SetLevelInfo(result.LevelName,resourcePath);
             controller.StartLevel(result.Board,result.LevelName);GetComponent<CameraFitter>().Fit(result.Board.Width,result.Board.Height);return true;
         }
-        private void LeaveSandbox(){if(!IsSandboxLevel)return;IsSandboxLevel=false;sandboxPath=null;CurrentLevelIndex=-1;}
+        private void LeaveSandbox(){LeaveDaily();if(!IsSandboxLevel)return;IsSandboxLevel=false;sandboxPath=null;CurrentLevelIndex=-1;}
+        private Board dailyBoard;
+        /// <summary>True while today's daily puzzle is being played (no level progress, streak on clear).</summary>
+        public bool IsDailyLevel { get; private set; }
+        /// <summary>Date key (yyyymmdd) of the daily puzzle being played.</summary>
+        public int DailyKey { get; private set; }
+        /// <summary>Daily streak after the latest daily clear.</summary>
+        public int LastDailyStreak { get; private set; }
+        /// <summary>True when the latest daily clear was the first solve of that day.</summary>
+        public bool LastDailyFirstSolve { get; private set; }
+        /// <summary>Raised once when the daily puzzle is cleared (after the streak is saved).</summary>
+        public event System.Action DailyCompleted;
+        /// <summary>Starts the daily puzzle from a generated board; restarts reuse an untouched copy.</summary>
+        public void StartDailyLevel(Board board,int dateKey)
+        {
+            if(board==null)return;
+            EnsureInitialized();bool sandbox=IsSandboxLevel;IsSandboxLevel=false;sandboxPath=null;
+            dailyBoard=board.Clone();DailyKey=dateKey;IsDailyLevel=true;CurrentLevelIndex=-1;
+            var zoom=GetComponent<BoardZoom>();if(zoom==null)zoom=gameObject.AddComponent<BoardZoom>();zoom.Forced=true;
+            controller.SetLevelInfo("Daily Puzzle","daily/"+dateKey);
+            controller.StartLevel(dailyBoard.Clone(),"Daily Puzzle");GetComponent<CameraFitter>().Fit(board.Width,board.Height);
+        }
+        private void LeaveDaily(){if(!IsDailyLevel)return;IsDailyLevel=false;dailyBoard=null;CurrentLevelIndex=-1;var zoom=GetComponent<BoardZoom>();if(zoom!=null)zoom.Forced=false;}
         [ContextMenu("Debug: Sandbox Path 1")]private void SandboxPathOne(){if(Application.isPlaying)TryStartSandboxLevel("TestLevels/path_001");}
         [ContextMenu("Debug: Sandbox Path 2")]private void SandboxPathTwo(){if(Application.isPlaying)TryStartSandboxLevel("TestLevels/path_002");}
         [ContextMenu("Debug: Sandbox Path 3")]private void SandboxPathThree(){if(Application.isPlaying)TryStartSandboxLevel("TestLevels/path_003");}
@@ -190,7 +212,7 @@ namespace ArrowEscape.View
         public void PreviousLevel() { int index=CurrentLevelIndex;bool sandbox=IsSandboxLevel;LeaveSandbox();if(sandbox)TryStartLevel(Math.Max(0,index-1));else if(index>0)TryStartLevel(index-1); }
         /// <summary>Restarts the current level from its JSON resource.</summary>
         [ContextMenu("Restart Level")]
-        public void RestartLevel() { if(IsSandboxLevel){TryStartSandboxLevel(sandboxPath);return;}if (CurrentLevelIndex >= 0) TryStartLevel(CurrentLevelIndex); }
+        public void RestartLevel() { if(IsDailyLevel){StartDailyLevel(dailyBoard,DailyKey);return;}if(IsSandboxLevel){TryStartSandboxLevel(sandboxPath);return;}if (CurrentLevelIndex >= 0) TryStartLevel(CurrentLevelIndex); }
         /// <summary>Inspector-only style jump: wraps around and ignores locks.</summary>
         public void DebugJump(int delta)
         {
@@ -223,6 +245,13 @@ namespace ArrowEscape.View
             else Initialize(new MemoryProgressStore(), new MemorySettingsStore());
         }
         /// <summary>Starts an existing unlocked level; invalid requests leave the current attempt untouched.</summary>
+        /// <summary>Developer option: opens any level, ignoring locks (progress is still recorded on a clear).</summary>
+        public bool TryStartLevelIgnoringLock(int index)
+        {
+            LeaveSandbox();EnsureInitialized();
+            if(index<0||index>=LevelCount)return false;
+            ShowLevel(index);return CurrentLevelIndex==index&&controller.Session!=null;
+        }
         public bool TryStartLevel(int index)
         {
             LeaveSandbox();
@@ -243,7 +272,7 @@ namespace ArrowEscape.View
             clearRecorded = false;
             LastCompletion = null;
             LastCoinReward=0;LastTrophyReward=0;LastLeaguePromoted=false;CurrentAttemptId=Inventory.Shop.BeginAttempt();ApplyEquipment();
-            if(IsSandboxLevel)return;
+            if(IsSandboxLevel||IsDailyLevel)return;
             if (string.IsNullOrEmpty(CurrentLevelId)) return;
             if(Inventory.LastSaveFailed&&!Inventory.Save())return;
             Progress.RememberLevel(CurrentLevelId);
@@ -251,6 +280,14 @@ namespace ArrowEscape.View
         }
         private void OnCleared()
         {
+            if(IsDailyLevel)
+            {
+                if(clearRecorded||!controller.IsCleared)return;clearRecorded=true;
+                int before=Inventory.State.DailyLastSolvedKey;
+                LastDailyStreak=DailyStreakRules.RecordSolve(Inventory.State,DailyKey);LastDailyFirstSolve=before!=DailyKey;
+                if(LastDailyFirstSolve)Inventory.Save();
+                DailyCompleted?.Invoke();return;
+            }
             if(IsSandboxLevel)
             {
                 if(clearRecorded||!controller.IsCleared)return;clearRecorded=true;

@@ -45,6 +45,16 @@ namespace ArrowEscape.UI
         public ToastView Toast { get; private set; }
         /// <summary>World ranking page.</summary>
         public RankingView Ranking { get; private set; }
+        /// <summary>Daily puzzle page (streak, badges, play).</summary>
+        public DailyView DailyPage { get; private set; }
+        /// <summary>Seven-day reward calendar.</summary>
+        public DailyRewardsView Rewards { get; private set; }
+        /// <summary>Daily puzzle rules: hearts, result and share.</summary>
+        public DailyPuzzleController Daily { get; private set; }
+        /// <summary>Stand-in rewarded ad until a real ad network is registered.</summary>
+        public AdPlaceholderView Ads { get; private set; }
+        /// <summary>Today's calendar key (local date); tests may replace it.</summary>
+        public System.Func<int> TodayKey { get; set; } = () => DailyCalendar.Key(System.DateTime.Now);
         /// <summary>Clock for the five-tap developer grant; tests may replace it.</summary>
         public System.Func<float> Clock { get; set; } = () => Time.realtimeSinceStartup;
 
@@ -82,8 +92,9 @@ namespace ArrowEscape.UI
             ApplyScreen(ScreenState.MainMenu, ScreenState.MainMenu);
             // An explicitly auto-started scene component keeps its existing play behavior.
             if (game.Session != null) Machine.StartPlaying();
-            if (LoadingScreensEnabled) Loading.Show(LoadingKind.Startup, null, MainMenu.PlayEntrance);
+            if (LoadingScreensEnabled) Loading.Show(LoadingKind.Startup, null, () => { MainMenu.PlayEntrance(); if (RewardWaiting) OpenRewards(); });
         }
+        private bool RewardWaiting => DailyRewardRules.CanClaim(bootstrap.Inventory.State, TodayKey());
         private void BuildScreens()
         {
             var canvasObject = new GameObject("ArrowEscapeMenus", typeof(RectTransform), typeof(Canvas), typeof(UnityEngine.UI.CanvasScaler), typeof(UnityEngine.UI.GraphicRaycaster));
@@ -102,7 +113,16 @@ namespace ArrowEscape.UI
             Profile = gameObject.AddComponent<ProfileView>(); Profile.Build(canvasObject.transform, CloseProfile, OpenAvatarShop, OpenRanking);
             Ranking = gameObject.AddComponent<RankingView>(); Ranking.Build(canvasObject.transform, CloseRanking, bootstrap.RankingSnapshot);
             Loading = gameObject.AddComponent<LoadingOverlay>(); Loading.Build(canvasObject.transform);
+            DailyPage = gameObject.AddComponent<DailyView>(); DailyPage.Build(canvasObject.transform, PlayDaily, CloseDailyPage);
+            Rewards = gameObject.AddComponent<DailyRewardsView>(); Rewards.Build(canvasObject.transform, ClaimReward, CloseRewards);
             Toast = gameObject.AddComponent<ToastView>(); Toast.Build(canvasObject.transform);
+            Daily = gameObject.AddComponent<DailyPuzzleController>(); Daily.Initialize(canvasObject.transform, bootstrap, game, hud, Toast, () => TodayKey(), GoHomeFromDaily);
+            Daily.Completed += () => Machine.LevelCompleted();
+            Ads = gameObject.AddComponent<AdPlaceholderView>(); Ads.Build(canvasObject.transform);
+            if (RewardedAds.Service == null || RewardedAds.Service is AdPlaceholderView) RewardedAds.Service = Ads;
+            Levels.DeveloperOpen = EconomyConfig.DeveloperGrantEnabled ? DeveloperOpenLevel : (System.Action<int>)null;
+            MainMenu.DailyButton.onClick.AddListener(OpenDailyPage);
+            MainMenu.RewardsButton.onClick.AddListener(OpenRewards);
             MainMenu.ProfileButton.onClick.AddListener(OpenProfile);
             MainMenu.StarsButton.onClick.AddListener(OnLevelsRequested);
             MainMenu.ShopButton.onClick.AddListener(OpenShop);MainMenu.CoinsButton.onClick.AddListener(OnCoinsTapped);Shop.CoinsButton.onClick.AddListener(OnCoinsTapped);
@@ -116,14 +136,17 @@ namespace ArrowEscape.UI
             PauseScreen.SettingsButton.onClick.AddListener(OpenSettings);
             PauseScreen.MainMenuButton.onClick.AddListener(ToMainMenu);
         }
-        private bool IsBlocked(Vector2 position) => Machine.Current != ScreenState.Playing || Confirm.IsOpen || (Loading != null && Loading.IsVisible) || (Intro != null && Intro.IsPlaying);
+        private bool IsBlocked(Vector2 position) => Machine.Current != ScreenState.Playing || Confirm.IsOpen || (Loading != null && Loading.IsVisible) || (Intro != null && Intro.IsPlaying) || (Daily != null && Daily.IsModalOpen) || (Ads != null && Ads.IsShowing);
         private void OnStateChanged(ScreenState oldState, ScreenState newState) => ApplyScreen(oldState, newState);
         private void ApplyScreen(ScreenState previous, ScreenState state)
         {
             if(state!=ScreenState.MainMenu&&Shop.IsVisible)Shop.Close();
             if (state != ScreenState.MainMenu && Profile.IsVisible) Profile.Hide();
             if (state != ScreenState.MainMenu && Ranking.IsVisible) Ranking.Hide();
-            MainMenu.Root.gameObject.SetActive(state == ScreenState.MainMenu&&!Shop.IsVisible&&!Profile.IsVisible&&!Ranking.IsVisible);
+            if (state != ScreenState.MainMenu && DailyPage.IsVisible) DailyPage.Hide();
+            if (state != ScreenState.MainMenu && Rewards.IsVisible) Rewards.Hide();
+            if (state != ScreenState.Playing && state != ScreenState.Paused && state != ScreenState.LevelComplete && state != ScreenState.Settings) { Daily.Fail.Hide(); Daily.Result.Hide(); }
+            MainMenu.Root.gameObject.SetActive(state == ScreenState.MainMenu&&!Shop.IsVisible&&!Profile.IsVisible&&!Ranking.IsVisible&&!DailyPage.IsVisible&&!Rewards.IsVisible);
             Levels.Root.gameObject.SetActive(state == ScreenState.LevelSelect);
             PauseScreen.Root.gameObject.SetActive(state == ScreenState.Paused);
             SettingsScreen.Root.gameObject.SetActive(state == ScreenState.Settings);
@@ -143,6 +166,64 @@ namespace ArrowEscape.UI
             MainMenu.SetTheme(bootstrap.Inventory.State.EquippedThemeId);
             MainMenu.SetEconomy(bootstrap.Inventory.State.Coins,bootstrap.Progress.Tracker.TotalStars,bootstrap.LevelCount*3,false);
             MainMenu.SetAvatar(bootstrap.Inventory.State.EquippedAvatarId,bootstrap.Inventory.State.EquippedFrameId);
+            int key=TodayKey();var state=bootstrap.Inventory.State;
+            MainMenu.SetDaily(DailyStreakRules.CurrentStreak(state,key),DailyStreakRules.SolvedToday(state,key),DailyRewardRules.CanClaim(state,key));
+        }
+        /// <summary>Opens the daily puzzle page from home.</summary>
+        public void OpenDailyPage()
+        {
+            if (Machine.Current != ScreenState.MainMenu || Shop.IsVisible) return;
+            MainMenu.Root.gameObject.SetActive(false); DailyPage.Show(bootstrap.Inventory.State, TodayKey());
+        }
+        private void CloseDailyPage()
+        {
+            if (!DailyPage.IsVisible) return;
+            DailyPage.Hide(); MainMenu.Root.gameObject.SetActive(Machine.Current == ScreenState.MainMenu); if (Machine.Current == ScreenState.MainMenu) RefreshMainMenu();
+        }
+        /// <summary>Builds today's board (off the main thread in Play mode) and starts it.</summary>
+        public void PlayDaily()
+        {
+            if (Machine.Current != ScreenState.MainMenu || Daily.IsBuilding) return;
+            var label = DailyPage.PlayButton.GetComponentInChildren<UnityEngine.UI.Text>(); label.text = "BUILDING PUZZLE..."; DailyPage.PlayButton.interactable = false;
+            Daily.Build(TodayKey(), (built, key) =>
+            {
+                DailyPage.PlayButton.interactable = true;
+                if (Machine.Current != ScreenState.MainMenu) return;
+                DailyPage.Hide(); bootstrap.StartDailyLevel(built, key); Machine.StartPlaying();
+            });
+        }
+        private void GoHomeFromDaily()
+        {
+            if (Machine.Current == ScreenState.Playing) Machine.Pause();
+            Machine.ToMainMenu();
+        }
+        /// <summary>Opens the 7-day reward calendar.</summary>
+        public void OpenRewards()
+        {
+            if (Machine.Current != ScreenState.MainMenu || Shop.IsVisible) return;
+            if (Profile.IsVisible) Profile.Hide(); if (Ranking.IsVisible) Ranking.Hide(); if (DailyPage.IsVisible) DailyPage.Hide();
+            MainMenu.Root.gameObject.SetActive(false); Rewards.Show(bootstrap.Inventory.State, TodayKey());
+        }
+        private void CloseRewards()
+        {
+            if (!Rewards.IsVisible) return;
+            Rewards.Hide(); MainMenu.Root.gameObject.SetActive(Machine.Current == ScreenState.MainMenu); if (Machine.Current == ScreenState.MainMenu) RefreshMainMenu();
+        }
+        /// <summary>Claims today's reward, saves it and presents it (day 7 spins the mystery reel).</summary>
+        public bool ClaimReward()
+        {
+            int key = TodayKey(); var shop = bootstrap.Inventory.Shop; int day = DailyRewardRules.NextDay(shop.Inventory);
+            var reward = DailyRewardRules.Claim(shop, key); if (reward == null) return false;
+            bootstrap.Inventory.Save(); Rewards.Present(reward, day, shop.Inventory, key); OnCoins(shop.Inventory.Coins);
+            return true;
+        }
+        /// <summary>Developer option: opens a locked level from the level list (three quick taps).</summary>
+        public void DeveloperOpenLevel(int index)
+        {
+            if (Machine.Current != ScreenState.LevelSelect) return;
+            if (!bootstrap.TryStartLevelIgnoringLock(index)) return;
+            Toast.Show("DEVELOPER MODE\nLEVEL " + (index + 1) + " OPENED", "icon_lock");
+            Machine.StartPlaying();
         }
         private void BindInventory()
         {
@@ -234,7 +315,7 @@ namespace ArrowEscape.UI
             // New level starts (menu, level select, next level, replay) get a 1-second loader; restarting from pause does not.
             bool newLevel = previous != ScreenState.Playing && previous != ScreenState.Paused;
             if (LoadingScreensEnabled && newLevel)
-                Loading.Show(LoadingKind.Level, "LEVEL " + (bootstrap.CurrentLevelIndex + 1));
+                Loading.Show(LoadingKind.Level, bootstrap.IsDailyLevel ? "DAILY PUZZLE" : "LEVEL " + (bootstrap.CurrentLevelIndex + 1));
             // Arrows land on the board as the loading screen fades (or right away on a restart).
             if (LoadingScreensEnabled) Intro.Play(newLevel ? LoadingOverlay.LevelSeconds - 0.1f : 0f);
         }
@@ -254,6 +335,11 @@ namespace ArrowEscape.UI
         {
             if (Loading != null && Loading.IsVisible) return true;
             if (Confirm != null && Confirm.IsOpen) { Confirm.Hide(); return true; }
+            if (Ads != null && Ads.IsShowing) return true;
+            if (Daily != null && Daily.Result.IsOpen) { Daily.Result.Hide(); GoHomeFromDaily(); return true; }
+            if (Daily != null && Daily.Fail.IsOpen) return true;
+            if (Rewards != null && Rewards.IsVisible) { if (!Rewards.IsSpinning) CloseRewards(); return true; }
+            if (DailyPage != null && DailyPage.IsVisible) { CloseDailyPage(); return true; }
             if(Shop!=null&&Shop.IsVisible)return Shop.HandleBack();
             if (Ranking != null && Ranking.IsVisible) { CloseRanking(); return true; }
             if (Profile != null && Profile.IsVisible) { CloseProfile(); return true; }

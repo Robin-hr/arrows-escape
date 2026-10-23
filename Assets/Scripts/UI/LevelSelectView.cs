@@ -29,6 +29,19 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.ScrollRect Scroll { get; private set; }
         /// <summary>Current tile buttons, in level order.</summary>
         public IReadOnlyList<UnityEngine.UI.Button> TileButtons => buttons;
+        /// <summary>Developer option: three quick taps on a locked tile open it for testing (null = off).</summary>
+        public Action<int> DeveloperOpen { get; set; }
+        /// <summary>Clock for the developer triple tap; tests may replace it.</summary>
+        public Func<float> Clock { get; set; } = () => Time.realtimeSinceStartup;
+        private readonly TapStreak lockedTaps = new TapStreak(3, 0.6f);
+        private int lockedTile = -1;
+        /// <summary>Counts a tap on a locked tile; the third quick tap on the same tile opens it.</summary>
+        public void TapLocked(int index)
+        {
+            if (DeveloperOpen == null || tiles == null || index < 0 || index >= tiles.Count || tiles[index].State != LevelTileState.Locked) return;
+            if (index != lockedTile) { lockedTaps.Reset(); lockedTile = index; }
+            if (lockedTaps.Tap(Clock())) { lockedTile = -1; DeveloperOpen(tiles[index].Index); }
+        }
         /// <summary>Builds the header, viewport, mask, and grid.</summary>
         public void Build(Transform parent, Action<int> onStart, Action onBack)
         {
@@ -55,6 +68,7 @@ namespace ArrowEscape.UI
                 int index = buttons.Count;
                 var button = UiFactory.Button("Level " + (index + 1), Scroll.content, Vector2.zero);
                 button.onClick.AddListener(() => { if (index < tiles.Count && tiles[index].State != LevelTileState.Locked) start(tiles[index].Index); });
+                button.gameObject.AddComponent<LockedTileTap>().Tapped += () => { if (!button.interactable) TapLocked(index); };
                 var label=button.GetComponentInChildren<UnityEngine.UI.Text>();
                 label.resizeTextForBestFit=false;label.supportRichText=true;label.horizontalOverflow=HorizontalWrapMode.Overflow;label.verticalOverflow=VerticalWrapMode.Overflow;label.lineSpacing=.82f;
                 label.rectTransform.anchorMin=new Vector2(0,.07f);label.rectTransform.anchorMax=new Vector2(1,.33f);

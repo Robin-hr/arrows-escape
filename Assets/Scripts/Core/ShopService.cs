@@ -14,6 +14,19 @@ namespace ArrowEscape.Core
         public int LastTrophyReward { get; private set; }
         /// <summary>Raised once after a successful purchase.</summary>
         public event Action<string> ItemPurchased;
+        /// <summary>Raised when the hint or undo count changes.</summary>
+        public event Action<BoostKind,int> BoostsChanged;
+        /// <summary>Hints or undos left.</summary>
+        public int BoostCount(BoostKind kind)=>kind==BoostKind.Hint?Inventory.Hints:Inventory.Undos;
+        /// <summary>Uses one hint or undo; false when none are left.</summary>
+        public bool TryUseBoost(BoostKind kind){if(BoostCount(kind)<=0)return false;SetBoost(kind,BoostCount(kind)-1);return true;}
+        /// <summary>Adds hints or undos (daily rewards, ads).</summary>
+        public void AddBoost(BoostKind kind,int amount){if(amount<0)throw new ArgumentOutOfRangeException(nameof(amount));SetBoost(kind,(int)Math.Min(EconomyConfig.MaxBoosts,(long)BoostCount(kind)+amount));}
+        /// <summary>Buys one hint or undo for EconomyConfig.BoostPrice coins.</summary>
+        public bool TryBuyBoost(BoostKind kind){if(!CanAfford(EconomyConfig.BoostPrice)||BoostCount(kind)>=EconomyConfig.MaxBoosts)return false;SetCoins((long)Inventory.Coins-EconomyConfig.BoostPrice);AddBoost(kind,1);return true;}
+        private void SetBoost(BoostKind kind,int value){if(kind==BoostKind.Hint)Inventory.Hints=value;else Inventory.Undos=value;BoostsChanged?.Invoke(kind,value);}
+        /// <summary>Gives a shop item for free (rewards); false when unknown or already owned.</summary>
+        public bool GrantItem(string id){var item=ShopCatalog.Find(id);if(item==null||Inventory.OwnedItemIds.Contains(id))return false;Inventory.OwnedItemIds.Add(id);ItemPurchased?.Invoke(id);return true;}
         /// <summary>Raised once when equipment changes in a slot.</summary>
         public event Action<ShopSlot,string> EquippedChanged;
         /// <summary>Wraps and normalizes an inventory.</summary>

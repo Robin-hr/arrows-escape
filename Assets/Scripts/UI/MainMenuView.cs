@@ -38,6 +38,22 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Button SettingsButton { get; private set; }
         /// <summary>Opens the world ranking.</summary>
         public UnityEngine.UI.Button RankingButton { get; private set; }
+        /// <summary>Opens the daily puzzle page.</summary>
+        public UnityEngine.UI.Button DailyButton { get; private set; }
+        /// <summary>Opens the daily rewards calendar.</summary>
+        public UnityEngine.UI.Button RewardsButton { get; private set; }
+        /// <summary>Streak count on the daily button.</summary>
+        public UnityEngine.UI.Text StreakText { get; private set; }
+        /// <summary>Red dot when today's reward is waiting.</summary>
+        public UnityEngine.UI.Image RewardDot { get; private set; }
+        /// <summary>Updates the daily button streak and the reward dot.</summary>
+        public void SetDaily(int streak, bool solvedToday, bool rewardWaiting)
+        {
+            if (StreakText == null) return;
+            StreakText.text = streak.ToString(); dailyFire.sprite = BrandArt.SpriteOf(streak > 0 ? "Daily/icon_fire" : "Daily/icon_fire_dim");
+            dailyCheck.gameObject.SetActive(solvedToday); RewardDot.gameObject.SetActive(rewardWaiting);
+        }
+        private UnityEngine.UI.Image dailyFire, dailyCheck;
         /// <summary>Side of the four home tiles.</summary>
         public const float TileSize = 214;
         /// <summary>Profile button in the header.</summary>
@@ -88,6 +104,19 @@ namespace ArrowEscape.UI
             BrandArt.Text("Label", PlayButton.transform, "PLAY", 76, new Vector2(440, 90), new Vector2(60, 36), Color.white);
             PlayLevelText = BrandArt.Text("LevelLabel", PlayButton.transform, "LEVEL 1", 30, new Vector2(440, 44), new Vector2(60, -24), new Color32(230, 247, 255, 255));
 
+            DailyButton = NeonButton("Daily", column, "ui_button_secondary", SecondaryBorder, new Vector2(430, 140), new Vector2(-222, 95));
+            BrandArt.Image("Icon", DailyButton.transform, "Daily/icon_daily", new Vector2(78, 78), new Vector2(-150, 6));
+            BrandArt.Text("Label", DailyButton.transform, "DAILY", 32, new Vector2(170, 44), new Vector2(-30, 22), Color.white);
+            BrandArt.Text("Sub", DailyButton.transform, "PUZZLE", 20, new Vector2(170, 30), new Vector2(-30, -16), BrandArt.Lavender);
+            dailyFire = BrandArt.Image("Fire", DailyButton.transform, "Daily/icon_fire_dim", new Vector2(64, 64), new Vector2(110, 10));
+            StreakText = BrandArt.Text("Streak", DailyButton.transform, "0", 30, new Vector2(80, 44), new Vector2(165, 6), Color.white);
+            dailyCheck = BrandArt.Image("Solved", DailyButton.transform, "icon_check", new Vector2(56, 56), new Vector2(190, 48)); dailyCheck.gameObject.SetActive(false);
+            RewardsButton = NeonButton("Rewards", column, "ui_button_secondary", SecondaryBorder, new Vector2(430, 140), new Vector2(222, 95));
+            BrandArt.Image("Icon", RewardsButton.transform, "Daily/icon_gift", new Vector2(80, 80), new Vector2(-150, 6));
+            BrandArt.Text("Label", RewardsButton.transform, "DAILY", 32, new Vector2(200, 44), new Vector2(10, 22), Color.white);
+            BrandArt.Text("Sub", RewardsButton.transform, "REWARDS", 20, new Vector2(200, 30), new Vector2(10, -16), BrandArt.Lavender);
+            RewardDot = BrandArt.Image("Dot", RewardsButton.transform, "ui_pill", new Vector2(40, 40), new Vector2(190, 48), PillBorder);
+            RewardDot.color = new Color32(255, 70, 110, 255); RewardDot.gameObject.SetActive(false);
             LevelsButton = Tile("Levels", "LEVELS", "icon_levels", column, -342);
             ShopButton = Tile("Shop", "SHOP", "icon_shop", column, -114);
             RankingButton = Tile("Ranking", "RANKING", "icon_ranking", column, 114);
@@ -97,7 +126,7 @@ namespace ArrowEscape.UI
             ContinueText = UiFactory.Text("ContinueLevel", column, "", UiStyle.Caption, new Vector2(500, 48), Vector2.zero); ContinueText.gameObject.SetActive(false);
             QuitButton = UiFactory.MenuButton("Quit", column, -720); QuitButton.gameObject.SetActive(false);
 
-            entranceItems = new[] { header, logo, (RectTransform)PlayButton.transform, (RectTransform)LevelsButton.transform, (RectTransform)ShopButton.transform, (RectTransform)RankingButton.transform, (RectTransform)SettingsButton.transform };
+            entranceItems = new[] { header, logo, (RectTransform)DailyButton.transform, (RectTransform)RewardsButton.transform, (RectTransform)PlayButton.transform, (RectTransform)LevelsButton.transform, (RectTransform)ShopButton.transform, (RectTransform)RankingButton.transform, (RectTransform)SettingsButton.transform };
             entranceGroups = new CanvasGroup[entranceItems.Length]; entranceRest = new Vector2[entranceItems.Length];
             for (int i = 0; i < entranceItems.Length; i++) { entranceRest[i] = entranceItems[i].anchoredPosition; entranceGroups[i] = entranceItems[i].gameObject.AddComponent<CanvasGroup>(); }
             PlayEntrance();

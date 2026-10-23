@@ -17,7 +17,7 @@ namespace ArrowEscape.View
         /// <summary>Whether the current motion is an exit or return.</summary>
         public bool IsFlying=>flying;
         /// <summary>Switches recipes without scanning child names or creating managed strings.</summary>
-        public void SetVisible(bool visible){if(body!=null)body.enabled=halo.enabled=head.enabled=visible;}
+        public void SetVisible(bool visible){if(body!=null){body.enabled=halo.enabled=visible;head.enabled=false;}}
         /// <summary>Builds fixed renderers once; the body mesh remains owned by ArrowView.</summary>
         public void Initialize(Mesh mesh,PathRibbon path)
         {
@@ -41,7 +41,7 @@ namespace ArrowEscape.View
             if(body==null)return;UpdateGeometry(distance);if(flying){if(returning){temperature=Mathf.Sqrt(Mathf.Clamp01(distance/returnDistance));if(distance<=0)EndFlight();}else temperature=Mathf.Max(temperature,ArrowEscape.Core.InfernoDesign.Temperature(progress));}
             properties.Clear();properties.SetFloat("_Temperature",temperature);properties.SetFloat("_Flying",flying?1:0);properties.SetFloat("_Blocked",impact/.12f);properties.SetFloat("_Clock",clock);properties.SetFloat("_WindowStart",distance);properties.SetFloat("_BodyLength",length);properties.SetFloat("_Lod",lod?1:0);properties.SetFloat("_State",feedback?1:0);properties.SetColor("_StateTint",tint);properties.SetFloat("_Opacity",alpha);
             Render(halo,2,light,sorting);Render(body,0,light,sorting);
-            head.transform.localPosition=headPoint-direction*1.1f;head.transform.localRotation=Quaternion.Euler(0,0,Mathf.Atan2(direction.y,direction.x)*Mathf.Rad2Deg);Render(head,1,light,sorting);
+            head.transform.localPosition=headPoint-direction*1.1f;head.transform.localRotation=Quaternion.Euler(0,0,Mathf.Atan2(direction.y,direction.x)*Mathf.Rad2Deg);Render(head,1,light,sorting);head.enabled=false;/* The uniform classic head replaces the flame head. */
         }
         private void UpdateGeometry(float distance)
         {

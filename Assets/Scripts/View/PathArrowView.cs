@@ -25,7 +25,8 @@ namespace ArrowEscape.View
         /// <summary>Painted 2D arrow art (Resources/Arrows): a shaded body strip and a separate rounded head.</summary>
         private static void LoadArt()
         {
-            if(artLoaded)return;artLoaded=true;
+            // Statics survive Play-mode restarts when domain reload is off, but the sprite does not: reload it then.
+            if(artLoaded&&headSprite!=null&&bodyTexture!=null)return;artLoaded=true;
             bodyTexture=Resources.Load<Texture2D>("Arrows/arrow_body");
             var head=Resources.Load<Texture2D>("Arrows/arrow_head");
             if(head!=null){headSprite=Sprite.Create(head,new Rect(0,0,head.width,head.height),new Vector2(1,.5f),head.height/HeadArtWidth,0,SpriteMeshType.FullRect);headSprite.name="Arrow head art";headSprite.hideFlags=HideFlags.HideAndDontSave;}
