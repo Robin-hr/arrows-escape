@@ -37,6 +37,12 @@ namespace ArrowEscape.Core
         public int DailyLastSolvedKey;
         /// <summary>Daily puzzles solved in total.</summary>
         public int DailySolvedCount;
+        /// <summary>Journey lives left (0..5); they refill over time, also while the game is closed.</summary>
+        public int JourneyLives = JourneyLifeRules.Max;
+        /// <summary>UTC ticks when the current refill countdown started (0 = full).</summary>
+        public long JourneyRefillTicks;
+        /// <summary>The player's chosen profile name (empty = default).</summary>
+        public string PlayerName = "";
         /// <summary>Equipped profile avatar.</summary>
         public string EquippedAvatarId = DefaultAvatarId;
         /// <summary>Equipped profile avatar frame.</summary>
@@ -91,7 +97,8 @@ namespace ArrowEscape.Core
             if(!ValidSlot(EquippedThemeId,ShopSlot.Theme))EquippedThemeId="paper";
             if(!ValidSlot(EquippedAvatarId,ShopSlot.Avatar))EquippedAvatarId=DefaultAvatarId;
             if(!ValidSlot(EquippedFrameId,ShopSlot.Frame))EquippedFrameId=DefaultFrameId;
-            NextAttemptId=Math.Max(0,NextAttemptId);LastPaidAttemptId=Math.Max(0,LastPaidAttemptId);
+            JourneyLives=Math.Max(0,Math.Min(JourneyLifeRules.Max,JourneyLives));JourneyRefillTicks=Math.Max(0,JourneyRefillTicks);PlayerName=PlayerNameRules.Clean(PlayerName);
+                        NextAttemptId=Math.Max(0,NextAttemptId);LastPaidAttemptId=Math.Max(0,LastPaidAttemptId);
             if(LastPaidAttemptId>0 && NextAttemptId<=LastPaidAttemptId && LastPaidAttemptId<int.MaxValue)NextAttemptId=LastPaidAttemptId+1;
         }
         /// <summary>The equipped id for a slot.</summary>

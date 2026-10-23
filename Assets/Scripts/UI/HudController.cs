@@ -174,6 +174,8 @@ namespace ArrowEscape.UI
         }
         private void Replay()
         {
+            if (game == null || !game.IsCleared || !CompletePanel.IsVisible) return;
+            if (BeforeNewAttempt != null && !BeforeNewAttempt()) return;
             if (!ConsumeCompletion()) return;
             if (bootstrap != null) bootstrap.RestartLevel();
             else game.RestartLevel();
@@ -181,8 +183,12 @@ namespace ArrowEscape.UI
 
         private void Next()
         {
-            if (bootstrap != null && bootstrap.CanGoNext && ConsumeCompletion()) bootstrap.NextLevel();
+            if (bootstrap == null || !bootstrap.CanGoNext) return;
+            if (BeforeNewAttempt != null && !BeforeNewAttempt()) return;
+            if (ConsumeCompletion()) bootstrap.NextLevel();
         }
+        /// <summary>Asked before Next/Replay start a new attempt (Journey spends a life); false cancels.</summary>
+        public System.Func<bool> BeforeNewAttempt { get; set; }
 
         private bool ConsumeCompletion()
         {
@@ -232,7 +238,7 @@ namespace ArrowEscape.UI
             bool daily = bootstrap != null && bootstrap.IsDailyLevel;
             if (Hud.IsDaily != daily) Hud.SetDaily(daily);
             if (daily) Hud.SetDailyInfo(DailyCalendar.Pretty(bootstrap.DailyKey), game.TapCount);
-            else if (bootstrap != null) Hud.SetLevelPosition(bootstrap.IsSandboxLevel?-1:bootstrap.CurrentLevelIndex, bootstrap.IsSandboxLevel?0:bootstrap.LevelCount);
+            else if (bootstrap != null) Hud.SetLevelPosition(bootstrap.IsSandboxLevel?-1:bootstrap.CurrentLevelIndex, bootstrap.IsSandboxLevel?0:bootstrap.ActiveLevelCount, bootstrap.IsJourneyLevel?"Journey":"Level");
             RefreshBoosts();
         }
 

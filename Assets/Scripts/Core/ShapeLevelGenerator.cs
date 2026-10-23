@@ -10,7 +10,12 @@ namespace ArrowEscape.Core
         {
             if(settings==null)throw new ArgumentNullException(nameof(settings));
             var errors=settings.Validate();if(errors.Count>0)throw new ArgumentException(string.Join(" ",errors));
-            ShapeMask mask=ShapeMask.Build(settings.Shape,settings.Width,settings.Height);
+            return Generate(settings,ShapeMask.Build(settings.Shape,settings.Width,settings.Height),seed);
+        }
+        /// <summary>Generates inside a custom silhouette (Journey levels); the settings' shape and box are not used.</summary>
+        public static ShapeGenerationResult Generate(ShapeLevelSettings settings,ShapeMask mask,int seed)
+        {
+            if(settings==null)throw new ArgumentNullException(nameof(settings));if(mask==null)throw new ArgumentNullException(nameof(mask));
             if(settings.MinArrowLength>ShapeLevelSettings.CatalogMaxArrowLength)return new ShapeGenerationResult(null,mask,seed,0,0,null,null,false,"Minimum length exceeds the catalog maximum of ten cells.");
             ShapeGenerationResult best=null;int bestDistance=int.MaxValue;var rejected=new int[4];
             for(int attempt=0;attempt<settings.MaxAttempts;attempt++)

@@ -1,3 +1,4 @@
+using ArrowEscape.Core;
 using UnityEngine;
 
 namespace ArrowEscape.UI
@@ -60,7 +61,15 @@ namespace ArrowEscape.UI
         private static readonly Color SubText = new Color32(255, 246, 236, 255);
         /// <summary>Opens the Journey road map (under PLAY).</summary>
         public UnityEngine.UI.Button JourneyButton { get; private set; }
-        /// <summary>Home-only animation of the profile avatar and frame.</summary>
+        /// <summary>The player's name under the profile badge (blackletter).</summary>
+        public UnityEngine.UI.Text PlayerNameText { get; private set; }
+        /// <summary>Journey lives on the JOURNEY button.</summary>
+        public UnityEngine.UI.Text JourneyLivesText { get; private set; }
+        /// <summary>Shows the profile name.</summary>
+        public void SetPlayerName(string name) { if (PlayerNameText != null) PlayerNameText.text = PlayerNameRules.Display(name); }
+        /// <summary>Shows the Journey lives left.</summary>
+        public void SetJourneyLives(int lives) { if (JourneyLivesText != null) JourneyLivesText.text = lives.ToString(); }
+        /// <summary>Animation of premium avatars and frames on the profile badge.</summary>
         public AvatarPulse AvatarMotion { get; private set; }
         /// <summary>Profile button in the header.</summary>
         public UnityEngine.UI.Button ProfileButton { get; private set; }
@@ -125,7 +134,9 @@ namespace ArrowEscape.UI
             RewardDot.color = new Color32(255, 70, 110, 255); RewardDot.gameObject.SetActive(false);
             JourneyButton = GlassButton("Journey", column, GlassKit.Kind.Tile, GlassKit.Green, new Vector2(580, 124), new Vector2(0, -318));
             BrandArt.Image("Icon", JourneyButton.transform, "icon_journey", new Vector2(76, 76), new Vector2(-190, 4));
-            BrandArt.Text("Label", JourneyButton.transform, "JOURNEY", 40, new Vector2(360, 60), new Vector2(40, 4), Color.white);
+            BrandArt.Text("Label", JourneyButton.transform, "JOURNEY", 40, new Vector2(360, 60), new Vector2(10, 4), Color.white);
+            BrandArt.Image("LivesIcon", JourneyButton.transform, "Daily/icon_heart", new Vector2(54, 54), new Vector2(200, 6));
+            JourneyLivesText = BrandArt.Text("Lives", JourneyButton.transform, "5", 30, new Vector2(60, 44), new Vector2(200, 4), Color.white);
             LevelsButton = Tile("Levels", "LEVELS", "icon_levels", column, -342, GlassKit.Cyan);
             ShopButton = Tile("Shop", "SHOP", "icon_shop", column, -114, GlassKit.Pink);
             RankingButton = Tile("Ranking", "RANKING", "icon_ranking", column, 114, GlassKit.Gold);
@@ -157,6 +168,8 @@ namespace ArrowEscape.UI
             profileHit.gameObject.AddComponent<ButtonFeel>();
             Avatar = AvatarBadge.Create("AvatarBadge", ProfileButton.transform, 140, Vector2.zero);
             AvatarMotion = AvatarPulse.Attach(Avatar);
+            PlayerNameText = BrandArt.NameText("PlayerName", header, 46, new Vector2(520, 64), new Vector2(0, -172));
+            PlayerNameText.text = PlayerNameRules.DefaultName;
 
             CoinsButton = GlassButton("Coins", header, GlassKit.Kind.Pill, GlassKit.Gold, new Vector2(330, 96), new Vector2(315, -62));
             BrandArt.Image("CoinIcon", CoinsButton.transform, "icon_coin", new Vector2(66, 66), new Vector2(-118, 0));
@@ -245,7 +258,6 @@ namespace ArrowEscape.UI
             if (Root == null || !Root.gameObject.activeInHierarchy || !(dt > 0) || float.IsInfinity(dt)) return;
             elapsed += dt;
             background.Tick(dt);
-            AvatarMotion.Tick(dt);
             for (int i = 0; i < entranceItems.Length; i++)
             {
                 float t = Mathf.Clamp01((elapsed - i * EntranceStagger) / EntranceTime), ease = 1 - Mathf.Pow(1 - t, 3);

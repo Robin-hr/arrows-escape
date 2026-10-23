@@ -57,6 +57,7 @@ namespace ArrowEscape.UI
             var column = UiFactory.Column(area, 960, 1640);
             BrandArt.Text("YouLabel", column, "YOUR RANK", 26, new Vector2(900, 40), new Vector2(0, 780), BrandArt.Cyan);
             MeRow = RankingRow.Create("Me", column, new Vector2(940, 150), new Vector2(0, 680), true);
+            AvatarPulse.Attach(MeRow.Avatar);
             StatusText = BrandArt.Text("Status", column, "", 24, new Vector2(900, 70), new Vector2(0, 560), BrandArt.Lavender);
             StatusText.horizontalOverflow = HorizontalWrapMode.Wrap;
             BrandArt.Text("TopLabel", column, "TOP " + TopCount, 26, new Vector2(900, 40), new Vector2(0, 500), BrandArt.Cyan);

@@ -48,6 +48,14 @@ namespace ArrowEscape.UI
         public RectTransform LeagueFill { get; private set; }
         /// <summary>The league card; tapping it opens the world ranking.</summary>
         public UnityEngine.UI.Button LeagueButton { get; private set; }
+        /// <summary>The player's name (blackletter).</summary>
+        public UnityEngine.UI.Text NameText { get; private set; }
+        /// <summary>Opens the name editor.</summary>
+        public UnityEngine.UI.Button EditNameButton { get; private set; }
+        /// <summary>Raised by the edit button.</summary>
+        public event Action EditNameRequested;
+        /// <summary>Shows the profile name.</summary>
+        public void SetPlayerName(string name) { if (NameText != null) NameText.text = PlayerNameRules.Display(name); }
         /// <summary>Equipped arrow and theme names.</summary>
         public UnityEngine.UI.Text EquippedText { get; private set; }
 
@@ -83,7 +91,14 @@ namespace ArrowEscape.UI
             Avatar = AvatarBadge.Create("AvatarBadge", AvatarButton.transform, 240, Vector2.zero);
             NeonKit.Icon("EditBadge", AvatarButton.transform, "icon_plus", 56, new Vector2(84, -84));
             AvatarButton.onClick.AddListener(() => onAvatar?.Invoke());
-            BrandArt.Text("PlayerName", column, "PLAYER", 46, new Vector2(800, 64), new Vector2(0, 458), Color.white);
+            AvatarPulse.Attach(Avatar);
+            NameText = BrandArt.NameText("PlayerName", column, 60, new Vector2(700, 80), new Vector2(-30, 458));
+            NameText.text = PlayerNameRules.DefaultName;
+            var editImage = BrandArt.Image("EditName", column, "ui_pill", new Vector2(96, 96), new Vector2(330, 458), PillBorder);
+            editImage.raycastTarget = true; if (editImage.sprite == null) editImage.color = new Color(0.16f, 0.11f, 0.48f, 0.95f);
+            EditNameButton = editImage.gameObject.AddComponent<UnityEngine.UI.Button>(); EditNameButton.targetGraphic = editImage; editImage.gameObject.AddComponent<ButtonFeel>();
+            NeonKit.Icon("Icon", editImage.transform, "icon_edit", 54, Vector2.zero);
+            EditNameButton.onClick.AddListener(() => EditNameRequested?.Invoke());
             BuildLeagueCard(column, onRanking);
 
             LevelsText = Stat(column, "LEVELS", -225, 160);

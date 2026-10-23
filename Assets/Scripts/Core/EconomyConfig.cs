@@ -25,6 +25,8 @@ namespace ArrowEscape.Core
         public const int DailyHearts = 3;
         /// <summary>Coin price of one extra heart when all hearts are lost.</summary>
         public const int HeartPrice = 500;
+        /// <summary>Coins for one Journey life.</summary>
+        public const int JourneyLifePrice = 300;
         /// <summary>Set false before a store release to disable the developer options (coin grant, open locked levels).</summary>
         public const bool DeveloperGrantEnabled = true;
     }

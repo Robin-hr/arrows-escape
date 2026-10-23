@@ -49,10 +49,10 @@ namespace ArrowEscape.View
         {
             EnsureInitialized();LevelLoadResult result=LevelRepository.LoadFromResources(resourcePath);
             if(!result.Success){Debug.LogWarning("ArrowEscape sandbox: "+string.Join("; ",result.Errors),this);return false;}
-            sandboxPath=resourcePath;IsSandboxLevel=true;controller.SetLevelInfo(result.LevelName,resourcePath);
+            IsJourneyLevel=false;sandboxPath=resourcePath;IsSandboxLevel=true;controller.SetLevelInfo(result.LevelName,resourcePath);
             controller.StartLevel(result.Board,result.LevelName);GetComponent<CameraFitter>().Fit(result.Board.Width,result.Board.Height);return true;
         }
-        private void LeaveSandbox(){LeaveDaily();if(!IsSandboxLevel)return;IsSandboxLevel=false;sandboxPath=null;CurrentLevelIndex=-1;}
+        private void LeaveSandbox(){LeaveDaily();IsJourneyLevel=false;if(!IsSandboxLevel)return;IsSandboxLevel=false;sandboxPath=null;CurrentLevelIndex=-1;}
         private Board dailyBoard;
         /// <summary>True while today's daily puzzle is being played (no level progress, streak on clear).</summary>
         public bool IsDailyLevel { get; private set; }
@@ -69,7 +69,7 @@ namespace ArrowEscape.View
         {
             if(board==null)return;
             EnsureInitialized();bool sandbox=IsSandboxLevel;IsSandboxLevel=false;sandboxPath=null;
-            dailyBoard=board.Clone();DailyKey=dateKey;IsDailyLevel=true;CurrentLevelIndex=-1;
+            IsJourneyLevel=false;dailyBoard=board.Clone();DailyKey=dateKey;IsDailyLevel=true;CurrentLevelIndex=-1;
             var zoom=GetComponent<BoardZoom>();if(zoom==null)zoom=gameObject.AddComponent<BoardZoom>();zoom.Forced=true;
             controller.SetLevelInfo("Daily Puzzle","daily/"+dateKey);
             controller.StartLevel(dailyBoard.Clone(),"Daily Puzzle");GetComponent<CameraFitter>().Fit(board.Width,board.Height);
@@ -102,6 +102,52 @@ namespace ArrowEscape.View
             var copy=new string[resourcePaths.Count];for(int i=0;i<copy.Length;i++)copy[i]=resourcePaths[i];
             catalogOverride=Array.AsReadOnly(copy);
         }
+        private IReadOnlyList<string> journeyPaths;
+        private string[] journeyIds;
+        /// <summary>True while a Journey level is being played (<see cref="CurrentLevelIndex"/> is then the Journey index).</summary>
+        public bool IsJourneyLevel { get; private set; }
+        /// <summary>Injects Journey resource paths before use (tests); null restores Resources/JourneyLevels.</summary>
+        public void SetJourneyCatalog(IReadOnlyList<string> resourcePaths) { journeyPaths = resourcePaths; journeyIds = null; }
+        private void EnsureJourney()
+        {
+            if (journeyIds != null) return;
+            if (journeyPaths == null) journeyPaths = LevelRepository.GetJourneyResourcePaths();
+            journeyIds = new string[journeyPaths.Count];
+            for (int i = 0; i < journeyIds.Length; i++) journeyIds[i] = ProgressTracker.ToLevelId(journeyPaths[i]);
+        }
+        /// <summary>Stable ids of the 200 Journey levels, in road order.</summary>
+        public IReadOnlyList<string> JourneyIds { get { EnsureJourney(); return Array.AsReadOnly(journeyIds); } }
+        /// <summary>Number of Journey levels.</summary>
+        public int JourneyCount { get { EnsureJourney(); return journeyIds.Length; } }
+        /// <summary>First Journey level not yet cleared (the player's place on the road).</summary>
+        public int JourneyContinueIndex { get { EnsureInitialized(); EnsureJourney(); return Math.Max(0, Progress.Tracker.GetResumeIndex(journeyIds)); } }
+        /// <summary>Level count of the catalog being played (Journey or main levels).</summary>
+        public int ActiveLevelCount => IsJourneyLevel ? JourneyCount : LevelCount;
+        /// <summary>Starts an unlocked Journey level (lives are handled by the menus).</summary>
+        public bool TryStartJourneyLevel(int index)
+        {
+            EnsureInitialized(); EnsureJourney();
+            if (index < 0 || index >= journeyIds.Length || !Progress.Tracker.IsUnlocked(journeyIds, index)) return false;
+            return ShowJourneyLevel(index);
+        }
+        /// <summary>Developer option: opens any Journey level.</summary>
+        public bool TryStartJourneyLevelIgnoringLock(int index)
+        {
+            EnsureInitialized(); EnsureJourney();
+            return index >= 0 && index < journeyIds.Length && ShowJourneyLevel(index);
+        }
+        private bool ShowJourneyLevel(int index)
+        {
+            LeaveSandbox();
+            BoardView view = GetComponent<BoardView>(); view.Clear();
+            LevelLoadResult result = LevelRepository.LoadFromResources(journeyPaths[index]);
+            if (!result.Success) { foreach (string error in result.Errors) Debug.LogError(error, this); return false; }
+            IsJourneyLevel = true; CurrentLevelIndex = index;
+            controller.SetLevelInfo(result.LevelName, journeyPaths[index]);
+            controller.StartLevel(result.Board, result.LevelName);
+            GetComponent<CameraFitter>().Fit(result.Board.Width, result.Board.Height);
+            return controller.Session != null;
+        }
         private IReadOnlyList<string> paths = Array.Empty<string>();
         private string[] levelIds = Array.Empty<string>();
         private GameController controller;
@@ -111,17 +157,17 @@ namespace ArrowEscape.View
         /// <summary>Number of available resource levels.</summary>
         public int LevelCount => paths.Count;
         /// <summary>Stable id of the current level.</summary>
-        public string CurrentLevelId => CurrentLevelIndex >= 0 && CurrentLevelIndex < levelIds.Length ? levelIds[CurrentLevelIndex] : "";
+        public string CurrentLevelId => IsJourneyLevel ? (CurrentLevelIndex >= 0 && CurrentLevelIndex < JourneyCount ? journeyIds[CurrentLevelIndex] : "") : CurrentLevelIndex >= 0 && CurrentLevelIndex < levelIds.Length ? levelIds[CurrentLevelIndex] : "";
         /// <summary>Whether the current level is the final resource level.</summary>
-        public bool IsLastLevel => IsSandboxLevel || LevelCount > 0 && CurrentLevelIndex == LevelCount - 1;
+        public bool IsLastLevel => IsSandboxLevel || ActiveLevelCount > 0 && CurrentLevelIndex == ActiveLevelCount - 1;
         /// <summary>Whether another unlocked level exists after this one.</summary>
-        public bool CanGoNext => !IsSandboxLevel && Progress != null && Progress.Tracker.IsUnlocked(levelIds, CurrentLevelIndex + 1) && CurrentLevelIndex >= 0;
+        public bool CanGoNext => !IsSandboxLevel && Progress != null && CurrentLevelIndex >= 0 && (IsJourneyLevel ? CurrentLevelIndex + 1 < JourneyCount && Progress.Tracker.IsUnlocked(journeyIds, CurrentLevelIndex + 1) : Progress.Tracker.IsUnlocked(levelIds, CurrentLevelIndex + 1));
         /// <summary>The loaded in-memory rules and their storage service.</summary>
         public ProgressService Progress { get; private set; }
         /// <summary>Summary retained for UI that subscribes after a clear.</summary>
         public CompletionResult LastCompletion { get; private set; }
         /// <summary>Whether all currently available ids have been completed.</summary>
-        public bool AllLevelsCompleted => !IsSandboxLevel && LevelCount > 0 && Progress != null && Progress.Tracker.CompletedCount(levelIds) == LevelCount;
+        public bool AllLevelsCompleted => !IsSandboxLevel && ActiveLevelCount > 0 && Progress != null && Progress.Tracker.CompletedCount(IsJourneyLevel ? JourneyIds : (IReadOnlyList<string>)levelIds) == ActiveLevelCount;
         /// <summary>Raised once after recording and saving a clear.</summary>
         public event Action<CompletionResult> LevelCompleted;
 
@@ -207,12 +253,12 @@ namespace ArrowEscape.View
         }
 
         /// <summary>Loads the next unlocked level; never wraps or skips a lock.</summary>
-        public void NextLevel() { if(IsSandboxLevel)return;EnsureInitialized(); if (CanGoNext) TryStartLevel(CurrentLevelIndex + 1); }
+        public void NextLevel() { if(IsSandboxLevel)return;EnsureInitialized(); if (!CanGoNext) return; if (IsJourneyLevel) TryStartJourneyLevel(CurrentLevelIndex + 1); else TryStartLevel(CurrentLevelIndex + 1); }
         /// <summary>Loads the previous level if it exists; never wraps.</summary>
         public void PreviousLevel() { int index=CurrentLevelIndex;bool sandbox=IsSandboxLevel;LeaveSandbox();if(sandbox)TryStartLevel(Math.Max(0,index-1));else if(index>0)TryStartLevel(index-1); }
         /// <summary>Restarts the current level from its JSON resource.</summary>
         [ContextMenu("Restart Level")]
-        public void RestartLevel() { if(IsDailyLevel){StartDailyLevel(dailyBoard,DailyKey);return;}if(IsSandboxLevel){TryStartSandboxLevel(sandboxPath);return;}if (CurrentLevelIndex >= 0 && !TryStartLevel(CurrentLevelIndex)) ShowLevel(CurrentLevelIndex); }
+        public void RestartLevel() { if(IsDailyLevel){StartDailyLevel(dailyBoard,DailyKey);return;}if(IsSandboxLevel){TryStartSandboxLevel(sandboxPath);return;}if(IsJourneyLevel){ShowJourneyLevel(CurrentLevelIndex);return;}if (CurrentLevelIndex >= 0 && !TryStartLevel(CurrentLevelIndex)) ShowLevel(CurrentLevelIndex); }
         /// <summary>Inspector-only style jump: wraps around and ignores locks.</summary>
         public void DebugJump(int delta)
         {
@@ -315,7 +361,7 @@ namespace ArrowEscape.View
         {
             EnsureInitialized();
             var state=Inventory.State;
-            return new PlayerSnapshot("PLAYER",state.Trophies,Progress.Tracker.TotalStars,state.EquippedAvatarId,state.EquippedFrameId);
+            return new PlayerSnapshot(PlayerNameRules.Display(state.PlayerName),state.Trophies,Progress.Tracker.TotalStars,state.EquippedAvatarId,state.EquippedFrameId);
         }
         private void WarnSaveFailure()
         {

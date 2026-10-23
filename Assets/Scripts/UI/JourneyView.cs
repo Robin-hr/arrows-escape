@@ -46,6 +46,26 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.ScrollRect Scroll { get; private set; }
         /// <summary>The player's avatar above the current level.</summary>
         public AvatarBadge Avatar { get; private set; }
+        /// <summary>The player's name under the marker avatar.</summary>
+        public UnityEngine.UI.Text NameText { get; private set; }
+        /// <summary>Journey lives pill (opens the lives panel).</summary>
+        public UnityEngine.UI.Button LivesButton { get; private set; }
+        /// <summary>Lives left.</summary>
+        public UnityEngine.UI.Text LivesText { get; private set; }
+        /// <summary>Refill countdown or FULL.</summary>
+        public UnityEngine.UI.Text LivesTimerText { get; private set; }
+        /// <summary>Supplies the lives shown in the header: (lives, seconds to the next life).</summary>
+        public Func<Vector2Int> LivesSource { get; set; }
+        private int shownLives = -1, shownSeconds = -1;
+        private float livesClock;
+        /// <summary>Refreshes the lives pill now.</summary>
+        public void RefreshLives()
+        {
+            if (LivesSource == null) return;
+            Vector2Int v = LivesSource(); if (v.x == shownLives && v.y == shownSeconds) return;
+            shownLives = v.x; shownSeconds = v.y;
+            LivesText.text = v.x.ToString(); LivesTimerText.text = v.x >= JourneyLifeRules.Max ? "FULL" : JourneyLifeRules.Format(v.y);
+        }
         /// <summary>Road mesh.</summary>
         public JourneyRoad Road => road;
         /// <summary>Pooled level nodes (inactive ones are unused).</summary>
@@ -101,15 +121,23 @@ namespace ArrowEscape.UI
             marker.anchorMin = marker.anchorMax = new Vector2(0.5f, 0);
             var pin = BrandArt.Image("Pin", marker, "Glass/avatar_glow", new Vector2(170, 170), new Vector2(0, 6)); pin.color = new Color32(56, 225, 255, 170);
             Avatar = AvatarBadge.Create("Avatar", marker, 120, Vector2.zero);
+            AvatarPulse.Attach(Avatar);
+            NameText = BrandArt.NameText("Name", marker, 34, new Vector2(320, 50), new Vector2(0, -86));
 
             var header = UiFactory.Rect("Header", safe, new Vector2(960, 150), Vector2.zero);
             header.anchorMin = header.anchorMax = header.pivot = new Vector2(0.5f, 1); header.anchoredPosition = new Vector2(0, -16);
             header.gameObject.AddComponent<MenuFit>().Configure(header, safe, new Vector2(1000, 170));
-            var plate = UiFactory.Rect("Plate", header, new Vector2(620, 110), new Vector2(40, -62)).gameObject.AddComponent<UnityEngine.UI.Image>();
+            var plate = UiFactory.Rect("Plate", header, new Vector2(500, 110), new Vector2(-70, -62)).gameObject.AddComponent<UnityEngine.UI.Image>();
             plate.raycastTarget = false; GlassKit.Apply(plate, GlassKit.Kind.Pill, new Color32(70, 60, 200, 255));
             BackButton = NeonKit.IconButton("Back", header, "icon_back", new Vector2(-420, -62), 112, 56);
             BackButton.onClick.AddListener(() => back?.Invoke());
-            BrandArt.Text("Title", header, "JOURNEY", 56, new Vector2(560, 100), new Vector2(40, -60), Color.white);
+            BrandArt.Text("Title", header, "JOURNEY", 52, new Vector2(460, 100), new Vector2(-70, -60), Color.white);
+            var livesImage = UiFactory.Rect("Lives", header, new Vector2(250, 110), new Vector2(345, -62)).gameObject.AddComponent<UnityEngine.UI.Image>();
+            GlassKit.Apply(livesImage, GlassKit.Kind.Pill, new Color32(255, 70, 120, 255));
+            LivesButton = livesImage.gameObject.AddComponent<UnityEngine.UI.Button>(); LivesButton.targetGraphic = livesImage; livesImage.gameObject.AddComponent<ButtonFeel>();
+            BrandArt.Image("Heart", livesImage.transform, "Daily/icon_heart", new Vector2(70, 70), new Vector2(-72, 4));
+            LivesText = BrandArt.Text("Count", livesImage.transform, "5", 40, new Vector2(80, 50), new Vector2(-72, 2), Color.white);
+            LivesTimerText = BrandArt.Text("Timer", livesImage.transform, "FULL", 26, new Vector2(140, 40), new Vector2(42, 4), Color.white);
             for (int i = 0; i < header.childCount; i++) { var child = (RectTransform)header.GetChild(i); child.anchorMin = child.anchorMax = new Vector2(0.5f, 1); }
 
             var foot = UiFactory.Rect("Footer", safe, new Vector2(600, 150), Vector2.zero);
@@ -132,13 +160,14 @@ namespace ArrowEscape.UI
         }
 
         /// <summary>Opens the map at the player's current level.</summary>
-        public void Show(IReadOnlyList<LevelTile> levels, int currentIndex, string avatarId, string frameId)
+        public void Show(IReadOnlyList<LevelTile> levels, int currentIndex, string avatarId, string frameId, string playerName = null)
         {
             if (Root == null) return;
             tiles = levels ?? new List<LevelTile>();
             current = Mathf.Clamp(currentIndex, 0, Mathf.Max(0, tiles.Count - 1));
             Root.gameObject.SetActive(true); Root.SetAsLastSibling();
-            Avatar.Set(avatarId, frameId);
+            Avatar.Set(avatarId, frameId); NameText.text = PlayerNameRules.Display(playerName);
+            shownLives = shownSeconds = -1; RefreshLives();
             content.sizeDelta = new Vector2(0, JourneyLayout.Height(tiles.Count));
             PlayText.text = "PLAY LEVEL " + (current + 1);
             PlayButton.interactable = tiles.Count > 0;
@@ -247,6 +276,7 @@ namespace ArrowEscape.UI
             if (!IsVisible || !(dt >= 0) || float.IsInfinity(dt)) return;
             clock += dt;
             Refresh();
+            livesClock += dt; if (livesClock >= 0.25f) { livesClock = 0; RefreshLives(); }
             if (tiles == null || tiles.Count == 0) return;
             Vector2 at = new Vector2(JourneyLayout.X(current), JourneyLayout.Y(current));
             float bob = Mathf.Sin(clock * 3.2f) * 10f;

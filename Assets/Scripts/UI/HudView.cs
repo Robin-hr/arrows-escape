@@ -50,6 +50,7 @@ namespace ArrowEscape.UI
         private Vector2 lastSize;
         private string lastName;
         private int lastLevelIndex = -2, lastLevelCount = -1;
+        private string lastLevelLabel = "Level";
         private int lastMoves = -1, lastTotal = -1, lastMistakes = -1;
         /// <summary>Level name label.</summary>
         public UnityEngine.UI.Text LevelText { get; private set; }
@@ -199,11 +200,11 @@ namespace ArrowEscape.UI
         public void SetHintState(bool canHint) { if (HintButton != null) HintButton.interactable = canHint; }
 
         /// <summary>Shows one-based progress through the resource list, or hides it before initialization.</summary>
-        public void SetLevelPosition(int index, int count)
+        public void SetLevelPosition(int index, int count, string label = "Level")
         {
-            if (LevelPositionText == null || (lastLevelIndex == index && lastLevelCount == count)) return;
-            lastLevelIndex = index; lastLevelCount = count;
-            LevelPositionText.text = index >= 0 && count > 0 ? $"Level {index + 1} / {count}" : "";
+            if (LevelPositionText == null || (lastLevelIndex == index && lastLevelCount == count && lastLevelLabel == label)) return;
+            lastLevelIndex = index; lastLevelCount = count; lastLevelLabel = label;
+            LevelPositionText.text = index >= 0 && count > 0 ? $"{label} {index + 1} / {count}" : "";
         }
 
         private void LateUpdate() => UpdateLayout();

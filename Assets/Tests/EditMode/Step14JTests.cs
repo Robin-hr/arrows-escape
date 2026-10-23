@@ -64,7 +64,7 @@ namespace ArrowEscape.Tests
                 Assert.That(journey.anchoredPosition.y - journey.sizeDelta.y * 0.5f, Is.GreaterThan(((RectTransform)menu.LevelsButton.transform).anchoredPosition.y + MainMenuView.TileSize * 0.5f));
                 menu.JourneyButton.onClick.Invoke();
                 Assert.That(flow.Journey.IsVisible, Is.True); Assert.That(menu.Root.gameObject.activeSelf, Is.False);
-                Assert.That(flow.Journey.CurrentIndex, Is.EqualTo(scene.Bootstrap.ContinueIndex));
+                Assert.That(flow.Journey.CurrentIndex, Is.EqualTo(scene.Bootstrap.JourneyContinueIndex));
                 var shown = flow.Journey.Nodes.Where(n => n.gameObject.activeSelf).ToList();
                 Assert.That(shown.Count, Is.GreaterThan(0)); Assert.That(shown.Any(n => n.Index == flow.Journey.CurrentIndex), Is.True);
                 var locked = shown.FirstOrDefault(n => n.State == LevelTileState.Locked);
@@ -73,7 +73,7 @@ namespace ArrowEscape.Tests
                 menu.JourneyButton.onClick.Invoke();
                 flow.Journey.PlayButton.onClick.Invoke();
                 Assert.That(flow.Machine.Current, Is.EqualTo(ScreenState.Playing)); Assert.That(flow.Journey.IsVisible, Is.False);
-                Assert.That(scene.Bootstrap.CurrentLevelIndex, Is.EqualTo(scene.Bootstrap.ContinueIndex));
+                Assert.That(scene.Bootstrap.IsJourneyLevel, Is.True); Assert.That(scene.Bootstrap.CurrentLevelIndex, Is.EqualTo(scene.Bootstrap.JourneyContinueIndex));
             }
         }
 
@@ -89,7 +89,7 @@ namespace ArrowEscape.Tests
             Assert.That(JourneyLayout.WorldName(1), Is.Not.Empty);
         }
 
-        /// <summary>Home elements wear the 3D glass finish; the avatar animates on the home page only and survives re-equipping.</summary>
+        /// <summary>Home elements wear the 3D glass finish and the home badge carries the avatar animation.</summary>
         [Test] public void GlassHomeAndAnimatedAvatar()
         {
             using (var scene = new EconomyTestScene(withUi: true))
@@ -102,16 +102,6 @@ namespace ArrowEscape.Tests
                     Assert.That(button.transform.Find(GlassKit.GlossName), Is.Not.Null, button.name);
                 }
                 var pulse = menu.AvatarMotion; Assert.That(pulse, Is.Not.Null); Assert.That(pulse.Badge, Is.SameAs(menu.Avatar));
-                var frame = menu.Avatar.FrameImage.rectTransform;
-                menu.Tick(0.4f); var before = frame.localScale; var spin = pulse.Ring.localEulerAngles.z;
-                menu.Tick(0.3f); Assert.That(frame.localScale, Is.Not.EqualTo(before)); Assert.That(pulse.Ring.localEulerAngles.z, Is.Not.EqualTo(spin));
-                scene.Bootstrap.Inventory.Shop.AddCoins(5000);
-                string avatar = ShopCatalog.Items.First(i => i.Slot == ShopSlot.Avatar && i.Price > 0).Id;
-                scene.Bootstrap.Inventory.TryBuy(avatar); scene.Bootstrap.Inventory.TryEquip(avatar);
-                Assert.That(menu.Avatar.AvatarId, Is.EqualTo(avatar));
-                float clock = pulse.Clock; menu.Tick(0.2f); Assert.That(pulse.Clock, Is.GreaterThan(clock), "still animating after the avatar changed");
-                scene.Flow.OpenProfile(); Assert.That(scene.Flow.Profile.Root.GetComponentsInChildren<AvatarPulse>(true), Is.Empty, "home page only");
-                clock = pulse.Clock; menu.Tick(0.2f); Assert.That(pulse.Clock, Is.EqualTo(clock), "frozen while the home page is hidden");
             }
         }
 

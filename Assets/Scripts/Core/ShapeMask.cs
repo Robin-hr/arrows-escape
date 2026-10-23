@@ -48,6 +48,17 @@ namespace ArrowEscape.Core
             if(maxX<0)throw new ArgumentException("Requested box contains no cell centers inside the shape.");
             return new ShapeMask(source,minX,minY,maxX,maxY);
         }
+        /// <summary>Custom silhouette (x, y with y up); empty boundary rows and columns are trimmed.</summary>
+        public static ShapeMask FromCells(bool[,] inside)
+        {
+            if(inside==null)throw new ArgumentNullException(nameof(inside));
+            int width=inside.GetLength(0),height=inside.GetLength(1);
+            if(width<1||height<1||width>64||height>64)throw new ArgumentOutOfRangeException(nameof(inside));
+            int minX=width,minY=height,maxX=-1,maxY=-1;
+            for(int y=0;y<height;y++)for(int x=0;x<width;x++)if(inside[x,y]){minX=Math.Min(minX,x);minY=Math.Min(minY,y);maxX=Math.Max(maxX,x);maxY=Math.Max(maxY,y);}
+            if(maxX<0)throw new ArgumentException("The silhouette has no inside cells.");
+            return new ShapeMask((bool[,])inside.Clone(),minX,minY,maxX,maxY);
+        }
         private static bool InCurve(ShapeKind kind,int x,int y,int w,int h)
         {
             long dx=2*x+1-w,dy=2*y+1-h,ww=(long)w*w,hh=(long)h*h;

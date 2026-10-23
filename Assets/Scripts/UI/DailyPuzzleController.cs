@@ -86,7 +86,9 @@ namespace ArrowEscape.UI
         }
 
         /// <summary>Starts the puzzle again with full hearts.</summary>
-        public void RestartDaily() { Fail.Hide(); bootstrap.RestartLevel(); }
+        public void RestartDaily() { if (BeforeRestart != null && !BeforeRestart()) return; Fail.Hide(); bootstrap.RestartLevel(); }
+        /// <summary>Asked before RESTART starts a new attempt (Journey spends a life); false cancels.</summary>
+        public Func<bool> BeforeRestart { get; set; }
 
         private void OnCleared() => Fail.Hide();
 

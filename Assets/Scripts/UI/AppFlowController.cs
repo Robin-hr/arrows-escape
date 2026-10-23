@@ -47,6 +47,16 @@ namespace ArrowEscape.UI
         public RankingView Ranking { get; private set; }
         /// <summary>Journey road map: every level as a stop on one winding road.</summary>
         public JourneyView Journey { get; private set; }
+        /// <summary>"No lives left" panel for the Journey.</summary>
+        public JourneyLivesView JourneyLives { get; private set; }
+        /// <summary>Gift box after a Journey level's first clear.</summary>
+        public GiftBoxView Gift { get; private set; }
+        /// <summary>Profile name editor.</summary>
+        public NameEditView NameEditor { get; private set; }
+        /// <summary>UTC clock for Journey life refills; tests may replace it.</summary>
+        public System.Func<long> UtcNow { get; set; } = () => System.DateTime.UtcNow.Ticks;
+        private DailyReward pendingGift;
+        private float pendingGiftDelay;
         /// <summary>Daily puzzle page (streak, badges, play).</summary>
         public DailyView DailyPage { get; private set; }
         /// <summary>Seven-day reward calendar.</summary>
@@ -119,9 +129,17 @@ namespace ArrowEscape.UI
             Rewards = gameObject.AddComponent<DailyRewardsView>(); Rewards.Build(canvasObject.transform, ClaimReward, CloseRewards);
             Journey = gameObject.AddComponent<JourneyView>(); Journey.Build(canvasObject.transform, PlayFromJourney, CloseJourney);
             Journey.DeveloperOpen = EconomyConfig.DeveloperGrantEnabled ? DeveloperOpenFromJourney : (System.Action<int>)null;
+            Journey.LivesSource = () => { var st = bootstrap.Inventory.State; long t = UtcNow(); int l = JourneyLifeRules.Update(st, t); return new Vector2Int(l, JourneyLifeRules.SecondsToNext(st, t)); };
+            JourneyLives = gameObject.AddComponent<JourneyLivesView>(); JourneyLives.Build(canvasObject.transform, () => bootstrap.Inventory.State, () => UtcNow());
+            JourneyLives.AdButton.onClick.AddListener(WatchAdForLife); JourneyLives.BuyButton.onClick.AddListener(BuyLife);
+            Journey.LivesButton.onClick.AddListener(() => JourneyLives.Show());
+            Gift = gameObject.AddComponent<GiftBoxView>(); Gift.Build(canvasObject.transform);
+            NameEditor = gameObject.AddComponent<NameEditView>(); NameEditor.Build(canvasObject.transform, SavePlayerName);
+            Profile.EditNameRequested += () => NameEditor.Show(bootstrap.Inventory.State.PlayerName);
             Toast = gameObject.AddComponent<ToastView>(); Toast.Build(canvasObject.transform);
             Daily = gameObject.AddComponent<DailyPuzzleController>(); Daily.Initialize(canvasObject.transform, bootstrap, game, hud, Toast, () => TodayKey(), GoHomeFromDaily);
             Daily.Completed += () => Machine.LevelCompleted();
+            hud.BeforeNewAttempt = JourneyAttemptAllowed; Daily.BeforeRestart = JourneyAttemptAllowed;
             Ads = gameObject.AddComponent<AdPlaceholderView>(); Ads.Build(canvasObject.transform);
             if (RewardedAds.Service == null || RewardedAds.Service is AdPlaceholderView) RewardedAds.Service = Ads;
             Levels.DeveloperOpen = EconomyConfig.DeveloperGrantEnabled ? DeveloperOpenLevel : (System.Action<int>)null;
@@ -141,7 +159,7 @@ namespace ArrowEscape.UI
             PauseScreen.SettingsButton.onClick.AddListener(OpenSettings);
             PauseScreen.MainMenuButton.onClick.AddListener(ToMainMenu);
         }
-        private bool IsBlocked(Vector2 position) => Machine.Current != ScreenState.Playing || Confirm.IsOpen || (Loading != null && Loading.IsVisible) || (Intro != null && Intro.IsPlaying) || (Daily != null && Daily.IsModalOpen) || (Ads != null && Ads.IsShowing);
+        private bool IsBlocked(Vector2 position) => Machine.Current != ScreenState.Playing || Confirm.IsOpen || JourneyLives.IsOpen || Gift.IsOpen || NameEditor.IsOpen || (Loading != null && Loading.IsVisible) || (Intro != null && Intro.IsPlaying) || (Daily != null && Daily.IsModalOpen) || (Ads != null && Ads.IsShowing);
         private void OnStateChanged(ScreenState oldState, ScreenState newState) => ApplyScreen(oldState, newState);
         private void ApplyScreen(ScreenState previous, ScreenState state)
         {
@@ -170,10 +188,19 @@ namespace ArrowEscape.UI
         {
             MainMenu.Refresh(bootstrap.HasAnyProgress,bootstrap.Progress.Tracker.CompletedCount(bootstrap.LevelIds),bootstrap.LevelCount,bootstrap.ContinueIndex);
             MainMenu.SetTheme(bootstrap.Inventory.State.EquippedThemeId);
-            MainMenu.SetEconomy(bootstrap.Inventory.State.Coins,bootstrap.Progress.Tracker.TotalStars,bootstrap.LevelCount*3,false);
+            MainMenu.SetEconomy(bootstrap.Inventory.State.Coins,MainStars(),bootstrap.LevelCount*3,false);
             MainMenu.SetAvatar(bootstrap.Inventory.State.EquippedAvatarId,bootstrap.Inventory.State.EquippedFrameId);
+            MainMenu.SetPlayerName(bootstrap.Inventory.State.PlayerName);
+            MainMenu.SetJourneyLives(JourneyLifeRules.Update(bootstrap.Inventory.State, UtcNow()));
             int key=TodayKey();var state=bootstrap.Inventory.State;
             MainMenu.SetDaily(DailyStreakRules.CurrentStreak(state,key),DailyStreakRules.SolvedToday(state,key),DailyRewardRules.CanClaim(state,key));
+        }
+        // Stars earned on the main levels only (the Journey has its own road).
+        private int MainStars()
+        {
+            int total = 0; var tracker = bootstrap.Progress.Tracker;
+            foreach (string id in bootstrap.LevelIds) if (tracker.TryGetRecord(id, out LevelRecord record)) total += record.bestStars;
+            return total;
         }
         /// <summary>Opens the daily puzzle page from home.</summary>
         public void OpenDailyPage()
@@ -209,7 +236,7 @@ namespace ArrowEscape.UI
             if (Machine.Current != ScreenState.MainMenu || Shop.IsVisible) return;
             MainMenu.Root.gameObject.SetActive(false);
             var state = bootstrap.Inventory.State;
-            Journey.Show(LevelSelectModel.Build(bootstrap.LevelIds, bootstrap.Progress.Tracker), bootstrap.ContinueIndex, state.EquippedAvatarId, state.EquippedFrameId);
+            Journey.Show(LevelSelectModel.Build(bootstrap.JourneyIds, bootstrap.Progress.Tracker), bootstrap.JourneyContinueIndex, state.EquippedAvatarId, state.EquippedFrameId, state.PlayerName);
         }
         private void CloseJourney()
         {
@@ -219,12 +246,43 @@ namespace ArrowEscape.UI
         private void PlayFromJourney(int index)
         {
             if (Machine.Current != ScreenState.MainMenu) return;
-            if (bootstrap.TryStartLevel(index)) { Journey.Hide(); Machine.StartPlaying(); }
+            if (!SpendJourneyLife()) return;
+            if (bootstrap.TryStartJourneyLevel(index)) { Journey.Hide(); Machine.StartPlaying(); }
+            else { JourneyLifeRules.Add(bootstrap.Inventory.State, 1, UtcNow()); bootstrap.Inventory.Save(); }
+        }
+        /// <summary>Spends one Journey life (saved); with none left it opens the lives panel and returns false.</summary>
+        public bool SpendJourneyLife()
+        {
+            if (!JourneyLifeRules.TrySpend(bootstrap.Inventory.State, UtcNow())) { JourneyLives.Show(); return false; }
+            bootstrap.Inventory.Save(); MainMenu.SetJourneyLives(bootstrap.Inventory.State.JourneyLives); Journey.RefreshLives();
+            return true;
+        }
+        private bool JourneyAttemptAllowed() => !bootstrap.IsJourneyLevel || SpendJourneyLife();
+        private void GrantLife()
+        {
+            JourneyLifeRules.Add(bootstrap.Inventory.State, 1, UtcNow()); bootstrap.Inventory.Save();
+            MainMenu.SetJourneyLives(bootstrap.Inventory.State.JourneyLives); Journey.RefreshLives(); JourneyLives.Refresh();
+        }
+        private void WatchAdForLife()
+        {
+            void Done(bool earned) { if (earned) GrantLife(); }
+            if (RewardedAds.Service == null) Done(true); else RewardedAds.Service.Show("journey_life", Done);
+        }
+        private void BuyLife()
+        {
+            var state = bootstrap.Inventory.State;
+            if (JourneyLifeRules.Update(state, UtcNow()) >= JourneyLifeRules.Max || !bootstrap.Inventory.Shop.TrySpendCoins(EconomyConfig.JourneyLifePrice)) return;
+            GrantLife();
+        }
+        private void SavePlayerName(string name)
+        {
+            var state = bootstrap.Inventory.State; state.PlayerName = PlayerNameRules.Clean(name); bootstrap.Inventory.Save();
+            MainMenu.SetPlayerName(state.PlayerName); Profile.SetPlayerName(state.PlayerName);
         }
         /// <summary>Developer option: opens a locked level from the Journey map (three quick taps).</summary>
         public void DeveloperOpenFromJourney(int index)
         {
-            if (Machine.Current != ScreenState.MainMenu || !bootstrap.TryStartLevelIgnoringLock(index)) return;
+            if (Machine.Current != ScreenState.MainMenu || !bootstrap.TryStartJourneyLevelIgnoringLock(index)) return;
             Journey.Hide(); Toast.Show("DEVELOPER MODE\nLEVEL " + (index + 1) + " OPENED", "icon_lock");
             Machine.StartPlaying();
         }
@@ -282,7 +340,7 @@ namespace ArrowEscape.UI
             bootstrap.Inventory.Shop.AddCoins(EconomyConfig.DeveloperGrant);bootstrap.Inventory.Save();
             Toast.Show("DEVELOPER MODE\n+"+EconomyConfig.DeveloperGrant.ToString("N0",System.Globalization.CultureInfo.InvariantCulture)+" COINS");
         }
-        private void OnCoins(int amount)=>MainMenu.SetEconomy(amount,bootstrap.Progress.Tracker.TotalStars,bootstrap.LevelCount*3);
+        private void OnCoins(int amount)=>MainMenu.SetEconomy(amount,MainStars(),bootstrap.LevelCount*3);
         /// <summary>Opens the shop only from the main menu.</summary>
         public void OpenShop(){if(Machine.Current!=ScreenState.MainMenu)return;MainMenu.Root.gameObject.SetActive(false);Shop.Show();}
         /// <summary>From the profile page: opens the shop on the Avatars tab; closing it returns to the profile.</summary>
@@ -293,6 +351,7 @@ namespace ArrowEscape.UI
             if (Machine.Current != ScreenState.MainMenu || Shop.IsVisible) return;
             MainMenu.Root.gameObject.SetActive(false);
             Profile.Show(ProfileStats.Build(bootstrap.Progress.Tracker, bootstrap.LevelIds, bootstrap.Inventory.State));
+            Profile.SetPlayerName(bootstrap.Inventory.State.PlayerName);
             if (LoadingScreensEnabled) Loading.Show(LoadingKind.Profile, "LOADING PROFILE");
         }
         /// <summary>Opens the world ranking from the home page or the profile league card.</summary>
@@ -332,13 +391,29 @@ namespace ArrowEscape.UI
             if (bootstrap.TryStartLevel(index)) Machine.StartPlaying();
         }
         private void OnPauseRequested() => Machine.Pause();
-        private void OnLevelsRequested() => Machine.OpenLevelSelect();
+        private void OnLevelsRequested()
+        {
+            // From a Journey level's completion card, "Levels" returns to the Journey map.
+            if (Machine.Current == ScreenState.LevelComplete && bootstrap.IsJourneyLevel) { Machine.ToMainMenu(); OpenJourney(); return; }
+            Machine.OpenLevelSelect();
+        }
         private void OpenSettings() => Machine.OpenSettings();
         private void Resume() => Machine.Resume();
-        private void Restart() { if (Machine.Current != ScreenState.Paused) return; bootstrap.RestartLevel(); Machine.StartPlaying(); }
+        private void Restart() { if (Machine.Current != ScreenState.Paused || !JourneyAttemptAllowed()) return; bootstrap.RestartLevel(); Machine.StartPlaying(); }
         private void ToMainMenu() => Machine.ToMainMenu();
         private void Back() => HandleBack();
-        private void OnLevelCompleted(CompletionResult result) => Machine.LevelCompleted();
+        private void OnLevelCompleted(CompletionResult result)
+        {
+            Machine.LevelCompleted();
+            if (!bootstrap.IsJourneyLevel || result == null || !result.IsFirstClear) return;
+            // First clear of a Journey level: grant and save a random gift, then open the gift box after the stars.
+            var shop = bootstrap.Inventory.Shop;
+            pendingGift = JourneyGiftRules.Roll(shop.Inventory, bootstrap.CurrentLevelId, bootstrap.CurrentAttemptId);
+            DailyRewardRules.Apply(shop, pendingGift); bootstrap.Inventory.Save(); OnCoins(shop.Inventory.Coins);
+            pendingGiftDelay = Application.isPlaying ? 1.9f : 0f;
+            if (pendingGiftDelay <= 0) ShowPendingGift();
+        }
+        private void ShowPendingGift() { var gift = pendingGift; pendingGift = null; if (gift != null) Gift.Show(gift, null); }
         private void OnLevelStarted()
         {
             ScreenState previous = Machine.Current;
@@ -346,7 +421,7 @@ namespace ArrowEscape.UI
             // New level starts (menu, level select, next level, replay) get a 1-second loader; restarting from pause does not.
             bool newLevel = previous != ScreenState.Playing && previous != ScreenState.Paused;
             if (LoadingScreensEnabled && newLevel)
-                Loading.Show(LoadingKind.Level, bootstrap.IsDailyLevel ? "DAILY PUZZLE" : "LEVEL " + (bootstrap.CurrentLevelIndex + 1));
+                Loading.Show(LoadingKind.Level, bootstrap.IsDailyLevel ? "DAILY PUZZLE" : (bootstrap.IsJourneyLevel ? "JOURNEY " : "LEVEL ") + (bootstrap.CurrentLevelIndex + 1));
             // Arrows land on the board as the loading screen fades (or right away on a restart).
             if (LoadingScreensEnabled) Intro.Play(newLevel ? LoadingOverlay.LevelSeconds - 0.1f : 0f);
         }
@@ -366,6 +441,9 @@ namespace ArrowEscape.UI
         {
             if (Loading != null && Loading.IsVisible) return true;
             if (Confirm != null && Confirm.IsOpen) { Confirm.Hide(); return true; }
+            if (Gift != null && Gift.IsOpen) { if (Gift.IsRevealed) Gift.CollectButton.onClick.Invoke(); return true; }
+            if (NameEditor != null && NameEditor.IsOpen) { NameEditor.Hide(); return true; }
+            if (JourneyLives != null && JourneyLives.IsOpen) { JourneyLives.Hide(); return true; }
             if (Ads != null && Ads.IsShowing) return true;
             if (Daily != null && Daily.Result.IsOpen) { Daily.Result.Hide(); GoHomeFromDaily(); return true; }
             if (Daily != null && Daily.Fail.IsOpen) return true;
@@ -380,6 +458,7 @@ namespace ArrowEscape.UI
         private void Update()
         {
             if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) HandleBack();
+            if (pendingGift != null) { pendingGiftDelay -= Time.unscaledDeltaTime; if (pendingGiftDelay <= 0) ShowPendingGift(); }
         }
         private void OnApplicationPause(bool paused) { if (paused && Machine.Current == ScreenState.Playing) Machine.Pause(); }
 #if !UNITY_EDITOR

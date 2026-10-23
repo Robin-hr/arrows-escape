@@ -32,8 +32,8 @@ namespace ArrowEscape.UI
 
         /// <summary>Overlay root (its own canvas, sorted above HUD and menus).</summary>
         public RectTransform Root { get; private set; }
-        /// <summary>The spinning neon ring.</summary>
-        public NeonRingLoader Loader { get; private set; }
+        /// <summary>The snake-arrow puzzle element.</summary>
+        public SnakeLoaderGraphic Loader { get; private set; }
         /// <summary>Caption under the loader.</summary>
         public UnityEngine.UI.Text Caption { get; private set; }
         /// <summary>True while covering the screen (including its fade-out).</summary>
@@ -49,7 +49,7 @@ namespace ArrowEscape.UI
 
         /// <summary>Loader edge length in canvas reference units: large at startup, medium for levels, small for profile.</summary>
         public static float LoaderSizeFor(LoadingKind kind) =>
-            kind == LoadingKind.Startup ? 380f : kind == LoadingKind.Level ? 320f : 260f;
+            kind == LoadingKind.Startup ? 520f : kind == LoadingKind.Level ? 400f : 280f;
 
         /// <summary>Builds the hidden overlay under a canvas.</summary>
         public void Build(Transform parent)
@@ -73,9 +73,12 @@ namespace ArrowEscape.UI
             logo.rectTransform.anchorMin = logo.rectTransform.anchorMax = new Vector2(0.5f, 0.69f);
             if (logo.texture == null) logo.color = new Color(1, 1, 1, 0);
 
-            loaderPanel = UiFactory.Rect("LoaderGlow", Root, new Vector2(580, 580), Vector2.zero);
-            loaderRect = UiFactory.Rect("RingLoader", Root, new Vector2(520, 520), Vector2.zero);
-            Loader = loaderRect.gameObject.AddComponent<NeonRingLoader>(); NeonKit.Isolate(loaderRect.gameObject);
+            // The puzzle sits on the same chamfered neon panel as every other card in the game.
+            loaderPanel = UiFactory.Rect("LoaderPanel", Root, new Vector2(580, 580), Vector2.zero);
+            NeonKit.Panel(loaderPanel.gameObject.AddComponent<UnityEngine.UI.Image>(), NeonKit.Cyan).raycastTarget = false;
+            loaderPanel.GetComponent<UnityEngine.UI.Image>().raycastTarget = false;
+            loaderRect = UiFactory.Rect("SnakeLoader", Root, new Vector2(520, 520), Vector2.zero);
+            Loader = loaderRect.gameObject.AddComponent<SnakeLoaderGraphic>(); Loader.DrawTile = false;
             Caption = BrandArt.Text("Caption", Root, "LOADING", 40, new Vector2(900, 70), Vector2.zero, BrandArt.Lavender);
             captionRect = Caption.rectTransform;
             Root.gameObject.SetActive(false);
@@ -96,7 +99,7 @@ namespace ArrowEscape.UI
             captionRect.anchoredPosition = startup ? Vector2.zero : new Vector2(0, -size * 0.5f - 70);
             Caption.fontSize = startup ? 40 : kind == LoadingKind.Level ? 46 : 34;
             SetCaption(string.IsNullOrEmpty(caption) ? "LOADING" : caption, animatedDots: startup || kind == LoadingKind.Profile);
-            Loader.Speed = startup ? 1.4f : kind == LoadingKind.Level ? 1.9f : 1.6f;
+            Loader.Speed = startup ? 1.4f : kind == LoadingKind.Level ? 2.4f : 1.8f;
             Loader.Restart(startup ? 0f : 0.3f);
             group.alpha = startup ? 1f : 0f;
             lastSize = Vector2.zero;

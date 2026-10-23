@@ -21,6 +21,15 @@ namespace ArrowEscape.Data
             return LevelBuilder.Build(data);
         }
 
+        /// <summary>Lists the Journey levels in Resources/JourneyLevels, sorted by name.</summary>
+        public static IReadOnlyList<string> GetJourneyResourcePaths()
+        {
+            TextAsset[] assets = Resources.LoadAll<TextAsset>("JourneyLevels");
+            Array.Sort(assets, (left, right) => string.CompareOrdinal(left.name, right.name));
+            var paths = new List<string>();
+            foreach (TextAsset asset in assets) paths.Add("JourneyLevels/" + asset.name);
+            return paths.AsReadOnly();
+        }
         /// <summary>Lists TextAssets directly in Resources/Levels, sorted by name.</summary>
         public static IReadOnlyList<string> GetLevelResourcePaths()
         {
