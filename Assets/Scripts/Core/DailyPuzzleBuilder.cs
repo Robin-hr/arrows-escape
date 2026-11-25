@@ -2,17 +2,19 @@ using System;
 namespace ArrowEscape.Core
 {
     /// <summary>
-    /// Builds the daily puzzle from the date alone, so every player gets the same board: one big (24 x 36) board
+    /// Builds the daily puzzle from the date alone, so every player gets the same board: one big (30 x 44) board, densely packed with winding arrows and three padlock/key pairs (Step 15)
     /// whose outline also comes from the date. Pure and deterministic; safe to run on a worker thread.
     /// </summary>
     public static class DailyPuzzleBuilder
     {
         /// <summary>Board width in cells.</summary>
-        public const int Width = 24;
+        public const int Width = 30;
         /// <summary>Board height in cells.</summary>
-        public const int Height = 36;
+        public const int Height = 44;
         private static readonly ShapeKind[] Outlines = { ShapeKind.Rectangle, ShapeKind.Ellipse, ShapeKind.Hexagon, ShapeKind.Octagon, ShapeKind.Oval, ShapeKind.Rhombus, ShapeKind.Decagon };
 
+        /// <summary>Padlock/key pairs on every daily board.</summary>
+        public const int Locks = 3;
         /// <summary>Stable seed for a calendar date key (yyyymmdd).</summary>
         public static int Seed(int dateKey) { unchecked { uint x = (uint)dateKey * 2654435761u; x ^= x >> 15; x *= 2246822519u; x ^= x >> 13; return (int)(x & 0x7FFFFFFF); } }
 
@@ -24,12 +26,14 @@ namespace ArrowEscape.Core
         {
             int seed = Seed(dateKey);
             ShapeKind first = OutlineFor(dateKey);
+            var dense = new DenseLevelSettings(3, 20, 560, 160, 320);
             foreach (ShapeKind shape in new[] { first, ShapeKind.Rectangle })
-                for (int k = 0; k < 6; k++)
+                for (int k = 0; k < 4; k++)
                 {
-                    var settings = new ShapeLevelSettings(shape, Width, Height, 4, 10, turnBias: 50, coverageTargetPermille: 750, maxFreeAtStartPermille: 500, maxAttempts: 10);
-                    var result = ShapeLevelGenerator.Generate(settings, seed + k * 104729);
-                    if (result.Success) return result.Board;
+                    Board raw = DenseLevelGenerator.Generate(ShapeMask.Build(shape, Width, Height), dense, seed + k * 104729);
+                    if (raw == null) continue;
+                    Board board = LockPlanner.AddLocks(raw, Locks, seed ^ 0x2545F491);
+                    if (LevelSolvability.IsSolvable(board) && LevelSolvability.CountFreeArrows(board) >= 2) return board;
                 }
             return Fallback();
         }

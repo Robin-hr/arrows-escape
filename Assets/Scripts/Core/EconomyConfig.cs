@@ -27,7 +27,11 @@ namespace ArrowEscape.Core
         public const int HeartPrice = 500;
         /// <summary>Coins for one Journey life.</summary>
         public const int JourneyLifePrice = 300;
-        /// <summary>Set false before a store release to disable the developer options (coin grant, open locked levels).</summary>
+        /// <summary>Developer options (coin grant, open locked levels): on in the editor and development builds only, never in a store release (Step 15).</summary>
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
         public const bool DeveloperGrantEnabled = true;
+#else
+        public const bool DeveloperGrantEnabled = false;
+#endif
     }
 }

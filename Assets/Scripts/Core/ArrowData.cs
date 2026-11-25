@@ -18,5 +18,7 @@ namespace ArrowEscape.Core
         public string direction;
         /// <summary>Optional Normal or Ice; omitted values preserve normal-arrow levels.</summary>
         public string type;
+        /// <summary>Step 15: optional id of the key arrow that holds this arrow's padlock; 0 (omitted) for none.</summary>
+        public int lockedBy;
     }
 }

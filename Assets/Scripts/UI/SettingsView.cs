@@ -20,6 +20,10 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Button ResetButton { get; private set; }
         /// <summary>Return action.</summary>
         public UnityEngine.UI.Button BackButton { get; private set; }
+        /// <summary>Step 15: opens the privacy policy page.</summary>
+        public UnityEngine.UI.Button PrivacyButton { get; private set; }
+        /// <summary>Step 15: the last URL the privacy button asked to open (tests read it instead of opening a browser).</summary>
+        public string LastOpenedUrl { get; private set; }
         /// <summary>Whether the full neon backdrop is shown (hidden when opened over a paused board).</summary>
         public bool BackdropVisible => backdrop != null && backdrop.gameObject.activeSelf;
         /// <summary>Creates the preference controls and wires stable callbacks.</summary>
@@ -34,7 +38,10 @@ namespace ArrowEscape.UI
             HapticsButton = UiFactory.MenuButton("Haptics: On", column, 55); NeonKit.WithIcon(HapticsButton, "icon_haptics", 72);
             ResetButton = UiFactory.MenuButton("Reset Progress", column, -115); NeonKit.Style(ResetButton, NeonButtonStyle.Danger); NeonKit.WithIcon(ResetButton, "icon_reset", 72);
             BackButton = UiFactory.MenuButton("Back", column, -285); NeonKit.WithIcon(BackButton, "icon_back", 64);
-            var version = UiFactory.Text("Version", column, "Version " + Application.version, 28, new Vector2(700, 50), new Vector2(0, -425));
+            PrivacyButton = UiFactory.Button("Privacy Policy", column, new Vector2(0, -395));
+            ((RectTransform)PrivacyButton.transform).sizeDelta = new Vector2(420, 72);
+            PrivacyButton.onClick.AddListener(() => { LastOpenedUrl = AppInfo.PrivacyPolicyUrl; if (Application.isPlaying) Application.OpenURL(AppInfo.PrivacyPolicyUrl); });
+            var version = UiFactory.Text("Version", column, "Version " + AppInfo.Version, 26, new Vector2(700, 44), new Vector2(0, -470));
             version.color = UiStyle.Muted;
             model = value; model.Changed += Refresh;
             SoundButton.onClick.AddListener(() => sound(!model.SoundEnabled));

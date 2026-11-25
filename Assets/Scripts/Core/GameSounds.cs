@@ -85,6 +85,50 @@ namespace ArrowEscape.Core
             return Normalize(s, 0.6f);
         }
 
+        /// <summary>Step 15: length of the unlock sound.</summary>
+        public const float UnlockSeconds = 0.55f;
+        /// <summary>Step 15: length of the padlock rattle.</summary>
+        public const float RattleSeconds = 0.32f;
+
+        /// <summary>Step 15 padlock opening: a metallic "clack" of the shackle springing free, then a bright rising two-note chime.</summary>
+        public static float[] Unlock(int rate)
+        {
+            int n = (int)(UnlockSeconds * rate); var s = new float[n]; uint seed = 9917u;
+            float Noise() { seed ^= seed << 13; seed ^= seed >> 17; seed ^= seed << 5; return (seed & 0xFFFF) / 32768f - 1f; }
+            float prev = 0;
+            for (int i = 0; i < n; i++)
+            {
+                double t = i / (double)rate; float x = Noise(); float hp = x - prev; prev = x;
+                double clack = (hp * 0.9 + Math.Sin(2 * Math.PI * 1850 * t) * 0.6 + Math.Sin(2 * Math.PI * 2710 * t) * 0.4) * Math.Exp(-t * 70);
+                double chime = 0;
+                double a = t - 0.06; if (a > 0) chime += (Math.Sin(2 * Math.PI * 1318.5 * a) + 0.3 * Math.Sin(2 * Math.PI * 2637 * a)) * Math.Exp(-a * 9) * Math.Min(1, a / 0.003);
+                double b = t - 0.15; if (b > 0) chime += (Math.Sin(2 * Math.PI * 1975.5 * b) + 0.3 * Math.Sin(2 * Math.PI * 3951 * b)) * Math.Exp(-b * 7) * Math.Min(1, b / 0.003);
+                s[i] = (float)(clack * 0.7 + chime * 0.45);
+            }
+            return Normalize(s, 0.7f);
+        }
+
+        /// <summary>Step 15 padlock rattle (tapping a padlocked arrow): three quick dull metal knocks with a chain jingle.</summary>
+        public static float[] LockRattle(int rate)
+        {
+            int n = (int)(RattleSeconds * rate); var s = new float[n]; uint seed = 31337u;
+            float Noise() { seed ^= seed << 13; seed ^= seed >> 17; seed ^= seed << 5; return (seed & 0xFFFF) / 32768f - 1f; }
+            float lp = 0;
+            for (int i = 0; i < n; i++)
+            {
+                double t = i / (double)rate; float x = Noise(); lp += 0.3f * (x - lp); double v = 0;
+                for (int k = 0; k < 3; k++)
+                {
+                    double c = t - k * 0.085; if (c <= 0) continue;
+                    double f = 620 + 90 * k;
+                    v += (Math.Sin(2 * Math.PI * f * c) * 0.7 + Math.Sin(2 * Math.PI * f * 2.76 * c) * 0.3 + lp * 0.8) * Math.Exp(-c * 38) * (1 - 0.18 * k);
+                    v += Math.Sin(2 * Math.PI * (3400 + 500 * k) * c) * Math.Exp(-c * 55) * 0.18;
+                }
+                s[i] = (float)v;
+            }
+            return Normalize(s, 0.6f);
+        }
+
         private static float[] Normalize(float[] s, float target)
         {
             float peak = 0; foreach (float v in s) peak = Math.Max(peak, Math.Abs(v));

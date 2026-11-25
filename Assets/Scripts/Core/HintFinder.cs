@@ -23,7 +23,7 @@ namespace ArrowEscape.Core
                     (freed[i] == freed[best] && (dependents[i] > dependents[best] ||
                     (dependents[i] == dependents[best] && board.Arrows[i].Id < board.Arrows[best].Id)))) best = i;
             }
-            // Removing a free arrow never makes this puzzle harder. Revisit this rule for special arrow types.
+            // Removing a free arrow never makes this puzzle harder (padlocks only add waits, never new blocks).
             return best < 0 ? HintResult.None : new HintResult(true, board.Arrows[best], freed[best], dependents[best]);
         }
 
@@ -47,7 +47,9 @@ namespace ArrowEscape.Core
                     dependents[soleBlocker]++;
                     blockers++;
                 }
-                free[i] = blockers == 0; // The same path-clear condition as Board.CanExit, without a second walk.
+                // Step 15: a padlocked arrow also waits for its key arrow.
+                if (arrow.LockedBy != 0 && indices.TryGetValue(arrow.LockedBy, out int key) && seen.Add(arrow.LockedBy)) { soleBlocker = key; dependents[key]++; blockers++; }
+                free[i] = blockers == 0; // The same condition as Board.CanExit, without a second walk.
                 if (blockers == 1) newlyFreed[soleBlocker]++;
             }
         }

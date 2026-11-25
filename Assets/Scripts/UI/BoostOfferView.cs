@@ -32,8 +32,8 @@ namespace ArrowEscape.UI
             TitleText = BrandArt.Text("Title", card, "OUT OF HINTS", 54, new Vector2(760, 90), new Vector2(0, 310), Color.white);
             icon = NeonKit.Icon("Icon", card, "icon_hint", 170, new Vector2(0, 150));
             BrandArt.Text("Note", card, "Get one more to keep going", 30, new Vector2(760, 60), new Vector2(0, 30), BrandArt.Lavender);
-            AdButton = UiFactory.Button("WATCH AD  +1", card, new Vector2(0, -90), NeonButtonStyle.Primary);
-            ((RectTransform)AdButton.transform).sizeDelta = new Vector2(620, 140); NeonKit.WithIcon(AdButton, "Daily/icon_ad", 70);
+            AdButton = UiFactory.Button("FREE BONUS  +1", card, new Vector2(0, -90), NeonButtonStyle.Primary);
+            ((RectTransform)AdButton.transform).sizeDelta = new Vector2(620, 140); NeonKit.WithIcon(AdButton, "icon_star", 64);
             BuyButton = UiFactory.Button("BUY 1 · " + EconomyConfig.BoostPrice, card, new Vector2(0, -250));
             ((RectTransform)BuyButton.transform).sizeDelta = new Vector2(620, 140); NeonKit.WithIcon(BuyButton, "icon_coin", 66);
             CloseButton = NeonKit.IconButton("Close", card, "Daily/icon_close", new Vector2(370, 350), 96, 52);

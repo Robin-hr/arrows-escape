@@ -40,8 +40,8 @@ namespace ArrowEscape.UI
             for (int i = 0; i < hearts.Length; i++) hearts[i] = BrandArt.Image("Life" + i, card, "Daily/icon_heart_empty", new Vector2(110, 110), new Vector2((i - 2) * 130, 290));
             TimerText = BrandArt.Text("Timer", card, "", 34, new Vector2(800, 60), new Vector2(0, 170), BrandArt.Cyan);
             BrandArt.Text("Note", card, "Every Journey level costs one life.\nLives refill over time, even when the game is closed.", 26, new Vector2(820, 90), new Vector2(0, 90), BrandArt.Lavender);
-            AdButton = UiFactory.Button("WATCH AD · +1 LIFE", card, new Vector2(0, -50), NeonButtonStyle.Primary);
-            ((RectTransform)AdButton.transform).sizeDelta = new Vector2(720, 140); NeonKit.WithIcon(AdButton, "Daily/icon_ad", 70);
+            AdButton = UiFactory.Button("FREE BONUS · +1 LIFE", card, new Vector2(0, -50), NeonButtonStyle.Primary);
+            ((RectTransform)AdButton.transform).sizeDelta = new Vector2(720, 140); NeonKit.WithIcon(AdButton, "icon_star", 64);
             BuyButton = UiFactory.Button("BUY 1 LIFE · " + EconomyConfig.JourneyLifePrice, card, new Vector2(0, -210));
             ((RectTransform)BuyButton.transform).sizeDelta = new Vector2(720, 140); NeonKit.WithIcon(BuyButton, "icon_coin", 66);
             CloseButton = UiFactory.Button("CLOSE", card, new Vector2(0, -380));

@@ -11,14 +11,16 @@ namespace ArrowEscape.Core
         private sealed class Definitions
         {
             internal readonly int[] Id;
+            internal readonly int[] Key;
             internal readonly Arrow[] Paths;
             internal readonly Direction[] Direction;
             internal readonly ArrowKind[] Kind;
             internal int Length=>Id.Length;
             internal Definitions(Arrow[] sorted)
             {
-                Paths=sorted;Id=new int[sorted.Length];Direction=new Direction[sorted.Length];Kind=new ArrowKind[sorted.Length];
-                for(int i=0;i<sorted.Length;i++){Id[i]=sorted[i].Id;Direction[i]=sorted[i].Direction;Kind[i]=sorted[i].Kind;}
+                Paths=sorted;Id=new int[sorted.Length];Direction=new Direction[sorted.Length];Kind=new ArrowKind[sorted.Length];Key=new int[sorted.Length];
+                for(int i=0;i<sorted.Length;i++){Id[i]=sorted[i].Id;Direction[i]=sorted[i].Direction;Kind[i]=sorted[i].Kind;Key[i]=-1;}
+                for(int i=0;i<sorted.Length;i++)if(sorted[i].LockedBy!=0)for(int k=0;k<sorted.Length;k++)if(Id[k]==sorted[i].LockedBy){Key[i]=k;break;}
             }
         }
         private sealed class Frame
@@ -99,6 +101,7 @@ namespace ArrowEscape.Core
                     long distance=Ahead(f.X[index],f.Y[index],arrows.Direction[index],x,y);
                     if(distance>0&&distance<nearest){nearest=distance;result=i;}
                 }
+            if(result<0&&arrows.Key[index]>=0&&f.Alive[arrows.Key[index]])result=arrows.Key[index];
             return result;
         }
         private static long BlockerDistance(Frame f,Definitions arrows,int index)

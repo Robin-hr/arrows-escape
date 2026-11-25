@@ -67,7 +67,7 @@ namespace ArrowEscape.Core
                 { moveHistory.Push(MoveRecord.ForSlide(arrow,moved)); return new MoveResult(arrow,moved,cells,MistakeCount); }
             }
             MistakeCount++;
-            return new MoveResult(MoveOutcome.Blocked, arrow, Board.GetBlocker(arrow), false, MistakeCount);
+            return new MoveResult(MoveOutcome.Blocked, arrow, Board.GetBlocker(arrow), false, MistakeCount, Board.IsHeldByLock(arrow));
         }
 
         /// <summary>Swaps the board and clears mistakes; null leaves the existing session unchanged.</summary>

@@ -25,9 +25,9 @@ namespace ArrowEscape.UI
             Root = UiFactory.ScreenRoot("RewardedAd", parent, new Color(0.01f, 0.01f, 0.05f, 0.97f), out var safe);
             var card = UiFactory.Column(safe, 860, 760);
             NeonKit.Panel(card.gameObject.AddComponent<UnityEngine.UI.Image>(), NeonKit.Gold);
-            NeonKit.Icon("AdIcon", card, "Daily/icon_ad", 200, new Vector2(0, 170));
-            BrandArt.Text("Title", card, "REWARDED AD", 56, new Vector2(800, 90), new Vector2(0, 0), Color.white);
-            BrandArt.Text("Note", card, "Your reward arrives when the ad ends", 28, new Vector2(800, 60), new Vector2(0, -80), BrandArt.Lavender);
+            NeonKit.Icon("AdIcon", card, "icon_star", 200, new Vector2(0, 170));
+            BrandArt.Text("Title", card, "FREE BONUS", 56, new Vector2(800, 90), new Vector2(0, 0), Color.white);
+            BrandArt.Text("Note", card, "Your bonus arrives in a moment", 28, new Vector2(800, 60), new Vector2(0, -80), BrandArt.Lavender);
             countdown = BrandArt.Text("Countdown", card, "3", 90, new Vector2(300, 130), new Vector2(0, -220), NeonKit.Gold);
             Root.gameObject.SetActive(false);
         }

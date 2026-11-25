@@ -127,6 +127,36 @@ namespace ArrowEscape.UI
             return text;
         }
 
+        /// <summary>Step 15: NORMAL / HARD / SUPER HARD label under the top bar (hidden for Normal).</summary>
+        public UnityEngine.UI.Text DifficultyText { get; private set; }
+        /// <summary>Step 15: the pill behind <see cref="DifficultyText"/>.</summary>
+        public UnityEngine.UI.Image DifficultyPill { get; private set; }
+        /// <summary>Step 15: cleared-arrows progress bar fill.</summary>
+        public UnityEngine.UI.Image ProgressFill { get; private set; }
+        /// <summary>Step 15: current progress shown by the bar (0..1).</summary>
+        public float Progress { get; private set; }
+        /// <summary>Step 15: first-time padlock coach banner.</summary>
+        public RectTransform LockTip { get; private set; }
+        private RectTransform progressTrack;
+        /// <summary>Step 15: shows the difficulty label for the current level.</summary>
+        public void SetDifficulty(LevelBadgeKind kind)
+        {
+            if (DifficultyPill == null) return;
+            bool show = kind != LevelBadgeKind.Normal;
+            if (DifficultyPill.gameObject.activeSelf != show) DifficultyPill.gameObject.SetActive(show);
+            if (!show) return;
+            DifficultyText.text = LevelBadge.Label(kind);
+            DifficultyPill.color = kind == LevelBadgeKind.SuperHard ? new Color32(214, 38, 110, 235) : new Color32(232, 140, 20, 235);
+        }
+        /// <summary>Step 15: sets the cleared fraction of the board.</summary>
+        public void SetProgress(float value)
+        {
+            Progress = Mathf.Clamp01(value); if (ProgressFill == null) return;
+            var r = ProgressFill.rectTransform; r.anchorMax = new Vector2(Progress, 1);
+        }
+        /// <summary>Step 15: shows or hides the padlock coach banner.</summary>
+        public void SetLockTipVisible(bool value) { if (LockTip != null && LockTip.gameObject.activeSelf != value) LockTip.gameObject.SetActive(value); }
+
         /// <summary>Creates the HUD once under a safe-area rectangle.</summary>
         public void Build(RectTransform safeArea)
         {
@@ -140,6 +170,7 @@ namespace ArrowEscape.UI
             LevelText = UiFactory.Text("LevelName", top, "", ViewTheme.HudFontSize, new Vector2(320, 65), new Vector2(-260, 40));
             LevelText.resizeTextForBestFit=true;LevelText.resizeTextMinSize=20;LevelText.resizeTextMaxSize=ViewTheme.HudFontSize;
             LevelPositionText = UiFactory.Text("LevelPosition", top, "", ViewTheme.HudFontSize, new Vector2(300, 65), new Vector2(100, 40));
+            LevelPositionText.resizeTextForBestFit=true;LevelPositionText.resizeTextMinSize=20;LevelPositionText.resizeTextMaxSize=ViewTheme.HudFontSize;
             MovesText = UiFactory.Text("Moves", top, "", ViewTheme.HudFontSize, new Vector2(300, 65), new Vector2(-290, -30));
             MovesText.resizeTextForBestFit = true; MovesText.resizeTextMinSize = 24; MovesText.resizeTextMaxSize = ViewTheme.HudFontSize;
             MistakesText = UiFactory.Text("Mistakes", top, "", ViewTheme.HudFontSize, new Vector2(300, 65), new Vector2(140, -30));
@@ -172,6 +203,21 @@ namespace ArrowEscape.UI
             stuck.GetComponent<UnityEngine.UI.Image>().raycastTarget=false;
             StuckText=UiFactory.Text("StuckText",stuck,"No way out from here.\nUndo or Restart.",32,Vector2.zero,Vector2.zero);
             StuckText.color=new Color32(255,150,190,255);UiFactory.Stretch(StuckText.rectTransform);stuck.gameObject.SetActive(false);
+            // Step 15: progress bar under the info bar, difficulty pill below it, padlock coach banner.
+            progressTrack = UiFactory.Rect("Progress", top, new Vector2(700, 14), new Vector2(-75, -92));
+            var track = progressTrack.gameObject.AddComponent<UnityEngine.UI.Image>(); track.color = new Color32(255, 255, 255, 40); track.raycastTarget = false;
+            var fill = UiFactory.Rect("Fill", progressTrack, Vector2.zero, Vector2.zero); fill.anchorMin = Vector2.zero; fill.anchorMax = new Vector2(0, 1); fill.pivot = new Vector2(0, .5f); fill.offsetMin = fill.offsetMax = Vector2.zero;
+            ProgressFill = fill.gameObject.AddComponent<UnityEngine.UI.Image>(); ProgressFill.color = new Color32(80, 232, 140, 255); ProgressFill.raycastTarget = false;
+            var pill = UiFactory.Rect("Difficulty", top, new Vector2(280, 56), new Vector2(-75, -136));
+            DifficultyPill = pill.gameObject.AddComponent<UnityEngine.UI.Image>(); DifficultyPill.sprite = BrandArt.SpriteOf("hud_pill", new Vector4(48, 46, 48, 46)); DifficultyPill.type = UnityEngine.UI.Image.Type.Sliced; DifficultyPill.raycastTarget = false;
+            DifficultyText = UiFactory.Text("Label", pill, "HARD", 34, new Vector2(280, 56), Vector2.zero); DifficultyText.color = Color.white; DifficultyText.fontStyle = FontStyle.Bold;
+            if (BrandArt.Display != null) DifficultyText.font = BrandArt.Display;
+            pill.gameObject.SetActive(false);
+            LockTip = UiFactory.Panel("LockTip", safeArea, ViewTheme.PanelCard); NeonKit.SetRim(LockTip, "neon_panel_rim", NeonKit.PanelBorder, NeonKit.Cyan);
+            LockTip.sizeDelta = new Vector2(900, 120); LockTip.anchorMin = LockTip.anchorMax = LockTip.pivot = new Vector2(.5f, 0);
+            LockTip.GetComponent<UnityEngine.UI.Image>().raycastTarget = false;
+            var tipText = UiFactory.Text("LockTipText", LockTip, "PADLOCK! Clear the arrow with the matching KEY first —\nthen the padlocked arrow is free to go.", 32, Vector2.zero, Vector2.zero);
+            tipText.color = new Color32(255, 226, 120, 255); UiFactory.Stretch(tipText.rectTransform); LockTip.gameObject.SetActive(false);
             foreach (var label in new[] { LevelText, LevelPositionText, MovesText, MistakesText }) label.color = TextColor;
             SetUndoState(false);
             SetHintState(false);
@@ -235,6 +281,7 @@ namespace ArrowEscape.UI
             bottom.localScale = Vector3.one * bottomScale;
             top.anchoredPosition = new Vector2(0, -size.y * 0.01f);
             bottom.anchoredPosition = new Vector2(0, size.y * 0.01f);
+            if(LockTip!=null){LockTip.localScale=Vector3.one*UiFit.ComputeScale(900,120,size.x*.92f,size.y*.07f);LockTip.anchoredPosition=new Vector2(0,size.y*.165f);}
             if(stuck!=null){stuck.localScale=Vector3.one*UiFit.ComputeScale(900,90,size.x*.9f,size.y*.04f);stuck.anchoredPosition=new Vector2(0,-size.y*.10f);}
         }
     }

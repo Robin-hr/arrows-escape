@@ -32,8 +32,8 @@ namespace ArrowEscape.UI
             BrandArt.Text("Title", card, "OUT OF HEARTS", 60, new Vector2(820, 100), new Vector2(0, 460), Color.white);
             for (int i = 0; i < 3; i++) BrandArt.Image("Heart" + i, card, "Daily/icon_heart_empty", new Vector2(110, 110), new Vector2((i - 1) * 130, 320));
             BrandArt.Text("Note", card, "Three mistakes used up your hearts.\nGet a heart to keep going.", 30, new Vector2(800, 110), new Vector2(0, 180), BrandArt.Lavender);
-            AdButton = UiFactory.Button("WATCH AD · +1 HEART", card, new Vector2(0, 40), NeonButtonStyle.Primary);
-            ((RectTransform)AdButton.transform).sizeDelta = new Vector2(720, 140); NeonKit.WithIcon(AdButton, "Daily/icon_ad", 70);
+            AdButton = UiFactory.Button("FREE BONUS · +1 HEART", card, new Vector2(0, 40), NeonButtonStyle.Primary);
+            ((RectTransform)AdButton.transform).sizeDelta = new Vector2(720, 140); NeonKit.WithIcon(AdButton, "icon_star", 64);
             BuyButton = UiFactory.Button("BUY HEART · " + EconomyConfig.HeartPrice, card, new Vector2(0, -120));
             ((RectTransform)BuyButton.transform).sizeDelta = new Vector2(720, 140); NeonKit.WithIcon(BuyButton, "icon_coin", 66);
             RestartButton = UiFactory.Button("RESTART", card, new Vector2(-185, -300));

@@ -15,30 +15,37 @@ namespace ArrowEscape.Tests
         {
             var paths=LevelRepository.GetLevelResourcePaths();Assert.That(paths.Count,Is.EqualTo(360));string path=paths[number-1];Assert.That(path,Does.StartWith("Levels/level_"+number.ToString("D3")));
             var result=LevelRepository.LoadFromResources(path);Assert.That(result.Success,Is.True,string.Join("; ",result.Errors));var board=result.Board;
-            Assert.That(LevelSolvability.IsSolvable(board),Is.True,path);foreach(var arrow in board.Arrows)Assert.That(arrow.Length,Is.InRange(CatalogLevelRules.CatalogMinArrowLength,CatalogLevelRules.CatalogMaxArrowLength));
+            Assert.That(LevelSolvability.IsSolvable(board),Is.True,path);if(number<=20)foreach(var arrow in board.Arrows)Assert.That(arrow.Length,Is.InRange(CatalogLevelRules.CatalogMinArrowLength,CatalogLevelRules.CatalogMaxArrowLength));
             if(number<=3)
             {
                 Assert.That(CatalogLevelRules.ValidateStarter(board,number),Is.Empty);var shape=number==1?ShapeKind.Square:number==2?ShapeKind.Rectangle:ShapeKind.RightTriangle;var starterMask=ShapeMask.Build(shape,number==3?8:6,number==1?6:8);Assert.That(board.Arrows.Sum(a=>a.Length)*1000/starterMask.Area,Is.GreaterThanOrEqualTo(900));foreach(var arrow in board.Arrows)foreach(var cell in arrow.Cells)Assert.That(starterMask.Contains(cell.X,cell.Y),Is.True);return;
             }
-            ShapeMask mask;if(number<=60){var entry=ShapePackPlan.CreateRequests()[number-4];mask=ShapeMask.Build(entry.Shape,entry.Width,entry.Height);}else{var entry=CatalogExpansionPlan.Create()[number-61];Assert.That(entry.Number,Is.EqualTo(number));Assert.That(path,Is.EqualTo("Levels/"+entry.Id));mask=ShapeMask.Build(entry.Shape,entry.Width,entry.Height);Assert.That(LevelSolvability.CountFreeArrows(board),Is.LessThan(board.Arrows.Count));}Assert.That(board.Width,Is.LessThanOrEqualTo(24));Assert.That(board.Height,Is.LessThanOrEqualTo(36));Assert.That(board.Arrows.Sum(a=>a.Length)*1000/mask.Area,Is.GreaterThanOrEqualTo(900));
+            if(number>20)
+            {
+                // Step 15: dense boards with long winding arrows, padlocks from level 75, and a NORMAL/HARD/SUPER HARD rhythm.
+                Assert.That(board.Width,Is.LessThanOrEqualTo(64));Assert.That(board.Height,Is.LessThanOrEqualTo(64));
+                int free=LevelSolvability.CountFreeArrows(board);Assert.That(free,Is.GreaterThanOrEqualTo(2));Assert.That(number>60?free*3:free,Is.LessThan(board.Arrows.Count),"most arrows start blocked");
+                foreach(var arrow in board.Arrows){Assert.That(arrow.Length,Is.InRange(3,32));if(arrow.LockedBy!=0){Assert.That(number,Is.GreaterThanOrEqualTo(75));Assert.That(board.GetArrowById(arrow.LockedBy),Is.Not.Null);}}
+                return;
+            }
+            ShapeMask mask;{var entry=ShapePackPlan.CreateRequests()[number-4];mask=ShapeMask.Build(entry.Shape,entry.Width,entry.Height);}Assert.That(board.Width,Is.LessThanOrEqualTo(24));Assert.That(board.Height,Is.LessThanOrEqualTo(36));Assert.That(board.Arrows.Sum(a=>a.Length)*1000/mask.Area,Is.GreaterThanOrEqualTo(900));
             foreach(var arrow in board.Arrows)foreach(var cell in arrow.Cells)Assert.That(mask.Contains(cell.X,cell.Y),Is.True);for(int d=0;d<4;d++)Assert.That(board.Arrows.Count(a=>(int)a.Direction==d)*100,Is.LessThanOrEqualTo(45*board.Arrows.Count));
         }
         /// <summary>Starter scores rise strictly; the reviewed first sixty keep both neighbour bounds.</summary>
         [Test]public void SmoothnessAndStarterDifficulty()
         {
-            int previous=-1;var paths=LevelRepository.GetLevelResourcePaths();for(int i=0;i<60;i++){int score=DifficultyRater.Rate(LevelAnalyzer.Analyze(LevelRepository.LoadFromResources(paths[i]).Board,new AnalysisOptions(128,32))).Score;if(i>0){Assert.That(score-previous,Is.InRange(-15,45));if(i<4)Assert.That(score,Is.GreaterThan(previous));}previous=score;}
+            int previous=-1;var paths=LevelRepository.GetLevelResourcePaths();for(int i=0;i<20;i++){int score=DifficultyRater.Rate(LevelAnalyzer.Analyze(LevelRepository.LoadFromResources(paths[i]).Board,new AnalysisOptions(128,32))).Score;if(i>0){Assert.That(score-previous,Is.InRange(-15,45));if(i<4)Assert.That(score,Is.GreaterThan(previous));}previous=score;}
         }
-        /// <summary>Levels 61..360 repeat Easy, Medium, Hard; every board is rated inside its step (Hard may reach Expert).</summary>
-        [Test]public void ExpansionCyclesEasyMediumHard()
+        /// <summary>Step 15: boards grow from level 21 to 360, every Super Hard peak is bigger than the levels around it, and padlocks start at 75.</summary>
+        [Test]public void Step15DifficultyCurve()
         {
-            var plan=CatalogExpansionPlan.Create();Assert.That(plan.Count,Is.EqualTo(300));var paths=LevelRepository.GetLevelResourcePaths();
-            for(int i=0;i<plan.Count;i++)
-            {
-                var entry=plan[i];Assert.That(entry.Number,Is.EqualTo(61+i));Assert.That(entry.Tier,Is.EqualTo((DifficultyTier)(i%3)));
-                int score=DifficultyRater.Rate(LevelAnalyzer.Analyze(LevelRepository.LoadFromResources(paths[60+i]).Board,new AnalysisOptions(128,32))).Score;
-                if(entry.Tier==DifficultyTier.Hard)Assert.That(score,Is.GreaterThanOrEqualTo(DifficultyWeights.HardThreshold),entry.Id);
-                else Assert.That(ShapeLevelGenerator.TierDistance(score,entry.Tier),Is.Zero,entry.Id+" scored "+score);
-            }
+            var paths=LevelRepository.GetLevelResourcePaths();var counts=new int[361];var locks=new int[361];
+            for(int n=21;n<=360;n++){var b=LevelRepository.LoadFromResources(paths[n-1]).Board;counts[n]=b.Arrows.Count;locks[n]=LockPlanner.CountLocks(b);}
+            Assert.That(counts[21],Is.LessThan(40));Assert.That(counts[60],Is.GreaterThan(60));Assert.That(counts[200],Is.GreaterThan(140));Assert.That(counts[350],Is.GreaterThan(180));
+            for(int n=70;n<=360;n+=10){Assert.That(LevelBadge.ForCatalog(n),Is.EqualTo(LevelBadgeKind.SuperHard));if(n<360)Assert.That(counts[n],Is.GreaterThan((counts[n-2]+counts[n-3])/2),"Super Hard "+n);}
+            for(int n=21;n<75;n++)Assert.That(locks[n],Is.Zero,"no padlocks before 75");
+            Assert.That(locks[75],Is.EqualTo(1),"padlock tutorial");Assert.That(Enumerable.Range(75,286).Count(n=>locks[n]>0),Is.GreaterThan(250));
+            double early=Enumerable.Range(61,50).Average(n=>counts[n]),late=Enumerable.Range(311,50).Average(n=>counts[n]);Assert.That(late,Is.GreaterThan(early*1.8));
         }
         /// <summary>Replacing board content never migrates or changes keyed player results.</summary>
         [Test]public void SavedKeysAndStarsStayAttached()

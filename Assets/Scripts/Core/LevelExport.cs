@@ -19,7 +19,7 @@ namespace ArrowEscape.Core
             if(string.IsNullOrWhiteSpace(name))throw new ArgumentException("A level name is required.",nameof(name));
             var result=new LevelData{name=name,width=board.Width,height=board.Height,arrows=new List<ArrowData>()};
             var arrows=new List<Arrow>(board.Arrows);arrows.Sort((a,b)=>a.Id.CompareTo(b.Id));
-            foreach(Arrow arrow in arrows)result.arrows.Add(new ArrowData{id=arrow.Id,x=arrow.X,y=arrow.Y,direction=arrow.Direction.ToString(),type=arrow.Kind==ArrowKind.Ice?"ice":"normal",cells=ExportCells(arrow)});
+            foreach(Arrow arrow in arrows)result.arrows.Add(new ArrowData{id=arrow.Id,x=arrow.X,y=arrow.Y,direction=arrow.Direction.ToString(),type=arrow.Kind==ArrowKind.Ice?"ice":"normal",cells=ExportCells(arrow),lockedBy=arrow.LockedBy});
             return result;
         }
     }

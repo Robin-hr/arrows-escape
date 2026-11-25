@@ -73,7 +73,7 @@ namespace ArrowEscape.Core
                     {
                         Direction d=(Direction)directionIndex;int dx=d.GetDx(),dy=d.GetDy();if(!Empty(mask,board,x-dx,y-dy)||!ClearRay(board,x,y,d))continue;
                         int blocks=rayCounts[x,y];
-                        heads.Add(new Cell(x,y));directions.Add(d);weights.Add(1+3*blocks);
+                        heads.Add(new Cell(x,y));directions.Add(d);weights.Add(1+s.BlockWeight*blocks);
                     }
                 }
                 rebuild=false;
@@ -94,6 +94,7 @@ namespace ArrowEscape.Core
         {
             // When both dimensions exceed twice the length cap, favor short targets to avoid sealing large pockets.
             int target=random.NextInt(s.MinArrowLength,s.LengthCap+1);
+            if(s.LongArrows&&s.SkewShort)target=Math.Min(target,random.NextInt(s.MinArrowLength,s.LengthCap+1));
             if(!s.LongArrows&&mask.Width>2*s.MaxArrowLength&&mask.Height>2*s.MaxArrowLength)target=Math.Min(target,Math.Min(random.NextInt(s.MinArrowLength,Math.Min(s.MaxArrowLength,10)+1),random.NextInt(s.MinArrowLength,Math.Min(s.MaxArrowLength,10)+1)));var cells=new List<Cell>{head,new Cell(head.X-direction.GetDx(),head.Y-direction.GetDy())};
             while(cells.Count<target)
             {

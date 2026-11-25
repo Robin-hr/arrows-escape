@@ -49,11 +49,19 @@ namespace ArrowEscape.Core
         private int Blocker(int index)
         {
             if(normalBlockers!=null){foreach(int other in normalBlockers[index])if(Alive[other])return other;return -1;}
+            int key=KeyIndex(index);
             int nearest=-1;long distance=long.MaxValue;
             for(int i=0;i<Alive.Length;i++)if(Alive[i])
                 for(int c=0;c<Definitions[i].Length;c++)
                 {long ahead=Ahead(index,i,c);if(ahead>0&&ahead<distance){distance=ahead;nearest=i;}}
-            return nearest;
+            return nearest>=0?nearest:key;
+        }
+        // Step 15: a padlocked arrow is also held by its key while the key is alive.
+        private int KeyIndex(int index)
+        {
+            int keyId=Definitions[index].LockedBy;if(keyId==0)return -1;
+            for(int i=0;i<Definitions.Length;i++)if(Definitions[i].Id==keyId)return Alive[i]?i:-1;
+            return -1;
         }
         // Normal paths never relocate. Cache their exact nearest-first blocking owners once;
         // descendants only change Alive flags. Ice states retain the original coordinate search.
@@ -70,7 +78,10 @@ namespace ArrowEscape.Core
                     {long ahead=Ahead(index,other,cell);if(ahead>0&&ahead<nearest)nearest=ahead;}
                     distances[other]=nearest;if(nearest!=long.MaxValue)owners.Add(other);
                 }
-                owners.Sort((a,b)=>distances[a]!=distances[b]?distances[a].CompareTo(distances[b]):a.CompareTo(b));result[index]=owners.ToArray();
+                owners.Sort((a,b)=>distances[a]!=distances[b]?distances[a].CompareTo(distances[b]):a.CompareTo(b));
+                int keyId=Definitions[index].LockedBy;
+                if(keyId!=0)for(int k=0;k<Definitions.Length;k++)if(Definitions[k].Id==keyId&&!owners.Contains(k)){owners.Add(k);break;}
+                result[index]=owners.ToArray();
             }
             return result;
         }

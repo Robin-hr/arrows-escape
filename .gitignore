@@ -112,3 +112,11 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Step 15: Google Play upload key and transfer scratch (never commit)
+/[Kk]eystore/
+*.keystore
+*.jks
+/_xfer/
+/_xfer_dev_md5.txt
+/[Aa]ssets/_Recovery*

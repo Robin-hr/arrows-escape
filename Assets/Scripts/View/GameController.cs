@@ -245,7 +245,7 @@ namespace ArrowEscape.View
                 boardView.TryGetArrowView(arrow.Id, out ArrowView tapped);
                 boardView.TryGetArrowView(result.Blocker.Id, out ArrowView blocker);
                 animator.PlayBlocked(tapped, arrow.Direction, blocker);
-                if (Guide != null) Guide.ShowBlockerLine(arrow, result.Blocker);
+                if (Guide != null && !result.HeldByLock) Guide.ShowBlockerLine(arrow, result.Blocker);
                 MoveBlocked?.Invoke(arrow, result.Blocker);
                 MistakeCountChanged?.Invoke(result.MistakeCount);
             }

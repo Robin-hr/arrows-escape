@@ -22,6 +22,11 @@ namespace ArrowEscape.Core
             : this(MoveOutcome.Slid,before,null,false,mistakeCount) { MovedArrow=after; SlideCells=slideCells; }
 
         /// <summary>Creates a result, keeping blocker and cleared flags consistent with the outcome.</summary>
+        public MoveResult(MoveOutcome outcome, Arrow arrow, Arrow blocker, bool boardCleared, int mistakeCount, bool heldByLock)
+            : this(outcome,arrow,blocker,boardCleared,mistakeCount) { HeldByLock = Outcome==MoveOutcome.Blocked && heldByLock; }
+        /// <summary>Step 15: the path was clear but the arrow's padlock is still held by <see cref="Blocker"/> (its key).</summary>
+        public bool HeldByLock { get; }
+        /// <summary>Creates a result, keeping blocker and cleared flags consistent with the outcome.</summary>
         public MoveResult(MoveOutcome outcome, Arrow arrow, Arrow blocker, bool boardCleared, int mistakeCount)
         {
             Outcome = outcome;

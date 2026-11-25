@@ -37,15 +37,19 @@ namespace ArrowEscape.Core
         public int MaxFreeAtStartPermille { get; }
         /// <summary>Maximum candidate attempts.</summary>
         public int MaxAttempts { get; }
-        /// <summary>Journey mode (Step 14L): arrows may reach <see cref="MaxArrowLength"/> (up to 16) instead of the catalog cap of 10, with uniform target lengths.</summary>
+        /// <summary>Long-arrow mode (Step 14L, widened in Step 15): arrows may reach <see cref="MaxArrowLength"/> (up to 32) instead of the catalog cap of 10, with uniform target lengths.</summary>
         public bool LongArrows { get; }
+        /// <summary>Step 15: extra pick weight for heads that sit on an existing arrow's ray (higher = longer blocking chains, fewer free arrows).</summary>
+        public int BlockWeight { get; }
+        /// <summary>Step 15: long-arrow targets are the shorter of two draws, so most arrows stay short and a few run long.</summary>
+        public bool SkewShort { get; }
         /// <summary>Longest arrow the generator grows.</summary>
-        public int LengthCap => LongArrows ? Math.Min(MaxArrowLength, 16) : Math.Min(MaxArrowLength, 10);
+        public int LengthCap => LongArrows ? Math.Min(MaxArrowLength, 32) : Math.Min(MaxArrowLength, 10);
         /// <summary>Optional desired tier.</summary>
         public DifficultyTier? TargetTier { get; }
         /// <summary>Stores settings; Validate collects every invalid value.</summary>
-        public ShapeLevelSettings(ShapeKind shape,int width,int height,int minArrowLength=4,int? maxArrowLength=null,int turnBias=45,int coverageTargetPermille=900,int maxFreeAtStartPermille=300,int maxAttempts=30,DifficultyTier? targetTier=null,bool starter=false,int maxBends=int.MaxValue,int minArrows=1,int maxArrows=int.MaxValue,int minFree=1,bool longArrows=false)
-        {LongArrows=longArrows;Shape=shape;Width=width;Height=height;MinArrowLength=minArrowLength;MaxArrowLength=maxArrowLength??10;TurnBias=turnBias;CoverageTargetPermille=coverageTargetPermille;MaxFreeAtStartPermille=maxFreeAtStartPermille;MaxAttempts=maxAttempts;TargetTier=targetTier;IsStarter=starter;MaxBends=maxBends;MinArrows=minArrows;MaxArrows=maxArrows;MinFree=minFree;}
+        public ShapeLevelSettings(ShapeKind shape,int width,int height,int minArrowLength=4,int? maxArrowLength=null,int turnBias=45,int coverageTargetPermille=900,int maxFreeAtStartPermille=300,int maxAttempts=30,DifficultyTier? targetTier=null,bool starter=false,int maxBends=int.MaxValue,int minArrows=1,int maxArrows=int.MaxValue,int minFree=1,bool longArrows=false,int blockWeight=3,bool skewShort=false)
+        {LongArrows=longArrows;BlockWeight=blockWeight;SkewShort=skewShort;Shape=shape;Width=width;Height=height;MinArrowLength=minArrowLength;MaxArrowLength=maxArrowLength??10;TurnBias=turnBias;CoverageTargetPermille=coverageTargetPermille;MaxFreeAtStartPermille=maxFreeAtStartPermille;MaxAttempts=maxAttempts;TargetTier=targetTier;IsStarter=starter;MaxBends=maxBends;MinArrows=minArrows;MaxArrows=maxArrows;MinFree=minFree;}
         /// <summary>Returns every invalid setting without throwing.</summary>
         public IReadOnlyList<string> Validate()
         {
@@ -63,6 +67,7 @@ namespace ArrowEscape.Core
             if(MaxBends<0)errors.Add("MaxBends must be nonnegative.");
             if(MinArrows<1||MaxArrows<MinArrows)errors.Add("Arrow-count bounds must be positive and ordered.");
             if(MinFree<1)errors.Add("MinFree must be positive.");
+            if(BlockWeight<0||BlockWeight>100)errors.Add("BlockWeight must be 0..100.");
             return errors.AsReadOnly();
         }
     }

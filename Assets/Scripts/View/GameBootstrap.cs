@@ -179,6 +179,7 @@ namespace ArrowEscape.View
             taps.Bind(GetComponent<BoardView>());
             GetComponent<PointerInputAdapter>().Bind(taps);
             GetComponent<GameController>().BindGuide(GetComponent<GuideController>());
+            if (GetComponent<LockBadges>() == null) gameObject.AddComponent<LockBadges>();
         }
         private void Start()
         {
@@ -216,6 +217,7 @@ namespace ArrowEscape.View
             LastCompletion = null;
             saveWarningLogged = false;
             controller = GetComponent<GameController>();
+            var lockBadges = GetComponent<LockBadges>(); if (lockBadges == null) lockBadges = gameObject.AddComponent<LockBadges>(); lockBadges.Bind(GetComponent<BoardView>(), controller);
             controller.BoardCleared += OnCleared;
             controller.LevelStarted += OnLevelStarted;
             ProgressLoadResult load = Progress.LoadResult;
@@ -233,6 +235,8 @@ namespace ArrowEscape.View
         }
 
         /// <summary>Loads an explicit zero-based resource index; also supports debugging locked levels.</summary>
+        /// <summary>Step 15: catalog boards with at least this many arrows always allow zoom.</summary>
+        public const int ZoomArrowThreshold = 60;
         public void ShowLevel(int index)
         {
             LeaveSandbox();
@@ -249,6 +253,8 @@ namespace ArrowEscape.View
             if (!result.Success)
             { foreach (string error in result.Errors) Debug.LogError(error, this); return; }
             CurrentLevelIndex = index;
+            // Step 15: big catalog boards (60+ arrows) get pinch/drag zoom and the HUD zoom buttons like Journey.
+            var zoom = GetComponent<BoardZoom>(); if (zoom == null) zoom = gameObject.AddComponent<BoardZoom>(); zoom.Forced = result.Board.Arrows.Count >= ZoomArrowThreshold;
             controller.SetLevelInfo(result.LevelName, resource);
             controller.StartLevel(result.Board, result.LevelName);
             GetComponent<CameraFitter>().Fit(result.Board.Width, result.Board.Height);

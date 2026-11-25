@@ -23,6 +23,15 @@ namespace ArrowEscape.Core
             if (data.arrows != null)
                 for (int i = 0; i < data.arrows.Count; i++)
                     ValidateArrow(data.arrows[i], i, data, ids, cells, errors);
+            if (data.arrows != null)
+                foreach (ArrowData arrow in data.arrows)
+                {
+                    if (arrow == null || arrow.lockedBy == 0) continue;
+                    if (arrow.lockedBy < 0 || arrow.lockedBy == arrow.id || !ids.Contains(arrow.lockedBy))
+                        errors.Add($"Arrow {arrow.id}: lockedBy must name another arrow in the level; received {arrow.lockedBy}.");
+                    else if (TryKind(arrow.type, out ArrowKind k) && k == ArrowKind.Ice)
+                        errors.Add($"Arrow {arrow.id}: ice arrows cannot be padlocked.");
+                }
             if (errors.Count > 0) return LevelLoadResult.Fail(errors, data.name);
 
             var board = new Board(data.width, data.height);
@@ -30,7 +39,7 @@ namespace ArrowEscape.Core
             {
                 TryDirection(arrow.direction, out Direction direction);
                 TryKind(arrow.type,out ArrowKind kind);
-                board.TryAddArrow(new Arrow(arrow.id, ReadCells(arrow), direction, kind), out _);
+                board.TryAddArrow(new Arrow(arrow.id, ReadCells(arrow), direction, kind, arrow.lockedBy), out _);
             }
             return LevelLoadResult.Ok(board, data.name);
         }

@@ -70,9 +70,9 @@ namespace ArrowEscape.EditorTools
         }
 
         /// <summary>Release version shown in stores and in the APK.</summary>
-        public const string Version = "0.1.0";
+        public const string Version = "0.2.0";
         /// <summary>Android version code (increase for every upload).</summary>
-        public const int AndroidVersionCode = 1;
+        public const int AndroidVersionCode = 2;
 
         // Step 14N cross-platform settings: Android IL2CPP ARM64 with internet (world ranking) and edge-to-edge drawing,
         // iOS full screen, desktop portrait windows that can be resized.

@@ -51,7 +51,7 @@ namespace ArrowEscape.Core
             if(source==null || GetArrowById(source.Id)!=null || source.Direction<Direction.Up || source.Direction>Direction.Right || source.Kind<ArrowKind.Normal || source.Kind>ArrowKind.Ice) return false;
             for(int i=0;i<source.Length;i++)
             { Cell cell=source.Cells[i]; if(!InBounds(cell.X,cell.Y)||occupancy.ContainsKey(cell))return false; }
-            arrow=new Arrow(source.Id,source.Cells,source.Direction,source.Kind);
+            arrow=new Arrow(source.Id,source.Cells,source.Direction,source.Kind,source.LockedBy);
             arrows.Add(arrow);
             for(int i=0;i<arrow.Length;i++)occupancy.Add(arrow.Cells[i],arrow);
             return true;
@@ -87,7 +87,26 @@ namespace ArrowEscape.Core
         public Arrow GetBlocker(Arrow arrow)
         {
             Cell? cell=GetBlockingCell(arrow);
-            return cell.HasValue ? GetArrowAt(cell.Value.X,cell.Value.Y) : null;
+            if(cell.HasValue) return GetArrowAt(cell.Value.X,cell.Value.Y);
+            return GetLockingKey(arrow);
+        }
+
+        /// <summary>Step 15: the key arrow still holding this arrow's padlock, or null when unlocked.</summary>
+        public Arrow GetLockingKey(Arrow arrow)
+        {
+            if(!Contains(arrow) || arrow.LockedBy==0) return null;
+            return GetArrowById(arrow.LockedBy);
+        }
+
+        /// <summary>True when the path ahead is clear but a padlock still holds the arrow.</summary>
+        public bool IsHeldByLock(Arrow arrow) => GetBlockingCell(arrow)==null && GetLockingKey(arrow)!=null;
+
+        /// <summary>Padlocked arrows whose key is this arrow (still on the board).</summary>
+        public List<Arrow> GetLockedBy(Arrow key)
+        {
+            var result=new List<Arrow>(); if(key==null) return result;
+            foreach(Arrow a in arrows) if(a.LockedBy==key.Id) result.Add(a);
+            return result;
         }
 
         /// <summary>Removes a board member without checking its exit path.</summary>

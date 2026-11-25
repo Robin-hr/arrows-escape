@@ -200,7 +200,36 @@ namespace ArrowEscape.UI
         }
         private void OnMistakes(int count) => Refresh();
         private void OnStuckChanged(bool value){Hud.SetStuckVisible(value);Hud.SetHintState(game.CanHint);}
-        private void OnLevelStarted() { CompletePanel.Hide(); Refresh(); Hud.SetStarState(game.TapCount, game.Par, true); }
+        private void OnLevelStarted()
+        {
+            CompletePanel.Hide(); Refresh(); Hud.SetStarState(game.TapCount, game.Par, true);
+            lockTipTime = 0; bool locks = false;
+            if (game.Session != null) foreach (Arrow a in game.Session.Board.Arrows) if (a.LockedBy != 0) { locks = true; break; }
+            Hud.SetLockTipVisible(locks && !LockTipDone); if (locks && !LockTipDone) lockTipTime = 9f;
+        }
+        private float lockTipTime;
+        /// <summary>Step 15: true once the player has opened a padlock (the coach banner stops appearing).</summary>
+        public static bool LockTipDone
+        {
+            get { if (lockTipOverride.HasValue) return lockTipOverride.Value; try { return PlayerPrefs.GetInt("ae_lock_tip_done", 0) == 1; } catch { return false; } }
+            set { lockTipOverride = null; try { PlayerPrefs.SetInt("ae_lock_tip_done", value ? 1 : 0); PlayerPrefs.Save(); } catch { } }
+        }
+        private static bool? lockTipOverride;
+        /// <summary>Tests pin the coach state without touching PlayerPrefs (null clears the pin).</summary>
+        public static void OverrideLockTip(bool? done) => lockTipOverride = done;
+        /// <summary>Step 15: difficulty label of the level being played.</summary>
+        public LevelBadgeKind CurrentBadge()
+        {
+            if (bootstrap == null || bootstrap.IsDailyLevel || bootstrap.IsSandboxLevel || bootstrap.CurrentLevelIndex < 0) return LevelBadgeKind.Normal;
+            return bootstrap.IsJourneyLevel ? LevelBadge.ForJourney(bootstrap.CurrentLevelIndex + 1) : LevelBadge.ForCatalog(bootstrap.CurrentLevelIndex + 1);
+        }
+        private void Update()
+        {
+            if (lockTipTime <= 0 || Hud == null) return;
+            var badges = game != null ? game.GetComponent<LockBadges>() : null;
+            if (badges != null && badges.UnlockCount > 0) { lockTipTime = 0; Hud.SetLockTipVisible(false); if (!lockTipOverride.HasValue) LockTipDone = true; return; }
+            lockTipTime -= Time.unscaledDeltaTime; if (lockTipTime <= 0) Hud.SetLockTipVisible(false);
+        }
         private void OnCoinPresented(){if(game!=null)game.RequestUiFeedback(UiFeedbackCue.Coin);}
         private void OnStarPresented(int index) { if (game != null) game.PresentStar(index); }
         private void OnPauseChanged(bool paused)
@@ -238,7 +267,10 @@ namespace ArrowEscape.UI
             Hud.SetStuckVisible(game.IsStuck);
             bool daily = bootstrap != null && bootstrap.IsDailyLevel;
             if (Hud.IsDaily != daily) Hud.SetDaily(daily);
-            Hud.SetZoomVisible(daily || (bootstrap != null && bootstrap.IsJourneyLevel));
+            var zoom = game.GetComponent<BoardZoom>();
+            Hud.SetZoomVisible(daily || (bootstrap != null && bootstrap.IsJourneyLevel) || (zoom != null && zoom.CanZoom));
+            Hud.SetProgress(game.StartingArrowCount > 0 ? game.MoveCount / (float)game.StartingArrowCount : 0);
+            Hud.SetDifficulty(CurrentBadge());
             if (daily) Hud.SetDailyInfo(DailyCalendar.Pretty(bootstrap.DailyKey), game.TapCount);
             else if (bootstrap != null) Hud.SetLevelPosition(bootstrap.IsSandboxLevel?-1:bootstrap.CurrentLevelIndex, bootstrap.IsSandboxLevel?0:bootstrap.ActiveLevelCount, bootstrap.IsJourneyLevel?"Journey":"Level");
             RefreshBoosts();

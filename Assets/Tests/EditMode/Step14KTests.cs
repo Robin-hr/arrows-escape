@@ -36,12 +36,12 @@ namespace ArrowEscape.Tests
             foreach (string path in paths)
             {
                 var load = LevelRepository.LoadFromResources(path); Assert.That(load.Success, Is.True, path);
-                Assert.That(load.Board.Arrows.Count, Is.InRange(55, 70), path);
+                Assert.That(load.Board.Arrows.Count, Is.InRange(95, 360), path);   // Step 15: much bigger, denser Journey boards
                 Assert.That(geometric.Any(g => path.ToLowerInvariant().Contains("_" + g)), Is.False, path);
-                foreach (Arrow a in load.Board.Arrows) Assert.That(a.Length, Is.InRange(4, 16), path);
+                foreach (Arrow a in load.Board.Arrows) Assert.That(a.Length, Is.InRange(3, 32), path);
                 longest = System.Math.Max(longest, load.Board.Arrows.Max(x => x.Length));
             }
-            Assert.That(longest, Is.GreaterThan(10), "Journey arrows reach past the main-level cap (Step 14L)");
+            Assert.That(longest, Is.GreaterThan(20), "Journey arrows reach far past the old cap (Step 15)");
             foreach (int i in new[] { 0, 99, 199 }) Assert.That(LevelSolvability.IsSolvable(LevelRepository.LoadFromResources(paths[i]).Board), Is.True, paths[i]);
         }
 
@@ -57,7 +57,7 @@ namespace ArrowEscape.Tests
                 Assert.That(flow.Machine.Current, Is.EqualTo(ScreenState.Playing)); Assert.That(scene.Bootstrap.IsJourneyLevel, Is.True);
                 Assert.That(scene.Bootstrap.Inventory.State.JourneyLives, Is.EqualTo(4)); Assert.That(scene.Inventory.Saved.JourneyLives, Is.EqualTo(4));
                 Assert.That(scene.Hud.Hud.LevelPositionText.text, Is.EqualTo("Journey 1 / 200"));
-                Assert.That(scene.Game.Session.Board.Arrows.Count, Is.InRange(55, 70));
+                Assert.That(scene.Game.Session.Board.Arrows.Count, Is.InRange(95, 200));
                 Assert.That(flow.Daily.Hearts, Is.EqualTo(3), "three hearts inside the level too");
                 var state = scene.Bootstrap.Inventory.State; int coins = state.Coins, hints = state.Hints, undos = state.Undos, owned = state.OwnedItemIds.Count;
                 scene.Clear();
