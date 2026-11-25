@@ -14,12 +14,12 @@ namespace ArrowEscape.Tests
             using (var scene = new EconomyTestScene(withUi: true))
             {
                 scene.Bootstrap.ShowLevel(0); Color first = Camera.main.backgroundColor;
-                Assert.That(first, Is.EqualTo(LevelColors.For(0, scene.Board.IsLightBoard)));
+                Assert.That(first, Is.EqualTo(SkinBackdrop.For("classic", 0, true)));
                 scene.Bootstrap.ShowLevel(1); Color second = Camera.main.backgroundColor;
-                Assert.That(second, Is.EqualTo(LevelColors.For(1, scene.Board.IsLightBoard))); Assert.That(second, Is.Not.EqualTo(first));
+                Assert.That(second, Is.EqualTo(SkinBackdrop.For("classic", 1, true))); Assert.That(second, Is.Not.EqualTo(first));
                 scene.Bootstrap.Inventory.Shop.AddCoins(1000); scene.Bootstrap.Inventory.TryBuy("inferno_streak"); scene.Bootstrap.Inventory.TryEquip("inferno_streak");
                 Assert.That(scene.Board.IsLightBoard, Is.False, "glowing skins sit on deep colours");
-                Assert.That(Camera.main.backgroundColor, Is.EqualTo((Color)LevelColors.Dark[1]));
+                Assert.That(Camera.main.backgroundColor, Is.EqualTo(SkinBackdrop.For("inferno_streak", 1, false)));
                 foreach (var backdrop in Object.FindObjectsByType<ThemeBackdrop>(FindObjectsSortMode.None)) Assert.That(backdrop.ParticleCount, Is.Zero, "no moving shapes behind the board");
                 Assert.That(scene.Board.HasDarkTheme, Is.False);
             }

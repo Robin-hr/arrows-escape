@@ -205,7 +205,7 @@ namespace ArrowEscape.DevBridge
                     if (action != "tap")
                     {
                         object inv = bootType.GetProperty("Inventory").GetValue(boot); string id = action.Substring(6);
-                        inv.GetType().GetMethod("TryBuy").Invoke(inv, new object[] { id }); object ok = inv.GetType().GetMethod("TryEquip", new[] { typeof(string) }).Invoke(inv, new object[] { id });
+                        object shopObj = inv.GetType().GetProperty("Shop").GetValue(inv); shopObj.GetType().GetMethod("AddCoins").Invoke(shopObj, new object[] { 5000 }); inv.GetType().GetMethod("TryBuy").Invoke(inv, new object[] { id }); object ok = inv.GetType().GetMethod("TryEquip", new[] { typeof(string) }).Invoke(inv, new object[] { id });
                         Append("play-log.txt", Now + " " + action + " " + ok); return;
                     }
                     Type gameType = Type.GetType("ArrowEscape.View.GameController, ArrowEscape.View"), tapType = Type.GetType("ArrowEscape.View.TapController, ArrowEscape.View");

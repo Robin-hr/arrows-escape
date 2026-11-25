@@ -128,7 +128,7 @@ namespace ArrowEscape.Tests
                 flow.HandleBack(); flow.MainMenu.PlayButton.onClick.Invoke(); scene.Hud.Hud.PauseButton.onClick.Invoke(); flow.PauseScreen.SettingsButton.onClick.Invoke();
                 Assert.That(flow.SettingsScreen.BackdropVisible, Is.False, "settings over a paused board only dims it");
                 Assert.That(scene.Hud.Hud.HintButton.transform.Find("Icon"), Is.Not.Null);
-                Assert.That(scene.Hud.Hud.LevelText.color, Is.EqualTo(HudView.TextColor));
+                Assert.That(scene.Hud.Hud.LevelText.color, Is.EqualTo(scene.Hud.Hud.InkColor));
             }
         }
 

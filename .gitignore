@@ -120,3 +120,8 @@ InitTestScene*.unity*
 /_xfer/
 /_xfer_dev_md5.txt
 /[Aa]ssets/_Recovery*
+
+# Step 17: upload key (never commit)
+/Keystore/
+*.keystore
+*.jks

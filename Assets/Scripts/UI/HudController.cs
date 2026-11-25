@@ -83,10 +83,13 @@ namespace ArrowEscape.UI
             if (CompletePanel == null) return false;
             if (CompletePanel.IsVisible || (Offer != null && Offer.IsOpen)) return true;
             Camera camera = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
-            return Contains(Hud.PauseButton.transform as RectTransform, screenPosition, camera) || Contains(Hud.UndoButton.transform as RectTransform, screenPosition, camera) ||
+            // Step 17: an open tools tray is modal; a tap outside it closes the tray and never reaches the board.
+            if (Hud.ToolsOpen) { if (!Contains(Hud.ToolsTray, screenPosition, camera) && !Contains(Hud.ToolsButton.transform as RectTransform, screenPosition, camera)) Hud.SetToolsOpen(false); return true; }
+            return Contains(Hud.PauseButton.transform as RectTransform, screenPosition, camera) || Contains(Hud.NightButton.transform as RectTransform, screenPosition, camera) ||
+                Contains(Hud.UndoButton.transform as RectTransform, screenPosition, camera) ||
                 Contains(Hud.HintButton.transform as RectTransform, screenPosition, camera) ||
-                Contains(Hud.RestartButton.transform as RectTransform, screenPosition, camera) ||
-                (Hud.IsDaily && (Contains(Hud.ZoomInButton.transform as RectTransform, screenPosition, camera) || Contains(Hud.ZoomOutButton.transform as RectTransform, screenPosition, camera)));
+                Contains(Hud.ToolsButton.transform as RectTransform, screenPosition, camera) ||
+                (Hud.ZoomInButton.gameObject.activeInHierarchy && (Contains(Hud.ZoomInButton.transform as RectTransform, screenPosition, camera) || Contains(Hud.ZoomOutButton.transform as RectTransform, screenPosition, camera)));
         }
 
         private static bool Contains(RectTransform rect, Vector2 point, Camera camera)
@@ -121,7 +124,10 @@ namespace ArrowEscape.UI
             CompletePanel.StarPresented += OnStarPresented;
             CompletePanel.CoinPresented += OnCoinPresented;
             Hud.UndoButton.onClick.AddListener(Undo);
-            Hud.RestartButton.onClick.AddListener(Restart);
+            Hud.RestartButton.onClick.AddListener(() => { Hud.SetToolsOpen(false); Restart(); });
+            Hud.ToolsButton.onClick.AddListener(() => Hud.SetToolsOpen(!Hud.ToolsOpen));
+            Hud.RevealButton.onClick.AddListener(() => { Hud.SetToolsOpen(false); Reveal(); });
+            Hud.NightButton.onClick.AddListener(ToggleNight);
             Hud.HintButton.onClick.AddListener(Hint);
             Hud.PauseButton.onClick.AddListener(() => PauseRequested?.Invoke());
             Hud.ZoomInButton.onClick.AddListener(() => Zoom(0.8f));
@@ -156,6 +162,27 @@ namespace ArrowEscape.UI
             if (game.ShowHint()) { wallet.TryUseBoost(BoostKind.Hint); bootstrap.Inventory.Save(); }
             RefreshBoosts();
         }
+        /// <summary>Step 17 TOOLS > FREE: marks every arrow that can leave now; costs one hint like a normal hint.</summary>
+        public int Reveal()
+        {
+            if (game == null || !game.CanHint) return 0;
+            var reveal = game.GetComponent<FreeArrowReveal>(); if (reveal == null) reveal = game.gameObject.AddComponent<FreeArrowReveal>();
+            var wallet = Wallet;
+            if (wallet != null && wallet.BoostCount(BoostKind.Hint) <= 0) { OpenOffer(BoostKind.Hint); return 0; }
+            int marked = reveal.Reveal();
+            if (marked > 0 && wallet != null) { wallet.TryUseBoost(BoostKind.Hint); bootstrap.Inventory.Save(); }
+            Hud.ShowNote(marked == 1 ? "1 arrow can leave right now" : marked + " arrows can leave right now");
+            RefreshBoosts(); return marked;
+        }
+        /// <summary>Step 17: moon/sun button. Light-board styles switch to their night board; glowing styles stay dark.</summary>
+        public void ToggleNight()
+        {
+            if (skinBoard == null) return;
+            if (!SkinBackdrop.NightChangesBoard(skinBoard.ArrowSkinId)) { Hud.ShowNote("Glowing arrows always shine on a dark board"); return; }
+            bool night = !skinBoard.NightMode;
+            if (bootstrap != null && bootstrap.Settings != null) bootstrap.Settings.SetNight(night);
+            skinBoard.NightMode = night; Refresh();
+        }
         /// <summary>Shows the offer for a helper that ran out.</summary>
         public void OpenOffer(BoostKind kind)
         {
@@ -167,7 +194,7 @@ namespace ArrowEscape.UI
             void Grant(bool earned) { if (!earned || Wallet == null) return; Wallet.AddBoost(kind, 1); bootstrap.Inventory.Save(); RefreshBoosts(); }
             if (RewardedAds.Service == null) Grant(true); else RewardedAds.Service.Show(kind == BoostKind.Hint ? "hint" : "undo", Grant);
         }
-        private void RefreshBoosts() { var wallet = Wallet; if (wallet != null && Hud != null) Hud.SetBoosts(wallet.BoostCount(BoostKind.Hint), wallet.BoostCount(BoostKind.Undo)); }
+        private void RefreshBoosts() { var wallet = Wallet; if (wallet != null && Hud != null) { Hud.SetBoosts(wallet.BoostCount(BoostKind.Hint), wallet.BoostCount(BoostKind.Undo)); Hud.SetCoins(wallet.Inventory.Coins); } }
         private void Zoom(float factor)
         {
             var zoom = game != null ? game.GetComponent<BoardZoom>() : null;
@@ -202,7 +229,7 @@ namespace ArrowEscape.UI
         private void OnStuckChanged(bool value){Hud.SetStuckVisible(value);Hud.SetHintState(game.CanHint);}
         private void OnLevelStarted()
         {
-            CompletePanel.Hide(); Refresh(); Hud.SetStarState(game.TapCount, game.Par, true);
+            CompletePanel.Hide(); Hud.SetToolsOpen(false); Refresh(); Hud.SetStarState(game.TapCount, game.Par, true);
             lockTipTime = 0; bool locks = false;
             if (game.Session != null) foreach (Arrow a in game.Session.Board.Arrows) if (a.LockedBy != 0) { locks = true; break; }
             Hud.SetLockTipVisible(locks && !LockTipDone); if (locks && !LockTipDone) lockTipTime = 9f;
@@ -260,7 +287,9 @@ namespace ArrowEscape.UI
         }
         private void Refresh()
         {
-            Hud.SetBoardContrast(skinBoard!=null&&(skinBoard.HasDarkTheme||ArrowSkinRegistry.Find(skinBoard.ArrowSkinId)?.PrefersDarkBoard==true&&!skinBoard.IsLightBoard),skinBoard!=null&&skinBoard.HasDarkTheme);
+            // Step 17: the banners follow the board: pastel paper on light boards, dusk paper on dark boards.
+            Hud.SetNight(skinBoard!=null&&!skinBoard.IsLightBoard);
+            Hud.SetArrowsLeft(game.Session!=null?game.Session.Board.Arrows.Count:0);
             Hud.SetState(game.LevelName, game.TapCount, game.Par, game.MistakeCount, game.CanUndo);
             Hud.SetStarState(game.TapCount, game.Par);
             Hud.SetHintState(game.CanHint);

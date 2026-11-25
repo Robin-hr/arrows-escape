@@ -63,8 +63,18 @@ namespace ArrowEscape.Core
         }
         /// <summary>Whether the wallet can cover a nonnegative price.</summary>
         public bool CanAfford(int price)=>price>=0&&Inventory.Coins>=price;
+        /// <summary>Step 17: the special offer running today (null = none); set by the game from <see cref="OfferCalendar"/>.</summary>
+        public SpecialOffer ActiveOffer { get; set; }
+        /// <summary>Step 17: today's price of an item (special offers discount cosmetics; boosts and hearts never change).</summary>
+        public int PriceOf(ShopItem item)=>item==null?0:ActiveOffer==null?item.Price:OfferCalendar.Discounted(item.Price,ActiveOffer.DiscountPercent);
+        /// <summary>Step 17: today's price of an item id.</summary>
+        public int PriceOf(string id)=>PriceOf(ShopCatalog.Find(id));
+        /// <summary>Step 17: true when the active offer has a coin gift that is not claimed yet.</summary>
+        public bool CanClaimOfferGift=>ActiveOffer!=null&&ActiveOffer.GiftCoins>0&&!Inventory.ClaimedOfferIds.Contains(ActiveOffer.Id);
+        /// <summary>Step 17: claims the active offer's free coins once per offer; returns the coins added.</summary>
+        public int ClaimOfferGift(){if(!CanClaimOfferGift)return 0;Inventory.ClaimedOfferIds.Add(ActiveOffer.Id);if(Inventory.ClaimedOfferIds.Count>40)Inventory.ClaimedOfferIds.RemoveAt(0);int before=Inventory.Coins;SetCoins((long)before+ActiveOffer.GiftCoins);return Inventory.Coins-before;}
         /// <summary>Checks affordability of an available, known item.</summary>
-        public bool CanAfford(string id){var item=ShopCatalog.Find(id);return item!=null&&item.IsAvailable&&CanAfford(item.Price);}
+        public bool CanAfford(string id){var item=ShopCatalog.Find(id);return item!=null&&item.IsAvailable&&CanAfford(PriceOf(item));}
         /// <summary>Unknown retained ids have no active ownership semantics.</summary>
         public bool IsOwned(string id)=>ShopCatalog.Find(id)!=null&&Inventory.OwnedItemIds.Contains(id);
         /// <summary>Whether a known item occupies its equipment slot.</summary>
@@ -73,8 +83,9 @@ namespace ArrowEscape.Core
         public bool TryBuy(string id)
         {
             var item=ShopCatalog.Find(id);
-            if(item==null||!item.IsAvailable||IsOwned(id)||!CanAfford(item.Price))return false;
-            Inventory.OwnedItemIds.Add(id);SetCoins((long)Inventory.Coins-item.Price);ItemPurchased?.Invoke(id);return true;
+            int price=PriceOf(item);
+            if(item==null||!item.IsAvailable||IsOwned(id)||!CanAfford(price))return false;
+            Inventory.OwnedItemIds.Add(id);SetCoins((long)Inventory.Coins-price);ItemPurchased?.Invoke(id);return true;
         }
         /// <summary>Explicit-slot overload rejects mismatched equipment.</summary>
         public bool TryEquip(ShopSlot slot,string id){var item=ShopCatalog.Find(id);return item!=null&&item.Slot==slot&&TryEquip(id);}

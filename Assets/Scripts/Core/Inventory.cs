@@ -59,6 +59,8 @@ namespace ArrowEscape.Core
         public List<string> RefundedRetiredItemIds = new List<string>();
         /// <summary>Refund overflow held until spending makes room under the existing wallet cap.</summary>
         public int PendingRetirementCoins;
+        /// <summary>Step 17: special offers whose free coin gift was claimed (bounded receipts).</summary>
+        public List<string> ClaimedOfferIds = new List<string>();
         /// <summary>Retired paid items and their refunds (the thunderbolt arrow, the Step 14H scenic themes and, in Step 16, every background theme).</summary>
         public static readonly string[] RetiredIds={"thunderbolt_dart","mystic_wood","frozen_cavern","pharaohs_tomb","volcanic_underworld","neon_cyberpunk","cosmic_nebula","grad_midnight","grad_aurora","grad_sunset","grad_lagoon","grad_emerald","grad_rose","geo_crystal","geo_neon","geo_gold"};
         private static readonly int[] RetiredRefunds={150,200,250,350,400,500,800,150,200,250,300,350,400,900,1200,1500};
@@ -90,7 +92,7 @@ namespace ArrowEscape.Core
             Coins=Math.Max(0,Math.Min(EconomyConfig.MaxCoins,Coins));Trophies=Math.Max(0,Trophies);
             Hints=Math.Max(0,Math.Min(EconomyConfig.MaxBoosts,Hints));Undos=Math.Max(0,Math.Min(EconomyConfig.MaxBoosts,Undos));
             DailyRewardDay=((DailyRewardDay%7)+7)%7;DailyStreak=Math.Max(0,DailyStreak);DailyBestStreak=Math.Max(DailyStreak,DailyBestStreak);DailySolvedCount=Math.Max(0,DailySolvedCount);
-            OwnedItemIds=OwnedItemIds??new List<string>(); RewardedStars=RewardedStars??new List<LevelRewardRecord>();
+            OwnedItemIds=OwnedItemIds??new List<string>(); RewardedStars=RewardedStars??new List<LevelRewardRecord>(); ClaimedOfferIds=ClaimedOfferIds??new List<string>();
             if(!OwnedItemIds.Contains("classic"))OwnedItemIds.Add("classic");
             if(!OwnedItemIds.Contains("paper"))OwnedItemIds.Add("paper");
             if(!OwnedItemIds.Contains(DefaultAvatarId))OwnedItemIds.Add(DefaultAvatarId);

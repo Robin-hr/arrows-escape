@@ -22,6 +22,12 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Button BackButton { get; private set; }
         /// <summary>Step 15: opens the privacy policy page.</summary>
         public UnityEngine.UI.Button PrivacyButton { get; private set; }
+        /// <summary>Step 17: daily puzzle, streak and offer reminders toggle.</summary>
+        public UnityEngine.UI.Button RemindersButton { get; private set; }
+        /// <summary>Step 17: called with the wanted reminder state when the toggle is pressed.</summary>
+        public Action<bool> RemindersChanged { get; set; }
+        /// <summary>Step 17: reminders are on (enabled and answered).</summary>
+        public bool RemindersOn => model != null && model.NotificationsEnabled && model.NotificationsAsked;
         /// <summary>Step 16: opens the terms and conditions page.</summary>
         public UnityEngine.UI.Button TermsButton { get; private set; }
         /// <summary>Step 15: the last URL the privacy button asked to open (tests read it instead of opening a browser).</summary>
@@ -33,20 +39,22 @@ namespace ArrowEscape.UI
         {
             Root = UiFactory.ScreenRoot("Settings", parent, ViewTheme.PanelDim, out var safe);
             NeonKit.Backdrop(Root, 0.35f); backdrop = (RectTransform)Root.Find("NeonBackdrop");
-            var column = UiFactory.Column(safe, 820, 1040);
+            var column = UiFactory.Column(safe, 820, 1200);
             NeonKit.Panel(column.gameObject.AddComponent<UnityEngine.UI.Image>(), NeonKit.Cyan);
-            UiFactory.Title("Settings", column, 395);
-            SoundButton = UiFactory.MenuButton("Sound: On", column, 225); soundIcon = NeonKit.WithIcon(SoundButton, "icon_sound_on", 72);
-            HapticsButton = UiFactory.MenuButton("Haptics: On", column, 55); NeonKit.WithIcon(HapticsButton, "icon_haptics", 72);
-            ResetButton = UiFactory.MenuButton("Reset Progress", column, -115); NeonKit.Style(ResetButton, NeonButtonStyle.Danger); NeonKit.WithIcon(ResetButton, "icon_reset", 72);
-            BackButton = UiFactory.MenuButton("Back", column, -285); NeonKit.WithIcon(BackButton, "icon_back", 64);
-            PrivacyButton = UiFactory.Button("Privacy Policy", column, new Vector2(-185, -395));
+            UiFactory.Title("Settings", column, 475);
+            SoundButton = UiFactory.MenuButton("Sound: On", column, 305); soundIcon = NeonKit.WithIcon(SoundButton, "icon_sound_on", 72);
+            HapticsButton = UiFactory.MenuButton("Haptics: On", column, 135);
+            RemindersButton = UiFactory.MenuButton("Reminders: Off", column, -35); NeonKit.WithIcon(RemindersButton, "Icons3D/i3_daily", 72);
+            RemindersButton.onClick.AddListener(() => RemindersChanged?.Invoke(!RemindersOn)); NeonKit.WithIcon(HapticsButton, "icon_haptics", 72);
+            ResetButton = UiFactory.MenuButton("Reset Progress", column, -205); NeonKit.Style(ResetButton, NeonButtonStyle.Danger); NeonKit.WithIcon(ResetButton, "icon_reset", 72);
+            BackButton = UiFactory.MenuButton("Back", column, -375); NeonKit.WithIcon(BackButton, "icon_back", 64);
+            PrivacyButton = UiFactory.Button("Privacy Policy", column, new Vector2(-185, -485));
             ((RectTransform)PrivacyButton.transform).sizeDelta = new Vector2(350, 72);
             PrivacyButton.onClick.AddListener(() => Open(AppInfo.PrivacyPolicyUrl));
-            TermsButton = UiFactory.Button("Terms & Conditions", column, new Vector2(185, -395));
+            TermsButton = UiFactory.Button("Terms & Conditions", column, new Vector2(185, -485));
             ((RectTransform)TermsButton.transform).sizeDelta = new Vector2(350, 72);
             TermsButton.onClick.AddListener(() => Open(AppInfo.TermsUrl));
-            var version = UiFactory.Text("Version", column, "Version " + AppInfo.Version, 26, new Vector2(700, 44), new Vector2(0, -470));
+            var version = UiFactory.Text("Version", column, "Version " + AppInfo.Version, 26, new Vector2(700, 44), new Vector2(0, -555));
             version.color = UiStyle.Muted;
             model = value; model.Changed += Refresh;
             SoundButton.onClick.AddListener(() => sound(!model.SoundEnabled));
@@ -62,6 +70,7 @@ namespace ArrowEscape.UI
         {
             UiFactory.SetToggle(SoundButton, model.SoundEnabled ? "Sound: On" : "Sound: Off", model.SoundEnabled);
             UiFactory.SetToggle(HapticsButton, model.HapticsEnabled ? "Haptics: On" : "Haptics: Off", model.HapticsEnabled);
+            UiFactory.SetToggle(RemindersButton, RemindersOn ? "Reminders: On" : "Reminders: Off", RemindersOn);
             if (soundIcon != null) soundIcon.sprite = BrandArt.SpriteOf(model.SoundEnabled ? "icon_sound_on" : "icon_sound_off");
         }
         private void OnDestroy() { if (model != null) model.Changed -= Refresh; }

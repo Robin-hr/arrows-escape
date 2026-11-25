@@ -30,6 +30,17 @@ namespace ArrowEscape.UI
             }
         }
 
+        private static Font hudFont;
+        /// <summary>Step 17: Oswald SemiBold (OFL), the condensed paper-HUD face.</summary>
+        public static Font HudFont
+        {
+            get
+            {
+                if (hudFont == null) hudFont = Resources.Load<Font>("Oswald-SemiBold");
+                return hudFont != null ? hudFont : Display;
+            }
+        }
+
         private static Font nameFont;
         /// <summary>Profile-name font: Titan One (OFL), a bold rounded game display face.</summary>
         public static Font NameFont

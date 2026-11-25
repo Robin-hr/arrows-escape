@@ -8,6 +8,6 @@ namespace ArrowEscape.Core
         /// <summary>Step 16: terms and conditions page (linked from Settings and the store listing).</summary>
         public const string TermsUrl = "https://claude.ai/artifact/UoeB4W7pdEbPtQK4gScL8D";
         /// <summary>Version label shown in Settings (matches the player build version).</summary>
-        public const string Version = "0.3.0";
+        public const string Version = "0.4.0";
     }
 }

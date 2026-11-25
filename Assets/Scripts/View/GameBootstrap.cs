@@ -199,7 +199,7 @@ namespace ArrowEscape.View
         public void Initialize(IProgressStore store,ISettingsStore settingsStore,IInventoryStore inventoryStore)
         {
             if(Inventory!=null)Inventory.Shop.EquippedChanged-=OnEquipped;
-            Inventory=new InventoryService(inventoryStore);Inventory.Load();Inventory.Shop.EquippedChanged+=OnEquipped;
+            Inventory=new InventoryService(inventoryStore);Inventory.Load();Inventory.Shop.EquippedChanged+=OnEquipped;RefreshSpecialOffer();
             ApplyEquipment();
             if (controller != null)
             { controller.BoardCleared -= OnCleared; controller.LevelStarted -= OnLevelStarted; }
@@ -210,6 +210,7 @@ namespace ArrowEscape.View
             Progress.Load();
             Settings = new SettingsService(settingsStore);
             Settings.Load();
+            GetComponent<BoardView>().NightMode = Settings.Model.NightMode;   // Step 17
             settingsWarningLogged = false;
             var settingsLoad = Settings.LoadResult;
             if (settingsLoad.Status != ProgressLoadStatus.Loaded && settingsLoad.Status != ProgressLoadStatus.NoFile)
@@ -380,6 +381,8 @@ namespace ArrowEscape.View
             saveWarningLogged = true;
             Debug.LogWarning("ArrowEscape progress could not be saved. Play continues with in-memory progress.", this);
         }
+        /// <summary>Step 17: today's special offer for the shop (Play mode only, so Edit Mode prices stay fixed).</summary>
+        public void RefreshSpecialOffer(){if(Inventory!=null&&Application.isPlaying)Inventory.Shop.ActiveOffer=OfferCalendar.ActiveOn(System.DateTime.Now);}
         private void OnEquipped(ShopSlot slot,string id)=>ApplyEquipment();
         private void ApplyEquipment()
         {

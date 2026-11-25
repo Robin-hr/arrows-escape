@@ -4,83 +4,124 @@ using UnityEngine;
 
 namespace ArrowEscape.UI
 {
-    /// <summary>Displays progress above the board and actions below it, inside the safe area.</summary>
+    /// <summary>
+    /// Step 17: paper HUD in the style of the reference — a lavender origami banner on top (coins, LEVEL n with hearts,
+    /// arrows left, settings and night buttons) and a mint banner at the bottom (UNDO, HINT, TOOLS tiles). Everything is
+    /// drawn from white art tinted by <see cref="SetNight"/> (day pastels or dusk colours). Public members keep the old
+    /// API so game flow, tests and the board layout are unchanged.
+    /// </summary>
     public sealed class HudView : MonoBehaviour
     {
+        // Reference sizes (1080 x 1920 canvas units).
+        private const float TopWidth = 1080, TopHeight = 300, BottomWidth = 1080, BottomHeight = 260;
         private RectTransform top, bottom;
-        /// <summary>Keeps labels readable over Inferno without restyling any other board or menu.</summary>
-        public void SetBoardContrast(bool dark)=>SetBoardContrast(dark,false);
-        /// <summary>Adds readability surfaces only when a non-Paper theme is equipped.</summary>
-        public void SetBoardContrast(bool dark,bool themed)
-        {if(LevelText==null)return;LevelText.color=LevelPositionText.color=MistakesText.color=TextColor;}
-        /// <summary>HUD text on the neon info bar (readable on every board theme).</summary>
-        public static Color TextColor=>new Color32(236,240,255,255);
+
+        /// <summary>Day palette.</summary>
+        public static readonly Color DayInk = new Color32(43, 27, 47, 255), DayTop = new Color32(216, 200, 232, 255), DayTopBack = new Color32(190, 228, 208, 255),
+            DayBottom = new Color32(190, 228, 208, 255), DayBottomBack = new Color32(250, 240, 226, 255), DayTile = new Color32(252, 246, 236, 255), DayPill = new Color32(250, 240, 226, 255);
+        /// <summary>Night palette.</summary>
+        public static readonly Color NightInk = new Color32(242, 234, 247, 255), NightTop = new Color32(84, 70, 104, 255), NightTopBack = new Color32(52, 92, 78, 255),
+            NightBottom = new Color32(52, 92, 78, 255), NightBottomBack = new Color32(70, 60, 84, 255), NightTile = new Color32(58, 50, 70, 255), NightPill = new Color32(70, 60, 84, 255);
+        /// <summary>True while the dusk palette is shown (dark boards).</summary>
+        public bool IsNight { get; private set; }
+        /// <summary>Current text and icon colour (dark plum by day, pale lilac by night).</summary>
+        public Color InkColor => IsNight ? NightInk : DayInk;
+        /// <summary>Kept for older callers: the HUD text colour follows the palette; see <see cref="InkColor"/>.</summary>
+        public void SetBoardContrast(bool dark) => SetNight(dark);
+        /// <summary>Kept for older callers.</summary>
+        public void SetBoardContrast(bool dark, bool themed) => SetNight(dark);
+        /// <summary>Legacy static text colour (night ink).</summary>
+        public static Color TextColor => NightInk;
         /// <summary>Moves over par but still two stars.</summary>
-        public static Color AmberColor=>new Color32(255,196,74,255);
+        public static Color AmberColor => new Color32(222, 136, 20, 255);
         /// <summary>Moves at one star.</summary>
-        public static Color RedColor=>new Color32(255,106,96,255);
+        public static Color RedColor => new Color32(226, 76, 64, 255);
         /// <summary>Live potential-star meter.</summary>
         public StarDisplay Stars { get; private set; }
         /// <summary>Freezes the small loss animation while paused.</summary>
         public bool StarsPaused { get; set; }
-        /// <summary>Updates the move-budget color and potential stars.</summary>
+        private int lastMoves = -1, lastTotal = -1, lastMistakes = -1, lastStarMoves, lastStarPar;
+        /// <summary>Updates the move-budget colour and potential stars.</summary>
         public void SetStarState(int moves, int par, bool reset = false)
         {
             if (Stars == null) return;
+            lastStarMoves = moves; lastStarPar = par;
             int count = StarRating.StarsIfClearedNow(moves, par);
-            MovesText.color = moves <= par ? TextColor : moves <= StarRating.TwoStarLimit(par) ? AmberColor : RedColor;
+            MovesText.color = moves <= par ? InkColor : moves <= StarRating.TwoStarLimit(par) ? AmberColor : RedColor;
             if (reset || Stars.Count != count) Stars.SetCount(count, !reset);
         }
         /// <summary>Explicit animation driver for tests.</summary>
-        public void Tick(float dt) { if (!StarsPaused && Stars != null) Stars.Tick(dt); }
-        private void Update() { if (Application.isPlaying) Tick(Time.deltaTime); }
+        public void Tick(float dt)
+        {
+            if (!StarsPaused && Stars != null) Stars.Tick(dt);
+            if (noteTime > 0) { noteTime -= dt; float a = Mathf.Clamp01(noteTime / .35f); noteGroup.alpha = a; if (noteTime <= 0) note.gameObject.SetActive(false); }
+        }
+        private void Update() { if (Application.isPlaying) Tick(Time.unscaledDeltaTime); }
 
         private RectTransform stuck;
         /// <summary>The noninteractive stuck warning text.</summary>
         public UnityEngine.UI.Text StuckText { get; private set; }
         /// <summary>The safe-area warning rectangle for layout checks.</summary>
-        public RectTransform StuckBanner=>stuck;
+        public RectTransform StuckBanner => stuck;
         /// <summary>Shows a proven-dead-end warning without blocking undo or restart.</summary>
         public void SetStuckVisible(bool value)
         {
-            if(stuck==null||stuck.gameObject.activeSelf==value)return;
-            stuck.gameObject.SetActive(value);lastSize=Vector2.zero;UpdateLayout();
+            if (stuck == null || stuck.gameObject.activeSelf == value) return;
+            stuck.gameObject.SetActive(value); lastSize = Vector2.zero; UpdateLayout();
         }
-        private RectTransform undoRect, hintRect, restartRect;
         private Vector2 lastSize;
         private string lastName;
         private int lastLevelIndex = -2, lastLevelCount = -1;
         private string lastLevelLabel = "Level";
-        private int lastMoves = -1, lastTotal = -1, lastMistakes = -1;
-        /// <summary>Level name label.</summary>
+        /// <summary>Level name (kept updated for flow and tests; the banner shows <see cref="TitleText"/>).</summary>
         public UnityEngine.UI.Text LevelText { get; private set; }
-        /// <summary>One-based level position, separate from the JSON level name.</summary>
+        /// <summary>"Level 2 / 360" (kept updated; the banner shows <see cref="TitleText"/>).</summary>
         public UnityEngine.UI.Text LevelPositionText { get; private set; }
-        /// <summary>Current exit progress label.</summary>
+        /// <summary>Step 17: the big banner title, e.g. "LEVEL 28", "JOURNEY 12", "DAILY 25 NOV".</summary>
+        public UnityEngine.UI.Text TitleText { get; private set; }
+        /// <summary>Moves against par under the hearts.</summary>
         public UnityEngine.UI.Text MovesText { get; private set; }
-        /// <summary>Blocked tap count label.</summary>
+        /// <summary>Blocked tap count label (hidden; hearts show mistakes).</summary>
         public UnityEngine.UI.Text MistakesText { get; private set; }
-        /// <summary>Pause action in the safe-area top bar.</summary>
+        /// <summary>Step 17: coins in the left pill.</summary>
+        public UnityEngine.UI.Text CoinsText { get; private set; }
+        /// <summary>Step 17: arrows still on the board, in the right pill.</summary>
+        public UnityEngine.UI.Text ArrowsLeftText { get; private set; }
+        /// <summary>Settings (gear): opens the pause menu.</summary>
         public UnityEngine.UI.Button PauseButton { get; private set; }
-        /// <summary>Unlimited undo control.</summary>
+        /// <summary>Step 17: night board toggle (moon by day, sun by night).</summary>
+        public UnityEngine.UI.Button NightButton { get; private set; }
+        /// <summary>Undo control (UNDO tile).</summary>
         public UnityEngine.UI.Button UndoButton { get; private set; }
-        /// <summary>Free suggestion control between Undo and Restart.</summary>
+        /// <summary>Hint control (HINT tile).</summary>
         public UnityEngine.UI.Button HintButton { get; private set; }
-        /// <summary>Restart attempt control.</summary>
+        /// <summary>Step 17: TOOLS tile; opens the tools tray.</summary>
+        public UnityEngine.UI.Button ToolsButton { get; private set; }
+        /// <summary>Restart (in the tools tray).</summary>
         public UnityEngine.UI.Button RestartButton { get; private set; }
+        /// <summary>Step 17: shows every arrow that can leave right now (in the tools tray, costs one hint).</summary>
+        public UnityEngine.UI.Button RevealButton { get; private set; }
+        /// <summary>Step 17: the tools tray above the TOOLS tile.</summary>
+        public RectTransform ToolsTray { get; private set; }
         /// <summary>Hints left ("+" when none), on the Hint button.</summary>
         public UnityEngine.UI.Text HintCountText { get; private set; }
         /// <summary>Undos left ("+" when none), on the Undo button.</summary>
         public UnityEngine.UI.Text UndoCountText { get; private set; }
-        /// <summary>Daily puzzle: zoom the board in.</summary>
+        /// <summary>Zoom the board in.</summary>
         public UnityEngine.UI.Button ZoomInButton { get; private set; }
-        /// <summary>Daily puzzle: zoom the board out.</summary>
+        /// <summary>Zoom the board out.</summary>
         public UnityEngine.UI.Button ZoomOutButton { get; private set; }
-        /// <summary>Hearts left in this attempt (every level and the daily puzzle; replaces the mistakes label).</summary>
+        /// <summary>Hearts left in this attempt.</summary>
         public UnityEngine.UI.Image[] Hearts { get; private set; }
         /// <summary>True while the HUD shows the daily-puzzle layout.</summary>
         public bool IsDaily { get; private set; }
-        private RectTransform heartRow, zoomColumn;
+        private RectTransform heartRow, zoomColumn, rail;
+        private UnityEngine.UI.Image topFront, topBack, bottomFront, bottomBack, trackImage, nightIcon;
+        private readonly System.Collections.Generic.List<UnityEngine.UI.Image> tiles = new System.Collections.Generic.List<UnityEngine.UI.Image>(), pills = new System.Collections.Generic.List<UnityEngine.UI.Image>(), inkIcons = new System.Collections.Generic.List<UnityEngine.UI.Image>();
+        private readonly System.Collections.Generic.List<UnityEngine.UI.Text> inkTexts = new System.Collections.Generic.List<UnityEngine.UI.Text>();
+        private RectTransform note; private CanvasGroup noteGroup; private UnityEngine.UI.Text noteText; private float noteTime;
+        /// <summary>The short message under the top banner, for tests.</summary>
+        public UnityEngine.UI.Text NoteText => noteText;
 
         /// <summary>Shows hint and undo counts; zero shows a "+" (tap to get more).</summary>
         public void SetBoosts(int hints, int undos)
@@ -90,55 +131,49 @@ namespace ArrowEscape.UI
             if (HintCountText.text != h) HintCountText.text = h;
             if (UndoCountText.text != u) UndoCountText.text = u;
         }
+        /// <summary>Step 17: coins in the banner.</summary>
+        public void SetCoins(long coins) { if (CoinsText == null) return; string t = coins >= 100000 ? (coins / 1000) + "K" : coins.ToString(); if (CoinsText.text != t) CoinsText.text = t; }
+        /// <summary>Step 17: arrows still on the board.</summary>
+        public void SetArrowsLeft(int count) { if (ArrowsLeftText == null) return; string t = count.ToString(); if (ArrowsLeftText.text != t) ArrowsLeftText.text = t; }
 
-        /// <summary>Switches between the level layout (stars, mistakes) and the daily layout (hearts, zoom).</summary>
+        /// <summary>Switches between the level layout and the daily layout.</summary>
         public void SetDaily(bool daily)
         {
             if (heartRow == null) return;
             IsDaily = daily;
-            zoomColumn.gameObject.SetActive(daily);
-            Stars.gameObject.SetActive(!daily);
             lastName = null; lastMoves = lastTotal = lastMistakes = -1; lastLevelIndex = -2;
         }
-
-        /// <summary>Shows the zoom buttons (daily and Journey boards).</summary>
+        /// <summary>Shows the zoom buttons.</summary>
         public void SetZoomVisible(bool visible) { if (zoomColumn != null && zoomColumn.gameObject.activeSelf != visible) zoomColumn.gameObject.SetActive(visible); }
 
         /// <summary>Daily header: title, date and moves (no par).</summary>
         public void SetDailyInfo(string date, int moves)
         {
             if (LevelText == null) return;
-            LevelText.text = "DAILY PUZZLE"; LevelPositionText.text = date; MovesText.text = "Moves " + moves; MovesText.color = TextColor;
+            LevelText.text = "DAILY PUZZLE"; LevelPositionText.text = date; MovesText.text = "Moves " + moves; MovesText.color = InkColor;
+            TitleText.text = ("DAILY " + ShortDate(date)).Trim();
         }
+        // "25 Nov 2026" -> "25 NOV"
+        private static string ShortDate(string date) { if (string.IsNullOrEmpty(date)) return ""; var parts = date.Split(' '); return parts.Length >= 2 ? (parts[0] + " " + parts[1]).ToUpperInvariant() : date.ToUpperInvariant(); }
 
         /// <summary>Fills the first <paramref name="count"/> hearts.</summary>
         public void SetHearts(int count)
         {
             if (Hearts == null) return;
-            for (int i = 0; i < Hearts.Length; i++) { var sprite = BrandArt.SpriteOf(i < count ? "Daily/icon_heart" : "Daily/icon_heart_empty"); if (Hearts[i].sprite != sprite) Hearts[i].sprite = sprite; }
+            for (int i = 0; i < Hearts.Length; i++) { var sprite = BrandArt.SpriteOf(i < count ? "Hud/hud_heart" : "Hud/hud_heart_empty"); if (Hearts[i].sprite != sprite) Hearts[i].sprite = sprite; }
         }
 
-        private static UnityEngine.UI.Text CountBadge(UnityEngine.UI.Button button)
-        {
-            var badge = BrandArt.Image("Count", button.transform, "ui_pill", new Vector2(64, 64), Vector2.zero, NeonKit.PillBorder);
-            var rect = badge.rectTransform; rect.anchorMin = rect.anchorMax = new Vector2(1, 1); rect.anchoredPosition = new Vector2(-14, -12);
-            badge.color = new Color32(255, 95, 175, 255);
-            var text = BrandArt.Text("Value", badge.transform, "3", 32, new Vector2(64, 64), Vector2.zero, Color.white);
-            return text;
-        }
-
-        /// <summary>Step 15: NORMAL / HARD / SUPER HARD label under the top bar (hidden for Normal).</summary>
+        /// <summary>Step 15: NORMAL / HARD / SUPER HARD label under the top banner (hidden for Normal).</summary>
         public UnityEngine.UI.Text DifficultyText { get; private set; }
         /// <summary>Step 15: the pill behind <see cref="DifficultyText"/>.</summary>
         public UnityEngine.UI.Image DifficultyPill { get; private set; }
-        /// <summary>Step 15: cleared-arrows progress bar fill.</summary>
+        /// <summary>Cleared-arrows progress fill (vertical rail on the right).</summary>
         public UnityEngine.UI.Image ProgressFill { get; private set; }
-        /// <summary>Step 15: current progress shown by the bar (0..1).</summary>
+        /// <summary>Current progress shown by the rail (0..1).</summary>
         public float Progress { get; private set; }
-        /// <summary>Step 15: first-time padlock coach banner.</summary>
+        /// <summary>First-time padlock coach banner.</summary>
         public RectTransform LockTip { get; private set; }
-        private RectTransform progressTrack;
-        /// <summary>Step 15: shows the difficulty label for the current level.</summary>
+        /// <summary>Shows the difficulty label for the current level.</summary>
         public void SetDifficulty(LevelBadgeKind kind)
         {
             if (DifficultyPill == null) return;
@@ -146,82 +181,167 @@ namespace ArrowEscape.UI
             if (DifficultyPill.gameObject.activeSelf != show) DifficultyPill.gameObject.SetActive(show);
             if (!show) return;
             DifficultyText.text = LevelBadge.Label(kind);
-            DifficultyPill.color = kind == LevelBadgeKind.SuperHard ? new Color32(214, 38, 110, 235) : new Color32(232, 140, 20, 235);
+            DifficultyPill.color = kind == LevelBadgeKind.SuperHard ? new Color32(214, 38, 110, 255) : new Color32(232, 140, 20, 255);
         }
-        /// <summary>Step 15: sets the cleared fraction of the board.</summary>
+        /// <summary>Sets the cleared fraction of the board (fills the rail from the bottom).</summary>
         public void SetProgress(float value)
         {
             Progress = Mathf.Clamp01(value); if (ProgressFill == null) return;
-            var r = ProgressFill.rectTransform; r.anchorMax = new Vector2(Progress, 1);
+            var r = ProgressFill.rectTransform; r.anchorMax = new Vector2(1, Progress);
         }
-        /// <summary>Step 15: shows or hides the padlock coach banner.</summary>
+        /// <summary>Shows or hides the padlock coach banner.</summary>
         public void SetLockTipVisible(bool value) { if (LockTip != null && LockTip.gameObject.activeSelf != value) LockTip.gameObject.SetActive(value); }
+        /// <summary>Step 17: opens or closes the tools tray.</summary>
+        public void SetToolsOpen(bool open) { if (ToolsTray != null && ToolsTray.gameObject.activeSelf != open) ToolsTray.gameObject.SetActive(open); }
+        /// <summary>Step 17: whether the tools tray is open.</summary>
+        public bool ToolsOpen => ToolsTray != null && ToolsTray.gameObject.activeSelf;
+        /// <summary>Step 17: a short message under the top banner for about two seconds.</summary>
+        public void ShowNote(string text) { if (note == null) return; noteText.text = text; note.gameObject.SetActive(true); noteGroup.alpha = 1; noteTime = 2.4f; }
+
+        /// <summary>Step 17: day (pastel) or night (dusk) palette; also swaps the moon/sun icon.</summary>
+        public void SetNight(bool night)
+        {
+            if (top == null) return;
+            IsNight = night;
+            topFront.color = night ? NightTop : DayTop; topBack.color = night ? NightTopBack : DayTopBack;
+            bottomFront.color = night ? NightBottom : DayBottom; bottomBack.color = night ? NightBottomBack : DayBottomBack;
+            foreach (var t in tiles) t.color = night ? NightTile : DayTile;
+            foreach (var p in pills) p.color = night ? NightPill : DayPill;
+            trackImage.color = night ? NightPill : DayTop;
+            Color ink = InkColor;
+            foreach (var i in inkIcons) i.color = ink;
+            foreach (var t in inkTexts) t.color = ink;
+            nightIcon.sprite = BrandArt.SpriteOf(night ? "Hud/hud_icon_sun" : "Hud/hud_icon_moon");
+            if (Stars != null && lastStarPar > 0) SetStarState(lastStarMoves, lastStarPar); else if (MovesText != null) MovesText.color = InkColor;
+        }
+
+        private UnityEngine.UI.Image Layer(string name, Transform parent, string art, Vector2 size)
+        {
+            var img = BrandArt.Image(name, parent, "Hud/" + art, size, Vector2.zero); img.preserveAspect = false; return img;
+        }
+        private UnityEngine.UI.Text Ink(string name, Transform parent, string value, int size, Vector2 box, Vector2 pos, TextAnchor anchor = TextAnchor.MiddleCenter)
+        {
+            var t = UiFactory.Text(name, parent, value, size, box, pos); t.font = BrandArt.HudFont; t.alignment = anchor; t.color = DayInk;
+            t.horizontalOverflow = HorizontalWrapMode.Overflow; t.verticalOverflow = VerticalWrapMode.Overflow; t.raycastTarget = false; inkTexts.Add(t); return t;
+        }
+        private UnityEngine.UI.Image InkIcon(string name, Transform parent, string art, float size, Vector2 pos)
+        {
+            var i = BrandArt.Image(name, parent, "Hud/" + art, new Vector2(size, size), pos); i.color = DayInk; inkIcons.Add(i); return i;
+        }
+        // Paper tile button: tinted tile, ink icon, optional label under it.
+        private UnityEngine.UI.Button Tile(string name, Transform parent, Vector2 pos, float size, string icon, float iconSize, string label = null, bool small = false)
+        {
+            var rect = UiFactory.Rect(name, parent, new Vector2(size, size), pos);
+            var image = rect.gameObject.AddComponent<UnityEngine.UI.Image>(); image.sprite = BrandArt.SpriteOf(small ? "Hud/hud_tile_small" : "Hud/hud_tile"); image.color = DayTile; tiles.Add(image);
+            var button = rect.gameObject.AddComponent<UnityEngine.UI.Button>(); button.targetGraphic = image; rect.gameObject.AddComponent<ButtonFeel>();
+            var colors = button.colors; colors.disabledColor = new Color(1, 1, 1, .55f); colors.pressedColor = new Color(.92f, .92f, .92f, 1); colors.highlightedColor = Color.white; button.colors = colors;
+            InkIcon("Icon", rect, icon, iconSize, new Vector2(0, 4));
+            // Label text stays the first Text child for older button-text helpers.
+            var hidden = UiFactory.Text("Label", rect, name, 10, Vector2.zero, Vector2.zero); hidden.enabled = false;
+            if (label != null) Ink(name + "Caption", parent, Spaced(label), 36, new Vector2(size + 60, 50), pos + new Vector2(0, -size * .5f - 22));
+            return button;
+        }
+        private static string Spaced(string s) { var b = new System.Text.StringBuilder(); for (int i = 0; i < s.Length; i++) { if (i > 0) b.Append(' '); b.Append(s[i]); } return b.ToString(); }
+        private UnityEngine.UI.Text Badge(Transform button, string art)
+        {
+            var badge = BrandArt.Image("Count", button, "Hud/" + art, new Vector2(58, 58), Vector2.zero);
+            var r = badge.rectTransform; r.anchorMin = r.anchorMax = new Vector2(1, 0); r.anchoredPosition = new Vector2(-8, 10);
+            var t = UiFactory.Text("Value", badge.transform, "3", 34, new Vector2(58, 58), new Vector2(0, 2)); t.font = BrandArt.HudFont; t.color = Color.white; t.raycastTarget = false;
+            return t;
+        }
+        private UnityEngine.UI.Image Pill(string name, Transform parent, Vector2 pos, Vector2 size)
+        {
+            var img = BrandArt.Image(name, parent, "Hud/hud_pill_paper", size, pos, new Vector4(60, 60, 60, 60)); img.color = DayPill; pills.Add(img); return img;
+        }
 
         /// <summary>Creates the HUD once under a safe-area rectangle.</summary>
         public void Build(RectTransform safeArea)
         {
             if (top != null) return;
-            top = UiFactory.Rect("TopBar", safeArea, new Vector2(900, 150), Vector2.zero);
+            // --- Top banner ---------------------------------------------------------------------------------------
+            top = UiFactory.Rect("TopBar", safeArea, new Vector2(TopWidth, TopHeight), Vector2.zero);
             top.anchorMin = top.anchorMax = top.pivot = new Vector2(0.5f, 1);
-            bottom = UiFactory.Rect("BottomBar", safeArea, new Vector2(1000, 120), Vector2.zero);
-            bottom.anchorMin = bottom.anchorMax = bottom.pivot = new Vector2(0.5f, 0);
-            var backing = UiFactory.Rect("InfoBar", top, new Vector2(760, 168), new Vector2(-75, 4)).gameObject.AddComponent<UnityEngine.UI.Image>();
-            backing.raycastTarget = false; NeonKit.Panel(backing, NeonKit.Cyan);
-            LevelText = UiFactory.Text("LevelName", top, "", ViewTheme.HudFontSize, new Vector2(320, 65), new Vector2(-260, 40));
-            LevelText.resizeTextForBestFit=true;LevelText.resizeTextMinSize=20;LevelText.resizeTextMaxSize=ViewTheme.HudFontSize;
-            LevelPositionText = UiFactory.Text("LevelPosition", top, "", ViewTheme.HudFontSize, new Vector2(300, 65), new Vector2(100, 40));
-            LevelPositionText.resizeTextForBestFit=true;LevelPositionText.resizeTextMinSize=20;LevelPositionText.resizeTextMaxSize=ViewTheme.HudFontSize;
-            MovesText = UiFactory.Text("Moves", top, "", ViewTheme.HudFontSize, new Vector2(300, 65), new Vector2(-290, -30));
-            MovesText.resizeTextForBestFit = true; MovesText.resizeTextMinSize = 24; MovesText.resizeTextMaxSize = ViewTheme.HudFontSize;
-            MistakesText = UiFactory.Text("Mistakes", top, "", ViewTheme.HudFontSize, new Vector2(300, 65), new Vector2(140, -30));
-            var starRoot = UiFactory.Rect("StarMeter", top, new Vector2(126, 38), new Vector2(-70,-30));
-            Stars = starRoot.gameObject.AddComponent<StarDisplay>(); Stars.Build(top, 34, 40);
-            starRoot.anchoredPosition = new Vector2(-70,-30);
-            float step = ViewTheme.ButtonWidth + ViewTheme.UiSpacing;
-            UndoButton = UiFactory.Button("Undo", bottom, new Vector2(-step, 0)); NeonKit.WithIcon(UndoButton, "icon_undo", 58);
-            HintButton = UiFactory.Button("Hint", bottom, Vector2.zero); NeonKit.WithIcon(HintButton, "icon_hint", 62);
-            RestartButton = UiFactory.Button("Restart", bottom, new Vector2(step, 0)); NeonKit.WithIcon(RestartButton, "icon_restart", 58);
-            UndoCountText = CountBadge(UndoButton); HintCountText = CountBadge(HintButton);
-            heartRow = UiFactory.Rect("Hearts", top, new Vector2(240, 70), new Vector2(140, -30));
+            Layer("Shadow", top, "hud_top_shadow", new Vector2(TopWidth, TopHeight));
+            topBack = Layer("Back", top, "hud_top_back", new Vector2(TopWidth, TopHeight));
+            topFront = Layer("Front", top, "hud_top_front", new Vector2(TopWidth, TopHeight));
+            var coinPill = Pill("CoinPill", top, new Vector2(-330, 26), new Vector2(232, 100));
+            BrandArt.Image("Coin", coinPill.transform, "Hud/hud_coin", new Vector2(78, 78), new Vector2(-68, 0));
+            CoinsText = Ink("Coins", coinPill.transform, "0", 56, new Vector2(140, 90), new Vector2(30, 2));
+            var leftPill = Pill("ArrowsPill", top, new Vector2(212, 26), new Vector2(232, 100));
+            InkIcon("Coil", leftPill.transform, "hud_icon_coil", 62, new Vector2(-66, 0));
+            ArrowsLeftText = Ink("ArrowsLeft", leftPill.transform, "0", 56, new Vector2(140, 90), new Vector2(30, 2));
+            TitleText = Ink("Title", top, "LEVEL 1", 70, new Vector2(330, 86), new Vector2(-58, 62));
+            TitleText.resizeTextForBestFit = true; TitleText.resizeTextMinSize = 30; TitleText.resizeTextMaxSize = 70; TitleText.horizontalOverflow = HorizontalWrapMode.Wrap; TitleText.verticalOverflow = VerticalWrapMode.Truncate;
+            heartRow = UiFactory.Rect("Hearts", top, new Vector2(200, 60), new Vector2(-58, 8));
             Hearts = new UnityEngine.UI.Image[EconomyConfig.DailyHearts];
-            for (int i = 0; i < Hearts.Length; i++) Hearts[i] = BrandArt.Image("Heart" + i, heartRow, "Daily/icon_heart", new Vector2(64, 64), new Vector2((i - 1) * 74, 0));
-            MistakesText.gameObject.SetActive(false);
-            zoomColumn = UiFactory.Rect("Zoom", safeArea, new Vector2(120, 260), Vector2.zero);
-            zoomColumn.anchorMin = zoomColumn.anchorMax = zoomColumn.pivot = new Vector2(1, 0); zoomColumn.anchoredPosition = new Vector2(-24, 260);
-            ZoomInButton = NeonKit.IconButton("ZoomIn", zoomColumn, "Daily/icon_zoom_in", new Vector2(0, 65), 112, 70);
-            ZoomOutButton = NeonKit.IconButton("ZoomOut", zoomColumn, "Daily/icon_zoom_out", new Vector2(0, -65), 112, 70);
-            zoomColumn.gameObject.SetActive(false);
-            undoRect = (RectTransform)UndoButton.transform;
-            hintRect = (RectTransform)HintButton.transform;
-            restartRect = (RectTransform)RestartButton.transform;
-            PauseButton = UiFactory.Button("Pause", top, new Vector2(380, 0));
-            ((RectTransform)PauseButton.transform).sizeDelta = new Vector2(120, 120);
-            var pauseLabel = PauseButton.GetComponentInChildren<UnityEngine.UI.Text>(); pauseLabel.enabled = false;
-            NeonKit.Icon("PauseIcon", PauseButton.transform, "icon_pause", 70, Vector2.zero);
-            stuck=UiFactory.Panel("StuckBanner",safeArea,ViewTheme.PanelCard);NeonKit.SetRim(stuck,"neon_panel_rim",NeonKit.PanelBorder,NeonKit.Magenta);
-            stuck.sizeDelta=new Vector2(900,90);stuck.anchorMin=stuck.anchorMax=stuck.pivot=new Vector2(.5f,1);
-            stuck.GetComponent<UnityEngine.UI.Image>().raycastTarget=false;
-            StuckText=UiFactory.Text("StuckText",stuck,"No way out from here.\nUndo or Restart.",32,Vector2.zero,Vector2.zero);
-            StuckText.color=new Color32(255,150,190,255);UiFactory.Stretch(StuckText.rectTransform);stuck.gameObject.SetActive(false);
-            // Step 15: progress bar under the info bar, difficulty pill below it, padlock coach banner.
-            progressTrack = UiFactory.Rect("Progress", top, new Vector2(700, 14), new Vector2(-75, -92));
-            var track = progressTrack.gameObject.AddComponent<UnityEngine.UI.Image>(); track.color = new Color32(255, 255, 255, 40); track.raycastTarget = false;
-            var fill = UiFactory.Rect("Fill", progressTrack, Vector2.zero, Vector2.zero); fill.anchorMin = Vector2.zero; fill.anchorMax = new Vector2(0, 1); fill.pivot = new Vector2(0, .5f); fill.offsetMin = fill.offsetMax = Vector2.zero;
-            ProgressFill = fill.gameObject.AddComponent<UnityEngine.UI.Image>(); ProgressFill.color = new Color32(80, 232, 140, 255); ProgressFill.raycastTarget = false;
-            var pill = UiFactory.Rect("Difficulty", top, new Vector2(280, 56), new Vector2(-75, -136));
-            DifficultyPill = pill.gameObject.AddComponent<UnityEngine.UI.Image>(); DifficultyPill.sprite = BrandArt.SpriteOf("hud_pill", new Vector4(48, 46, 48, 46)); DifficultyPill.type = UnityEngine.UI.Image.Type.Sliced; DifficultyPill.raycastTarget = false;
-            DifficultyText = UiFactory.Text("Label", pill, "HARD", 34, new Vector2(280, 56), Vector2.zero); DifficultyText.color = Color.white; DifficultyText.fontStyle = FontStyle.Bold;
-            if (BrandArt.Display != null) DifficultyText.font = BrandArt.Display;
+            for (int i = 0; i < Hearts.Length; i++) Hearts[i] = BrandArt.Image("Heart" + i, heartRow, "Hud/hud_heart", new Vector2(58, 58), new Vector2((i - 1) * 58, 0));
+            MovesText = Ink("Moves", top, "", 30, new Vector2(200, 52), new Vector2(-104, -42), TextAnchor.MiddleRight); MovesText.verticalOverflow = VerticalWrapMode.Truncate;
+            MovesText.resizeTextForBestFit = true; MovesText.resizeTextMinSize = 18; MovesText.resizeTextMaxSize = 30; MovesText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            var starRoot = UiFactory.Rect("StarMeter", top, new Vector2(100, 30), new Vector2(42, -42));
+            Stars = starRoot.gameObject.AddComponent<StarDisplay>(); Stars.Build(top, 28, 32); starRoot.anchoredPosition = new Vector2(42, -42);
+            LevelText = Ink("LevelName", top, "", 30, new Vector2(320, 40), new Vector2(-58, -42)); LevelText.gameObject.SetActive(false);
+            LevelPositionText = Ink("LevelPosition", top, "", 30, new Vector2(300, 40), new Vector2(-58, -42)); LevelPositionText.gameObject.SetActive(false);
+            MistakesText = Ink("Mistakes", top, "", 30, new Vector2(300, 40), new Vector2(-58, -42)); MistakesText.gameObject.SetActive(false);
+            PauseButton = Tile("Pause", top, new Vector2(430, 74), 104, "hud_icon_gear", 64, null, true);
+            NightButton = Tile("Night", top, new Vector2(430, -40), 104, "hud_icon_moon", 64, null, true);
+            nightIcon = NightButton.transform.Find("Icon").GetComponent<UnityEngine.UI.Image>();
+            var pill = UiFactory.Rect("Difficulty", top, new Vector2(250, 50), new Vector2(-58, -118));
+            DifficultyPill = pill.gameObject.AddComponent<UnityEngine.UI.Image>(); DifficultyPill.sprite = BrandArt.SpriteOf("Hud/hud_pill_paper", new Vector4(60, 60, 60, 60)); DifficultyPill.type = UnityEngine.UI.Image.Type.Sliced; DifficultyPill.raycastTarget = false;
+            DifficultyText = UiFactory.Text("Label", pill, "HARD", 30, new Vector2(250, 50), new Vector2(0, 1)); DifficultyText.color = Color.white; DifficultyText.font = BrandArt.HudFont; DifficultyText.raycastTarget = false;
             pill.gameObject.SetActive(false);
-            LockTip = UiFactory.Panel("LockTip", safeArea, ViewTheme.PanelCard); NeonKit.SetRim(LockTip, "neon_panel_rim", NeonKit.PanelBorder, NeonKit.Cyan);
-            LockTip.sizeDelta = new Vector2(900, 120); LockTip.anchorMin = LockTip.anchorMax = LockTip.pivot = new Vector2(.5f, 0);
-            LockTip.GetComponent<UnityEngine.UI.Image>().raycastTarget = false;
-            var tipText = UiFactory.Text("LockTipText", LockTip, "PADLOCK! Clear the arrow with the matching KEY first —\nthen the padlocked arrow is free to go.", 32, Vector2.zero, Vector2.zero);
-            tipText.color = new Color32(255, 226, 120, 255); UiFactory.Stretch(tipText.rectTransform); LockTip.gameObject.SetActive(false);
-            foreach (var label in new[] { LevelText, LevelPositionText, MovesText, MistakesText }) label.color = TextColor;
+
+            // --- Bottom banner ------------------------------------------------------------------------------------
+            bottom = UiFactory.Rect("BottomBar", safeArea, new Vector2(BottomWidth, BottomHeight), Vector2.zero);
+            bottom.anchorMin = bottom.anchorMax = bottom.pivot = new Vector2(0.5f, 0);
+            Layer("Shadow", bottom, "hud_bottom_shadow", new Vector2(BottomWidth, BottomHeight));
+            bottomBack = Layer("Back", bottom, "hud_bottom_back", new Vector2(BottomWidth, BottomHeight));
+            bottomFront = Layer("Front", bottom, "hud_bottom_front", new Vector2(BottomWidth, BottomHeight));
+            UndoButton = Tile("Undo", bottom, new Vector2(-314, 34), 150, "hud_icon_back", 92, "UNDO");
+            HintButton = Tile("Hint", bottom, new Vector2(0, 34), 150, "hud_icon_hint", 96, "HINT");
+            ToolsButton = Tile("Tools", bottom, new Vector2(314, 34), 150, "hud_icon_tools", 96, "TOOLS");
+            UndoCountText = Badge(UndoButton.transform, "hud_badge"); HintCountText = Badge(HintButton.transform, "hud_badge");
+            // Tools tray: a paper card above the TOOLS tile with RESTART and SHOW FREE ARROWS.
+            ToolsTray = UiFactory.Rect("ToolsTray", bottom, new Vector2(420, 220), new Vector2(232, 290));
+            var trayCard = ToolsTray.gameObject.AddComponent<UnityEngine.UI.Image>(); trayCard.sprite = BrandArt.SpriteOf("Hud/hud_pill_paper", new Vector4(60, 60, 60, 60)); trayCard.type = UnityEngine.UI.Image.Type.Sliced; trayCard.color = DayPill; pills.Add(trayCard);
+            RestartButton = Tile("Restart", ToolsTray, new Vector2(-96, 22), 120, "hud_icon_restart", 74, "RESTART");
+            RevealButton = Tile("Reveal", ToolsTray, new Vector2(96, 22), 120, "hud_icon_reveal", 74, "FREE");
+            ToolsTray.gameObject.SetActive(false);
+
+            // --- Right rail: progress and zoom -------------------------------------------------------------------
+            rail = UiFactory.Rect("Rail", safeArea, new Vector2(120, 760), Vector2.zero);
+            rail.anchorMin = rail.anchorMax = rail.pivot = new Vector2(1, .5f);
+            var track = UiFactory.Rect("Progress", rail, new Vector2(30, 420), new Vector2(-40, 150));
+            trackImage = track.gameObject.AddComponent<UnityEngine.UI.Image>(); trackImage.sprite = BrandArt.SpriteOf("Hud/hud_track", new Vector4(30, 30, 30, 30)); trackImage.type = UnityEngine.UI.Image.Type.Sliced; trackImage.raycastTarget = false; trackImage.color = DayTop;
+            var fill = UiFactory.Rect("Fill", track, Vector2.zero, Vector2.zero); fill.anchorMin = Vector2.zero; fill.anchorMax = new Vector2(1, 0); fill.pivot = new Vector2(.5f, 0); fill.offsetMin = new Vector2(5, 5); fill.offsetMax = new Vector2(-5, -5);
+            ProgressFill = fill.gameObject.AddComponent<UnityEngine.UI.Image>(); ProgressFill.sprite = BrandArt.SpriteOf("Hud/hud_track", new Vector4(30, 30, 30, 30)); ProgressFill.type = UnityEngine.UI.Image.Type.Sliced; ProgressFill.color = new Color32(124, 196, 156, 255); ProgressFill.raycastTarget = false;
+            zoomColumn = UiFactory.Rect("Zoom", rail, new Vector2(110, 230), new Vector2(-55, -210));
+            ZoomInButton = Tile("ZoomIn", zoomColumn, new Vector2(0, 56), 96, "hud_icon_zoom_in", 58, null, true);
+            ZoomOutButton = Tile("ZoomOut", zoomColumn, new Vector2(0, -56), 96, "hud_icon_zoom_out", 58, null, true);
+            zoomColumn.gameObject.SetActive(false);
+
+            // --- Notes and banners ---------------------------------------------------------------------------------
+            stuck = PaperCard("StuckBanner", safeArea, new Vector2(900, 96));
+            stuck.anchorMin = stuck.anchorMax = stuck.pivot = new Vector2(.5f, 1);
+            StuckText = Ink("StuckText", stuck, "No way out from here.\nUndo or Restart.", 32, Vector2.zero, Vector2.zero); StuckText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            inkTexts.Remove(StuckText); StuckText.color = RedColor; UiFactory.Stretch(StuckText.rectTransform); stuck.gameObject.SetActive(false);
+            LockTip = PaperCard("LockTip", safeArea, new Vector2(900, 120));
+            LockTip.anchorMin = LockTip.anchorMax = LockTip.pivot = new Vector2(.5f, 0);
+            var tipText = Ink("LockTipText", LockTip, "PADLOCK! Clear the arrow with the matching KEY first —\nthen the padlocked arrow is free to go.", 30, Vector2.zero, Vector2.zero);
+            tipText.horizontalOverflow = HorizontalWrapMode.Wrap; UiFactory.Stretch(tipText.rectTransform); LockTip.gameObject.SetActive(false);
+            note = PaperCard("Note", safeArea, new Vector2(760, 84)); note.anchorMin = note.anchorMax = note.pivot = new Vector2(.5f, 1);
+            noteGroup = note.gameObject.AddComponent<CanvasGroup>(); noteGroup.blocksRaycasts = false; noteGroup.interactable = false;
+            noteText = Ink("NoteText", note, "", 30, Vector2.zero, Vector2.zero); noteText.horizontalOverflow = HorizontalWrapMode.Wrap; UiFactory.Stretch(noteText.rectTransform); note.gameObject.SetActive(false);
+            SetNight(false);
             SetUndoState(false);
             SetHintState(false);
             UpdateLayout();
+        }
+
+        private RectTransform PaperCard(string name, Transform parent, Vector2 size)
+        {
+            var rect = UiFactory.Rect(name, parent, size, Vector2.zero);
+            var img = rect.gameObject.AddComponent<UnityEngine.UI.Image>(); img.sprite = BrandArt.SpriteOf("Hud/hud_pill_paper", new Vector4(60, 60, 60, 60)); img.type = UnityEngine.UI.Image.Type.Sliced; img.raycastTarget = false; img.color = DayPill; pills.Add(img);
+            return rect;
         }
 
         /// <summary>Updates only labels whose values changed.</summary>
@@ -229,31 +349,27 @@ namespace ArrowEscape.UI
         {
             if (LevelText == null) return;
             if (lastName != levelName) { lastName = levelName; LevelText.text = DisplayName(levelName); }
-            if (lastMoves != moves || lastTotal != total)
-            { lastMoves = moves; lastTotal = total; MovesText.text = $"Moves {moves} / {total}"; }
+            if (lastMoves != moves || lastTotal != total) { lastMoves = moves; lastTotal = total; MovesText.text = $"Moves {moves} / {total}"; }
             if (lastMistakes != mistakes) { lastMistakes = mistakes; MistakesText.text = $"Mistakes {mistakes}"; }
             SetUndoState(canUndo);
         }
 
         /// <summary>Removes authoring prefixes while preserving ordinary level names.</summary>
         public static string DisplayName(string name)
-        {if(string.IsNullOrEmpty(name))return "";if(name.StartsWith("Shape ",System.StringComparison.Ordinal)){int colon=name.IndexOf(':');if(colon>=0)return name.Substring(colon+1).Trim().TrimEnd(':');}return name.TrimEnd(':');}
+        { if (string.IsNullOrEmpty(name)) return ""; if (name.StartsWith("Shape ", System.StringComparison.Ordinal)) { int colon = name.IndexOf(':'); if (colon >= 0) return name.Substring(colon + 1).Trim().TrimEnd(':'); } return name.TrimEnd(':'); }
 
-        /// <summary>Sets undo availability and the standard disabled button tint.</summary>
-        public void SetUndoState(bool canUndo)
-        {
-            if (UndoButton != null) UndoButton.interactable = canUndo;
-        }
-
+        /// <summary>Sets undo availability.</summary>
+        public void SetUndoState(bool canUndo) { if (UndoButton != null) UndoButton.interactable = canUndo; }
         /// <summary>Sets hint availability without changing the board.</summary>
-        public void SetHintState(bool canHint) { if (HintButton != null) HintButton.interactable = canHint; }
+        public void SetHintState(bool canHint) { if (HintButton != null) HintButton.interactable = canHint; if (RevealButton != null) RevealButton.interactable = canHint; }
 
-        /// <summary>Shows one-based progress through the resource list, or hides it before initialization.</summary>
+        /// <summary>Shows one-based progress and the banner title ("LEVEL 28", "JOURNEY 12").</summary>
         public void SetLevelPosition(int index, int count, string label = "Level")
         {
             if (LevelPositionText == null || (lastLevelIndex == index && lastLevelCount == count && lastLevelLabel == label)) return;
             lastLevelIndex = index; lastLevelCount = count; lastLevelLabel = label;
             LevelPositionText.text = index >= 0 && count > 0 ? $"{label} {index + 1} / {count}" : "";
+            TitleText.text = index >= 0 && count > 0 ? $"{label.ToUpperInvariant()} {index + 1}" : "PRACTICE";
         }
 
         private void LateUpdate() => UpdateLayout();
@@ -263,26 +379,18 @@ namespace ArrowEscape.UI
             Vector2 size = ((RectTransform)top.parent).rect.size;
             if (size == lastSize || size.x <= 0 || size.y <= 0) return;
             lastSize = size;
-            // Keep every visible pixel within the camera's reserved top/bottom bands.
-            float topScale = UiFit.ComputeScale(900, 150, size.x * 0.9f, size.y * 0.13f);
-            if(stuck!=null&&stuck.gameObject.activeSelf)topScale=Mathf.Min(topScale,size.y*.08f/150);
-            float minimumBar = 3 * 200 + 2 * ViewTheme.UiSpacing;
-            float barWidth = Mathf.Max(minimumBar, Mathf.Min(1000, size.x * 0.94f));
-            bottom.sizeDelta = new Vector2(barWidth, ViewTheme.ButtonHeight);
-            float buttonScale = UiFit.ComputeScale(3 * ViewTheme.ButtonWidth, ViewTheme.ButtonHeight,
-                barWidth - 2 * ViewTheme.UiSpacing, ViewTheme.ButtonHeight);
-            float width = Mathf.Max(200, ViewTheme.ButtonWidth * buttonScale);
-            undoRect.sizeDelta = hintRect.sizeDelta = restartRect.sizeDelta = new Vector2(width, ViewTheme.ButtonHeight);
-            undoRect.anchoredPosition = new Vector2(-width - ViewTheme.UiSpacing, 0);
-            hintRect.anchoredPosition = Vector2.zero;
-            restartRect.anchoredPosition = new Vector2(width + ViewTheme.UiSpacing, 0);
-            float bottomScale = UiFit.ComputeScale(barWidth, ViewTheme.ButtonHeight, size.x * 0.9f, size.y * 0.14f);
-            top.localScale = Vector3.one * topScale;
-            bottom.localScale = Vector3.one * bottomScale;
-            top.anchoredPosition = new Vector2(0, -size.y * 0.01f);
-            bottom.anchoredPosition = new Vector2(0, size.y * 0.01f);
-            if(LockTip!=null){LockTip.localScale=Vector3.one*UiFit.ComputeScale(900,120,size.x*.92f,size.y*.07f);LockTip.anchoredPosition=new Vector2(0,size.y*.165f);}
-            if(stuck!=null){stuck.localScale=Vector3.one*UiFit.ComputeScale(900,90,size.x*.9f,size.y*.04f);stuck.anchoredPosition=new Vector2(0,-size.y*.10f);}
+            // The camera keeps the top 15 % and bottom 16 % free; the banners fill those bands at most.
+            float topScale = Mathf.Min(size.x / TopWidth, size.y * .148f / TopHeight);
+            if (stuck != null && stuck.gameObject.activeSelf) topScale = Mathf.Min(topScale, size.y * .1f / TopHeight);
+            float bottomScale = Mathf.Min(size.x / BottomWidth, size.y * .158f / BottomHeight);
+            top.localScale = Vector3.one * topScale; bottom.localScale = Vector3.one * bottomScale;
+            top.anchoredPosition = Vector2.zero; bottom.anchoredPosition = Vector2.zero;
+            float railScale = Mathf.Min(1f, size.y * .62f / 760f, topScale * 1.1f);
+            rail.localScale = Vector3.one * railScale; rail.anchoredPosition = new Vector2(0, -size.y * .02f);
+            float bandTop = TopHeight * topScale;
+            if (LockTip != null) { LockTip.localScale = Vector3.one * Mathf.Min(UiFit.ComputeScale(900, 120, size.x * .92f, size.y * .07f), 1); LockTip.anchoredPosition = new Vector2(0, BottomHeight * bottomScale + 8); }
+            if (stuck != null) { stuck.localScale = Vector3.one * UiFit.ComputeScale(900, 96, size.x * .9f, size.y * .04f); stuck.anchoredPosition = new Vector2(0, -bandTop - 6); }
+            if (note != null) { note.localScale = Vector3.one * Mathf.Min(UiFit.ComputeScale(760, 84, size.x * .8f, size.y * .045f), 1); note.anchoredPosition = new Vector2(0, -bandTop - 10); }
         }
     }
 }

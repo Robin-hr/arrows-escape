@@ -25,6 +25,10 @@ namespace ArrowEscape.Data
         public void SetSound(bool value) { if (Model.SoundEnabled == value) return; Model.SoundEnabled = value; Save(); }
         /// <summary>Sets and saves haptics only if changed.</summary>
         public void SetHaptics(bool value) { if (Model.HapticsEnabled == value) return; Model.HapticsEnabled = value; Save(); }
+        /// <summary>Step 17: saves the night-board preference.</summary>
+        public void SetNight(bool value) { if (Model.NightMode == value) return; Model.NightMode = value; Save(); }
+        /// <summary>Step 17: saves the reminder preference.</summary>
+        public void SetNotifications(bool value) { if (Model.NotificationsEnabled == value && Model.NotificationsAsked) return; Model.NotificationsEnabled = value; Model.NotificationsAsked = true; Save(); }
         private void Save() { try { LastSaveFailed = !store.TrySave(Model.Data); } catch (Exception) { LastSaveFailed = true; } }
     }
 }

@@ -1,0 +1,15 @@
+{
+    "name": "ArrowEscape.Notifications",
+    "rootNamespace": "ArrowEscape.Notifications",
+    "references": [
+        "ArrowEscape.Core",
+        "Unity.Notifications.Android"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.mobile.notifications",
+            "expression": "2.1.0",
+            "define": "AK_NOTIFICATIONS"
+        }
+    ]
+}

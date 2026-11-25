@@ -15,6 +15,6 @@ namespace ArrowEscape.Tests
         public SettingsLoadResult Load() { Loads++; return new SettingsLoadResult(Saved == null ? null : Copy(Saved), Saved == null ? ProgressLoadStatus.NoFile : ProgressLoadStatus.Loaded); }
         /// <summary>Counts and optionally stores the changed values.</summary>
         public bool TrySave(SettingsData data) { Saves++; if (FailSave) return false; Saved = Copy(data); return true; }
-        private static SettingsData Copy(SettingsData data) => new SettingsData { version = data.version, soundEnabled = data.soundEnabled, hapticsEnabled = data.hapticsEnabled };
+        private static SettingsData Copy(SettingsData data) => new SettingsData { version = data.version, soundEnabled = data.soundEnabled, hapticsEnabled = data.hapticsEnabled, nightMode = data.nightMode, notificationsEnabled = data.notificationsEnabled, notificationsAsked = data.notificationsAsked };
     }
 }

@@ -29,8 +29,13 @@ namespace ArrowEscape.View
         /// <summary>Step 16: picks this level's solid colour from <see cref="LevelColors"/>.</summary>
         public int ColorKey { get => colorKey; set { colorKey = value; ApplyDotStyle(); GetComponent<CameraFitter>()?.ApplyBackground(); } }
         private int colorKey;
-        /// <summary>Step 16: the solid colour behind the arrows for the current level and skin.</summary>
-        public Color Backdrop => LevelColors.For(colorKey, lightBoard);
+        /// <summary>Step 17: the solid colour behind the arrows, chosen by the equipped arrow style (and shaded per level).</summary>
+        public Color Backdrop => SkinBackdrop.For(arrowSkinId, colorKey, lightBoard);
+        /// <summary>Step 17: night board preference; light-board styles move to their deep board (Classic Ink turns light).</summary>
+        public bool NightMode { get => nightMode; set { if (nightMode == value) return; nightMode = value; SetArrowSkin(arrowSkinId); ApplyDotStyle(); GetComponent<CameraFitter>()?.ApplyBackground(); } }
+        private bool nightMode;
+        /// <summary>Step 17: Classic Ink colour for the current board brightness.</summary>
+        public Color ClassicInk => lightBoard ? ViewTheme.ArrowColor : SkinBackdrop.NightInk;
         /// <summary>Applies the equipped theme before refreshing skins and contrast.</summary>
         public void SetTheme(string id)
         {ThemeId="paper";var backdrop=GetComponent<ThemeBackdrop>();backdrop?.SetTheme(ThemeId);SetArrowSkin(arrowSkinId);ApplyDotStyle();GetComponent<CameraFitter>()?.ApplyBackground();}
@@ -49,18 +54,21 @@ namespace ArrowEscape.View
             arrowSkinId=id;
             var director=GetComponent<SkinDirector>();
             if(ArrowSkinRegistry.Find(id)!=null&&director==null){director=gameObject.AddComponent<SkinDirector>();director.Bind(this,GetComponent<GameController>());}
-            if(ArrowSkinRegistry.Find(id)?.PrefersDarkBoard==true)light=director?.InfernoLightOverride??false;
-            else if(wasFire){light=true;director?.ResetInfernoOverride();}
-            if(HasDarkTheme)light=false;
+            // Step 17: board brightness follows the arrow style (dark arrows -> light board) and night mode.
+            light=SkinBackdrop.LightBoard(id,nightMode);
+            if(ArrowSkinRegistry.Find(id)?.PrefersDarkBoard==true&&director?.InfernoLightOverride!=null)light=director.InfernoLightOverride.Value;
+            else if(wasFire&&ArrowSkinRegistry.Find(id)?.PrefersDarkBoard!=true)director?.ResetInfernoOverride();
             lightBoard=light;
+            if(ArrowSkinRegistry.Find(id)==null)SetNormalArrowColor(ClassicInk);
             foreach(var pair in arrowViews)if(pair.Value!=null)pair.Value.SetSkin(id,light);
             foreach(var pair in releasedViews)if(pair.Value!=null)pair.Value.SetSkin(id,light);
-            if(wasFire||ArrowSkinRegistry.Find(id)?.PrefersDarkBoard==true){GetComponent<CameraFitter>()?.ApplyBackground();ApplyDotStyle();}
+            GetComponent<CameraFitter>()?.ApplyBackground();ApplyDotStyle();
             director?.RefreshDimming();SkinChanged?.Invoke();
         }
         private void ApplyDotStyle()
         {
             Color tint=lightBoard?ViewTheme.CellDot:new Color(233f/255,238f/255,242f/255,.16f);
+            var paper=GetComponent<PaperDots>();if(paper!=null)paper.SetTint(lightBoard?new Color(ViewTheme.ArrowColor.r,ViewTheme.ArrowColor.g,ViewTheme.ArrowColor.b,.13f):new Color(1,1,1,.07f));
             if(PathDots!=null)PathDots.SetRestColor(tint);
             else if(root!=null)for(int i=0;i<root.childCount;i++){var child=root.GetChild(i);if(child.name.StartsWith("Cell ",StringComparison.Ordinal)){var dot=child.GetComponent<SpriteRenderer>();if(dot!=null)dot.color=tint;}}
         }
@@ -119,6 +127,7 @@ namespace ArrowEscape.View
             root = new GameObject("Board").transform;
             root.SetParent(transform, false);
             if(GetComponent<BoardZoom>()==null)gameObject.AddComponent<BoardZoom>();
+            if(GetComponent<PaperDots>()==null)gameObject.AddComponent<PaperDots>().Bind(this);
             UsesPaths=false;
             foreach(Arrow arrow in board.Arrows)if(arrow.Length>1){UsesPaths=true;break;}
             if(UsesPaths)

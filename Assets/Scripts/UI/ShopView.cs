@@ -79,6 +79,13 @@ namespace ArrowEscape.UI
             SoundsButton.onClick.AddListener(()=>ShowTab(ShopSlot.Sound));
             ArrowsButton.onClick.AddListener(ShowArrows);ThemesButton.onClick.AddListener(ShowThemes);AvatarsButton.onClick.AddListener(()=>ShowTab(ShopSlot.Avatar));FramesButton.onClick.AddListener(()=>ShowTab(ShopSlot.Frame));
             scroll=BuildScroll(safe);
+            // Step 17: special-offer banner under the tabs (weekend sales and festival gifts).
+            OfferBanner=UiFactory.Panel("OfferBanner",safe,ViewTheme.PanelCard);NeonKit.SetRim(OfferBanner,"neon_panel_rim",NeonKit.PanelBorder,NeonKit.Magenta);
+            OfferBanner.sizeDelta=new Vector2(960,112);OfferBanner.anchorMin=OfferBanner.anchorMax=OfferBanner.pivot=new Vector2(.5f,1);OfferBanner.anchoredPosition=new Vector2(0,-300);
+            OfferTitle=BrandArt.Text("OfferTitle",OfferBanner,"",34,new Vector2(560,46),new Vector2(-150,22),new Color32(255,214,90,255));OfferTitle.alignment=TextAnchor.MiddleLeft;
+            OfferPitch=UiFactory.Text("OfferPitch",OfferBanner,"",24,new Vector2(560,40),new Vector2(-150,-22));OfferPitch.alignment=TextAnchor.MiddleLeft;OfferPitch.color=new Color32(220,226,255,255);OfferPitch.resizeTextForBestFit=true;OfferPitch.resizeTextMinSize=16;OfferPitch.resizeTextMaxSize=24;
+            ClaimButton=UiFactory.Button("Claim",OfferBanner,new Vector2(330,0),NeonButtonStyle.Primary);((RectTransform)ClaimButton.transform).sizeDelta=new Vector2(250,84);
+            ClaimButton.onClick.AddListener(ClaimGift);OfferBanner.gameObject.SetActive(false);
             Detail=gameObject.AddComponent<ShopDetailSheet>();Detail.Build(parent,confirm,game);Detail.Changed+=Refresh;
             Root.gameObject.SetActive(false);
         }
@@ -104,6 +111,28 @@ namespace ArrowEscape.UI
             content.gameObject.AddComponent<UnityEngine.UI.ContentSizeFitter>().verticalFit=UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
             view.viewport=viewport;view.content=content;view.horizontal=false;view.scrollSensitivity=50;return view;
         }
+        /// <summary>Step 17: the special-offer banner (hidden when no offer runs today).</summary>
+        public RectTransform OfferBanner { get; private set; }
+        /// <summary>Step 17: offer title, e.g. "WEEKEND SALE  -25%".</summary>
+        public UnityEngine.UI.Text OfferTitle { get; private set; }
+        /// <summary>Step 17: offer pitch line.</summary>
+        public UnityEngine.UI.Text OfferPitch { get; private set; }
+        /// <summary>Step 17: claims the offer's free coins (shown only while unclaimed).</summary>
+        public UnityEngine.UI.Button ClaimButton { get; private set; }
+        private void RefreshOffer()
+        {
+            if(OfferBanner==null||inventory==null)return;var offer=inventory.Shop.ActiveOffer;bool show=offer!=null;
+            OfferBanner.gameObject.SetActive(show);((RectTransform)scroll.transform).offsetMax=new Vector2(-24,show?-430:-310);
+            if(!show)return;
+            OfferTitle.text=offer.Title+"  -"+offer.DiscountPercent+"%";OfferPitch.text=offer.Pitch;
+            bool claim=inventory.Shop.CanClaimOfferGift;ClaimButton.gameObject.SetActive(claim);
+            if(claim)ClaimButton.GetComponentInChildren<UnityEngine.UI.Text>().text="CLAIM "+offer.GiftCoins;
+        }
+        private void ClaimGift()
+        {
+            if(inventory==null)return;int coins=inventory.Shop.ClaimOfferGift();if(coins<=0)return;
+            inventory.Save();game?.RequestUiFeedback(UiFeedbackCue.Coin);RefreshOffer();
+        }
         /// <summary>Rebinds a saved inventory after startup or a development reset.</summary>
         public void Bind(InventoryService service)
         {
@@ -117,7 +146,7 @@ namespace ArrowEscape.UI
         public void Show(ShopSlot slot)
         {
             if(inventory==null)return;Root.gameObject.SetActive(true);Root.SetAsLastSibling();
-            renderer?.Dispose();renderer=new ArrowPreviewRenderer();tab=slot;Rebuild();counter.SetValue(inventory.State.Coins,false);
+            renderer?.Dispose();renderer=new ArrowPreviewRenderer();tab=slot;Rebuild();counter.SetValue(inventory.State.Coins,false);RefreshOffer();
         }
         private void ShowArrows()=>ShowTab(ShopSlot.Arrow);
         private void ShowThemes()=>ShowTab(ShopSlot.Theme);
@@ -167,7 +196,7 @@ namespace ArrowEscape.UI
         private void OnCoins(int amount){counter.SetValue(amount);Refresh();}
         private void OnEquipped(ShopSlot slot,string id)=>Refresh();
         /// <summary>Refreshes states without recreating the card hierarchy.</summary>
-        public void Refresh(){for(int i=0;i<cards.Count;i++){cards[i].Refresh(inventory.Shop);cards[i].SetBadgeAvatar(inventory.State.EquippedAvatarId);}Detail.Refresh();}
+        public void Refresh(){for(int i=0;i<cards.Count;i++){cards[i].Refresh(inventory.Shop);cards[i].SetBadgeAvatar(inventory.State.EquippedAvatarId);}Detail.Refresh();RefreshOffer();}
         private void HandleBackAction()=>HandleBack();
         /// <summary>Closes the detail first, then the shop; callers consume confirmation modals first.</summary>
         public bool HandleBack(){if(!IsVisible)return false;if(Detail.IsVisible){Detail.Hide();return true;}Close();return true;}

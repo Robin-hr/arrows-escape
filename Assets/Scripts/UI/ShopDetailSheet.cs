@@ -78,14 +78,14 @@ namespace ArrowEscape.UI
         public void Refresh()
         {
             if(Item==null||inventory==null)return;var shop=inventory.Shop;
-            string label=!Item.IsAvailable?"Coming soon":shop.IsEquipped(Item.Id)?"Equipped":shop.IsOwned(Item.Id)?"Equip":shop.CanAfford(Item.Price)?"Buy - "+Item.Price:"Need "+(Item.Price-inventory.State.Coins)+" more";
-            mainLabel.text=label;MainButton.interactable=Item.IsAvailable&&!shop.IsEquipped(Item.Id)&&(shop.IsOwned(Item.Id)||shop.CanAfford(Item.Price));
+            string label=!Item.IsAvailable?"Coming soon":shop.IsEquipped(Item.Id)?"Equipped":shop.IsOwned(Item.Id)?"Equip":shop.CanAfford(shop.PriceOf(Item))?"Buy - "+shop.PriceOf(Item):"Need "+(shop.PriceOf(Item)-inventory.State.Coins)+" more";
+            mainLabel.text=label;MainButton.interactable=Item.IsAvailable&&!shop.IsEquipped(Item.Id)&&(shop.IsOwned(Item.Id)||shop.CanAfford(shop.PriceOf(Item)));
         }
         private void OnMain()
         {
             if(!MainButton.interactable||Item==null)return;
             if(inventory.Shop.IsOwned(Item.Id)){if(inventory.TryEquip(Item.Id)){Changed?.Invoke();Refresh();}return;}
-            confirm.Show("Confirm purchase","Buy "+Item.Name+" for "+Item.Price+" coins?","Buy - "+Item.Price,Buy);
+            confirm.Show("Confirm purchase","Buy "+Item.Name+" for "+inventory.Shop.PriceOf(Item)+" coins?","Buy - "+inventory.Shop.PriceOf(Item),Buy);
         }
         private void Buy()
         {if(Item==null||!inventory.TryBuy(Item.Id))return;game.RequestUiFeedback(UiFeedbackCue.Purchase);Changed?.Invoke();Refresh();}

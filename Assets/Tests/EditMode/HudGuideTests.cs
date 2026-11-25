@@ -15,7 +15,7 @@ namespace ArrowEscape.Tests
         /// <summary>Undo, Hint, and Restart appear in that order; Hint requests one suggestion.</summary>
         [Test] public void Button()
         {
-            var hud = s.Hud.Hud; Assert.That(hud.UndoButton.transform.GetSiblingIndex(), Is.LessThan(hud.HintButton.transform.GetSiblingIndex())); Assert.That(hud.HintButton.transform.GetSiblingIndex(), Is.LessThan(hud.RestartButton.transform.GetSiblingIndex()));
+            var hud = s.Hud.Hud; Assert.That(hud.UndoButton.transform.GetSiblingIndex(), Is.LessThan(hud.HintButton.transform.GetSiblingIndex())); Assert.That(hud.HintButton.transform.GetSiblingIndex(), Is.LessThan(hud.ToolsButton.transform.GetSiblingIndex()));
             Assert.That(hud.HintButton.GetComponentInChildren<UnityEngine.UI.Text>().text, Is.EqualTo("Hint")); hud.HintButton.onClick.Invoke(); Assert.That(s.Game.HintCount, Is.EqualTo(1)); Assert.That(s.Game.Guide.HasActiveHint, Is.True);
         }
         /// <summary>Level starts and clears refresh availability without disturbing undo or visibility.</summary>
@@ -32,10 +32,10 @@ namespace ArrowEscape.Tests
             var hud = s.Hud.Hud; Canvas.ForceUpdateCanvases(); var bar = (RectTransform)hud.HintButton.transform.parent; var safe = (RectTransform)bar.parent;
             safe.anchorMin = safe.anchorMax = new Vector2(0.5f, 0.5f); safe.sizeDelta = new Vector2(width, height);
             FlowTestScene.Callback(hud, "LateUpdate"); Canvas.ForceUpdateCanvases();
-            var buttons = new[] { hud.UndoButton, hud.HintButton, hud.RestartButton }; float previousRight = float.NegativeInfinity;
+            var buttons = new[] { hud.UndoButton, hud.HintButton, hud.ToolsButton }; /* Step 17: paper tiles; Restart lives in the TOOLS tray */ float previousRight = float.NegativeInfinity;
             foreach (var button in buttons)
             {
-                var rect = (RectTransform)button.transform; Assert.That(rect.rect.width, Is.GreaterThanOrEqualTo(200)); var corners = new Vector3[4]; rect.GetWorldCorners(corners);
+                var rect = (RectTransform)button.transform; Assert.That(rect.rect.width, Is.GreaterThanOrEqualTo(140)); var corners = new Vector3[4]; rect.GetWorldCorners(corners);
                 float left = float.PositiveInfinity, right = float.NegativeInfinity;
                 foreach (Vector3 corner in corners)
                 {

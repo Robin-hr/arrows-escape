@@ -125,6 +125,10 @@ namespace ArrowEscape.UI
             SettingsScreen = gameObject.AddComponent<SettingsView>();
             SettingsScreen.Build(canvasObject.transform, bootstrap.Settings.Model, SetSound, SetHaptics, AskReset, Back);
             Confirm = gameObject.AddComponent<ConfirmDialog>(); Confirm.Build(canvasObject.transform);
+            // Step 17: local reminders (daily puzzle, streak, special offers) and their settings toggle.
+            Notifications = gameObject.AddComponent<NotificationDirector>(); Notifications.Bind(bootstrap, Confirm);
+            SettingsScreen.RemindersChanged = on => Notifications.SetEnabled(on, _ => { SettingsScreen.Refresh(); bootstrap.CheckSettingsSave(); });
+            if (Application.isPlaying) Notifications.Reschedule();
             Shop=gameObject.AddComponent<ShopView>();Shop.Build(canvasObject.transform,Confirm,game);Shop.Closed+=OnShopClosed;
             Profile = gameObject.AddComponent<ProfileView>(); Profile.Build(canvasObject.transform, CloseProfile, OpenAvatarShop, OpenRanking);
             Ranking = gameObject.AddComponent<RankingView>(); Ranking.Build(canvasObject.transform, CloseRanking, bootstrap.RankingSnapshot);
@@ -198,6 +202,8 @@ namespace ArrowEscape.UI
             MainMenu.SetPlayerName(bootstrap.Inventory.State.PlayerName);
             MainMenu.SetJourneyLives(JourneyLifeRules.Update(bootstrap.Inventory.State, UtcNow()));
             int key=TodayKey();var state=bootstrap.Inventory.State;
+            // Step 17: after a couple of cleared levels, ask once whether the player wants reminders.
+            if (Application.isPlaying && Notifications != null && !Rewards.IsVisible && (Loading == null || !Loading.IsVisible)) Notifications.MaybeAsk(bootstrap.Progress.Tracker.CompletedCount(bootstrap.LevelIds));
             MainMenu.SetDaily(DailyStreakRules.CurrentStreak(state,key),DailyStreakRules.SolvedToday(state,key),DailyRewardRules.CanClaim(state,key));
         }
         // Stars earned on the main levels only (the Journey has its own road).
@@ -354,9 +360,9 @@ namespace ArrowEscape.UI
         }
         private void OnCoins(int amount)=>MainMenu.SetEconomy(amount,MainStars(),bootstrap.LevelCount*3);
         /// <summary>Opens the shop only from the main menu.</summary>
-        public void OpenShop(){if(Machine.Current!=ScreenState.MainMenu)return;MainMenu.Root.gameObject.SetActive(false);Shop.Show();}
+        public void OpenShop(){if(Machine.Current!=ScreenState.MainMenu)return;MainMenu.Root.gameObject.SetActive(false);bootstrap?.RefreshSpecialOffer();Shop.Show();}
         /// <summary>From the profile page: opens the shop on the Avatars tab; closing it returns to the profile.</summary>
-        public void OpenAvatarShop(){if(Machine.Current!=ScreenState.MainMenu)return;MainMenu.Root.gameObject.SetActive(false);Shop.Show(ShopSlot.Avatar);}
+        public void OpenAvatarShop(){if(Machine.Current!=ScreenState.MainMenu)return;MainMenu.Root.gameObject.SetActive(false);bootstrap?.RefreshSpecialOffer();Shop.Show(ShopSlot.Avatar);}
         /// <summary>Opens the profile page from the home page, behind a 2-second loading screen.</summary>
         public void OpenProfile()
         {
@@ -443,6 +449,8 @@ namespace ArrowEscape.UI
             RefreshMainMenu(); RefreshLevels();
             ApplyScreen(Machine.Current, Machine.Current);
         }
+        /// <summary>Step 17: schedules the daily puzzle, streak and special-offer reminders.</summary>
+        public NotificationDirector Notifications { get; private set; }
         private void SetSound(bool value) { bootstrap.Settings.SetSound(value); bootstrap.CheckSettingsSave(); }
         private void SetHaptics(bool value) { bootstrap.Settings.SetHaptics(value); bootstrap.CheckSettingsSave(); }
         private void AskReset()

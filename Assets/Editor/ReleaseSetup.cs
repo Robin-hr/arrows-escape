@@ -42,6 +42,7 @@ namespace ArrowEscape.EditorTools
             Step("brand textures", ApplyBrandImports);
             Step("icons", ApplyIcons);
             Step("platforms", ApplyPlatforms);
+            Step("notifications", ApplyNotifications);
             AssetDatabase.SaveAssets();
         }
 
@@ -70,9 +71,9 @@ namespace ArrowEscape.EditorTools
         }
 
         /// <summary>Release version shown in stores and in the APK.</summary>
-        public const string Version = "0.3.0";
+        public const string Version = "0.4.0";
         /// <summary>Android version code (increase for every upload).</summary>
-        public const int AndroidVersionCode = 3;
+        public const int AndroidVersionCode = 4;
 
         // Step 14N cross-platform settings: Android IL2CPP ARM64 with internet (world ranking) and edge-to-edge drawing,
         // iOS full screen, desktop portrait windows that can be resized.
@@ -117,6 +118,43 @@ namespace ArrowEscape.EditorTools
                 if (importer.wrapMode != TextureWrapMode.Clamp) { importer.wrapMode = TextureWrapMode.Clamp; changed = true; }
                 if (changed) importer.SaveAndReimport();
             }
+        }
+
+        /// <summary>Step 17: notification icons and reboot-safe scheduling for Unity Mobile Notifications (via reflection, so the
+        /// project still compiles if the package is missing). Exact-alarm scheduling stays off (no special Play permission).</summary>
+        private static void ApplyNotifications()
+        {
+            Type settings = null, iconType = null;
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                settings = settings ?? assembly.GetType("Unity.Notifications.NotificationSettings+AndroidSettings");
+                iconType = iconType ?? assembly.GetType("Unity.Notifications.NotificationIconType");
+            }
+            if (settings == null || iconType == null) { Debug.LogWarning("Arrow Escape release setup: Mobile Notifications package not found"); return; }
+            var reschedule = settings.GetProperty("RescheduleOnDeviceRestart");
+            if (reschedule != null && !(bool)reschedule.GetValue(null)) reschedule.SetValue(null, true);
+            Texture2D small = NotificationIcon("ak_small.png"), large = NotificationIcon("ak_large.png");
+            if (small == null || large == null) return;
+            settings.GetMethod("ClearDrawableResources")?.Invoke(null, null);
+            var add = settings.GetMethod("AddDrawableResource");
+            add.Invoke(null, new object[] { "ak_small", small, Enum.Parse(iconType, "Small") });
+            add.Invoke(null, new object[] { "ak_large", large, Enum.Parse(iconType, "Large") });
+        }
+
+        private static Texture2D NotificationIcon(string file)
+        {
+            string path = "Assets/Art/Notifications/" + file;
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer == null) return null;
+            bool changed = false;
+            if (importer.textureType != TextureImporterType.Default) { importer.textureType = TextureImporterType.Default; changed = true; }
+            if (!importer.isReadable) { importer.isReadable = true; changed = true; }
+            if (importer.mipmapEnabled) { importer.mipmapEnabled = false; changed = true; }
+            if (importer.textureCompression != TextureImporterCompression.Uncompressed) { importer.textureCompression = TextureImporterCompression.Uncompressed; changed = true; }
+            if (importer.npotScale != TextureImporterNPOTScale.None) { importer.npotScale = TextureImporterNPOTScale.None; changed = true; }
+            if (!importer.alphaIsTransparency) { importer.alphaIsTransparency = true; changed = true; }
+            if (changed) importer.SaveAndReimport();
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
         }
 
         private static Texture2D Icon(string file, bool transparent, int maxSize)

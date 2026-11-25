@@ -76,7 +76,7 @@ namespace ArrowEscape.UI
         /// <summary>Refreshes purchase state outside the frame path.</summary>
         public void Refresh(ShopService shop)
         {
-            state.text=!Item.IsAvailable?"Coming soon":shop.IsEquipped(Item.Id)?"Equipped":shop.IsOwned(Item.Id)?"Owned":Item.Price.ToString();
+            state.text=!Item.IsAvailable?"Coming soon":shop.IsEquipped(Item.Id)?"Equipped":shop.IsOwned(Item.Id)?"Owned":shop.ActiveOffer!=null&&shop.PriceOf(Item)<Item.Price?shop.PriceOf(Item)+"  -"+shop.ActiveOffer.DiscountPercent+"%":Item.Price.ToString();
             state.color=shop.IsEquipped(Item.Id)?new Color32(125,255,176,255):shop.IsOwned(Item.Id)?NeonKit.Text:new Color32(255,214,92,255);
             coin.gameObject.SetActive(Item.IsAvailable&&!shop.IsOwned(Item.Id));check.gameObject.SetActive(shop.IsEquipped(Item.Id));
         }

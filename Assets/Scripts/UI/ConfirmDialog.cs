@@ -6,7 +6,7 @@ namespace ArrowEscape.UI
     /// <summary>Single modal confirmation above every other screen.</summary>
     public sealed class ConfirmDialog : MonoBehaviour
     {
-        private Action confirm;
+        private Action confirm, cancel;
         private UnityEngine.UI.Text title, message;
         private UnityEngine.UI.Image cardRim;
         /// <summary>Blocking screen root.</summary>
@@ -28,13 +28,16 @@ namespace ArrowEscape.UI
             CancelButton = UiFactory.Button("Cancel", card, new Vector2(-195, -205));
             ConfirmButton = UiFactory.Button("Confirm", card, new Vector2(195, -205), NeonButtonStyle.Primary);
             ((RectTransform)CancelButton.transform).sizeDelta = ((RectTransform)ConfirmButton.transform).sizeDelta = new Vector2(360, 130);
-            CancelButton.onClick.AddListener(Hide); ConfirmButton.onClick.AddListener(Confirm);
+            CancelButton.onClick.AddListener(Cancel); ConfirmButton.onClick.AddListener(Confirm);
             Hide();
         }
         /// <summary>Shows one confirmation; the callback is consumed before invocation.</summary>
-        public void Show(string heading, string text, string confirmLabel, Action onConfirm)
+        public void Show(string heading, string text, string confirmLabel, Action onConfirm) => Show(heading, text, confirmLabel, onConfirm, null, "Cancel");
+        /// <summary>Step 17: confirmation with a cancel callback and label (e.g. "Not now").</summary>
+        public void Show(string heading, string text, string confirmLabel, Action onConfirm, Action onCancel, string cancelLabel)
         {
-            title.text = (heading ?? "").ToUpperInvariant(); message.text = text; confirm = onConfirm;
+            title.text = (heading ?? "").ToUpperInvariant(); message.text = text; confirm = onConfirm; cancel = onCancel;
+            CancelButton.GetComponentInChildren<UnityEngine.UI.Text>().text = cancelLabel ?? "Cancel";
             bool destructive = confirmLabel == "Delete";
             NeonKit.Style(ConfirmButton, destructive ? NeonButtonStyle.Danger : NeonButtonStyle.Primary);
             cardRim.color = destructive ? NeonKit.Magenta : NeonKit.Cyan;
@@ -42,7 +45,8 @@ namespace ArrowEscape.UI
             Root.gameObject.SetActive(true); Root.SetAsLastSibling();
         }
         /// <summary>Closes without confirming.</summary>
-        public void Hide() { confirm = null; if (Root != null) Root.gameObject.SetActive(false); }
+        public void Hide() { confirm = null; cancel = null; if (Root != null) Root.gameObject.SetActive(false); }
+        private void Cancel() { Action action = cancel; Hide(); action?.Invoke(); }
         private void Confirm() { if (!IsOpen) return; Action action = confirm; Hide(); action?.Invoke(); }
     }
 }
