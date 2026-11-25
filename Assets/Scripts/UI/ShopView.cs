@@ -11,7 +11,9 @@ namespace ArrowEscape.UI
     {
         private InventoryService inventory;
         private ArrowSkinResources skinResources;
-        private readonly LiveSkinPreview[] elementalCards=new LiveSkinPreview[10];
+        private readonly LiveSkinPreview[] elementalCards=new LiveSkinPreview[24];
+        // Step 16: one live preview per skin (several skins share a shader recipe index).
+        private static int PreviewSlot(string id){var all=ArrowSkinRegistry.All;for(int i=0;i<all.Count;i++)if(all[i].Id==id)return i;return 0;}
         private readonly LiveThemePreview[] themeCards=new LiveThemePreview[ThemeDesign.Count];
         private readonly List<ShopCard> cards=new List<ShopCard>(28);
         private readonly List<RectTransform> sections=new List<RectTransform>(7);
@@ -73,7 +75,7 @@ namespace ArrowEscape.UI
             for(int i=0;i<header.childCount;i++){var child=(RectTransform)header.GetChild(i);child.anchorMin=child.anchorMax=new Vector2(.5f,1);}
             var tabs=UiFactory.Rect("Tabs",safe,new Vector2(960,110),Vector2.zero);tabs.anchorMin=tabs.anchorMax=tabs.pivot=new Vector2(.5f,1);tabs.anchoredPosition=new Vector2(0,-182);
             tabs.gameObject.AddComponent<MenuFit>().Configure(tabs,safe,new Vector2(1000,120));
-            ArrowsButton=MakeTab(tabs,"Arrows","icon_arrow",-384);ThemesButton=MakeTab(tabs,"Themes","icon_theme",-192);AvatarsButton=MakeTab(tabs,"Avatars","icon_avatar",0);FramesButton=MakeTab(tabs,"Frames","icon_frame",192);SoundsButton=MakeTab(tabs,"Sounds","Icons3D/i3_sound",384);
+            ArrowsButton=MakeTab(tabs,"Arrows","icon_arrow",-288);ThemesButton=MakeTab(tabs,"Themes","icon_theme",0);ThemesButton.gameObject.SetActive(false);AvatarsButton=MakeTab(tabs,"Avatars","icon_avatar",-96);FramesButton=MakeTab(tabs,"Frames","icon_frame",96);SoundsButton=MakeTab(tabs,"Sounds","Icons3D/i3_sound",288);   // Step 16: no Themes tab
             SoundsButton.onClick.AddListener(()=>ShowTab(ShopSlot.Sound));
             ArrowsButton.onClick.AddListener(ShowArrows);ThemesButton.onClick.AddListener(ShowThemes);AvatarsButton.onClick.AddListener(()=>ShowTab(ShopSlot.Avatar));FramesButton.onClick.AddListener(()=>ShowTab(ShopSlot.Frame));
             scroll=BuildScroll(safe);
@@ -148,7 +150,7 @@ namespace ArrowEscape.UI
         {
             for(int i=0;i<cards.Count;i++)if(ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true)
             {
-                int n=ArrowSkinRegistry.Find(cards[i].Item.Id).Index;
+                int n=PreviewSlot(cards[i].Item.Id);
                 var infernoCard=elementalCards[n];if(infernoCard==null){var go=new GameObject("Procedural Inferno card");go.transform.SetParent(transform,false);infernoCard=go.AddComponent<LiveSkinPreview>();infernoCard.Initialize(null,new Vector2(22000+n*1000,22000));infernoCard.AutoReplay=false;infernoCard.SetDark(true);infernoCard.ShowStraight(cards[i].Item.Id);infernoCard.SetResolution(400,225);infernoCard.HalfRate=true;elementalCards[n]=infernoCard;}
                 cards[i].Preview.texture=infernoCard.Texture;
             }
@@ -195,7 +197,7 @@ namespace ArrowEscape.UI
                 int themeIndex=ThemeDesign.Index(cards[i].Item.Id);if(themeIndex>=0){bool shown=corners[2].y>=viewportCorners[0].y&&corners[0].y<=viewportCorners[2].y;themeCards[themeIndex].gameObject.SetActive(shown);continue;}
                 if(ArrowSkinRegistry.Find(cards[i].Item.Id)?.IsProcedural==true)
                 {
-                    var infernoCard=elementalCards[ArrowSkinRegistry.Find(cards[i].Item.Id).Index];
+                    var infernoCard=elementalCards[PreviewSlot(cards[i].Item.Id)];
                     bool shown=corners[2].y>=viewportCorners[0].y&&corners[0].y<=viewportCorners[2].y;
                     if(infernoCard!=null){infernoCard.gameObject.SetActive(shown);cards[i].Preview.texture=infernoCard.Texture;}continue;
                 }

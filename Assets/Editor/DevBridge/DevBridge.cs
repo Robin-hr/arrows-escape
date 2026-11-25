@@ -197,6 +197,27 @@ namespace ArrowEscape.DevBridge
                         }
                     Write("dump.txt", text.ToString());
                 }
+                else if (action == "tap" || action.StartsWith("equip:", StringComparison.Ordinal))
+                {
+                    // tap: taps one hinted arrow (frame-by-frame exit checks). equip:<id>: buys if needed and equips a shop item.
+                    Type bootType = Type.GetType("ArrowEscape.View.GameBootstrap, ArrowEscape.View");
+                    object boot = UnityEngine.Object.FindFirstObjectByType(bootType);
+                    if (action != "tap")
+                    {
+                        object inv = bootType.GetProperty("Inventory").GetValue(boot); string id = action.Substring(6);
+                        inv.GetType().GetMethod("TryBuy").Invoke(inv, new object[] { id }); object ok = inv.GetType().GetMethod("TryEquip", new[] { typeof(string) }).Invoke(inv, new object[] { id });
+                        Append("play-log.txt", Now + " " + action + " " + ok); return;
+                    }
+                    Type gameType = Type.GetType("ArrowEscape.View.GameController, ArrowEscape.View"), tapType = Type.GetType("ArrowEscape.View.TapController, ArrowEscape.View");
+                    Type boardViewType = Type.GetType("ArrowEscape.View.BoardView, ArrowEscape.View"), hintType = Type.GetType("ArrowEscape.Core.HintFinder, ArrowEscape.Core");
+                    object game = UnityEngine.Object.FindFirstObjectByType(gameType), taps = UnityEngine.Object.FindFirstObjectByType(tapType), view = UnityEngine.Object.FindFirstObjectByType(boardViewType);
+                    object session = gameType.GetProperty("Session").GetValue(game); object board = session.GetType().GetProperty("Board").GetValue(session);
+                    object hint = hintType.GetMethod("Find").Invoke(null, new[] { board }); object arrow = hint.GetType().GetProperty("Arrow").GetValue(hint);
+                    int x = (int)arrow.GetType().GetProperty("X").GetValue(arrow), y = (int)arrow.GetType().GetProperty("Y").GetValue(arrow);
+                    Vector3 world = (Vector3)boardViewType.GetMethod("CellToWorld", new[] { typeof(int), typeof(int) }).Invoke(view, new object[] { x, y });
+                    tapType.GetMethod("PointerDown").Invoke(taps, new object[] { 1, (Vector2)world }); tapType.GetMethod("PointerUp").Invoke(taps, new object[] { 1, (Vector2)world });
+                    Append("play-log.txt", Now + " tap " + x + "," + y);
+                }
                 else if (action == "solve")
                 {
                     // Taps hinted arrows until the level is cleared (screenshots of the completion screen).

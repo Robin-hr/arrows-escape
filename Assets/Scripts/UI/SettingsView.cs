@@ -22,6 +22,8 @@ namespace ArrowEscape.UI
         public UnityEngine.UI.Button BackButton { get; private set; }
         /// <summary>Step 15: opens the privacy policy page.</summary>
         public UnityEngine.UI.Button PrivacyButton { get; private set; }
+        /// <summary>Step 16: opens the terms and conditions page.</summary>
+        public UnityEngine.UI.Button TermsButton { get; private set; }
         /// <summary>Step 15: the last URL the privacy button asked to open (tests read it instead of opening a browser).</summary>
         public string LastOpenedUrl { get; private set; }
         /// <summary>Whether the full neon backdrop is shown (hidden when opened over a paused board).</summary>
@@ -38,9 +40,12 @@ namespace ArrowEscape.UI
             HapticsButton = UiFactory.MenuButton("Haptics: On", column, 55); NeonKit.WithIcon(HapticsButton, "icon_haptics", 72);
             ResetButton = UiFactory.MenuButton("Reset Progress", column, -115); NeonKit.Style(ResetButton, NeonButtonStyle.Danger); NeonKit.WithIcon(ResetButton, "icon_reset", 72);
             BackButton = UiFactory.MenuButton("Back", column, -285); NeonKit.WithIcon(BackButton, "icon_back", 64);
-            PrivacyButton = UiFactory.Button("Privacy Policy", column, new Vector2(0, -395));
-            ((RectTransform)PrivacyButton.transform).sizeDelta = new Vector2(420, 72);
-            PrivacyButton.onClick.AddListener(() => { LastOpenedUrl = AppInfo.PrivacyPolicyUrl; if (Application.isPlaying) Application.OpenURL(AppInfo.PrivacyPolicyUrl); });
+            PrivacyButton = UiFactory.Button("Privacy Policy", column, new Vector2(-185, -395));
+            ((RectTransform)PrivacyButton.transform).sizeDelta = new Vector2(350, 72);
+            PrivacyButton.onClick.AddListener(() => Open(AppInfo.PrivacyPolicyUrl));
+            TermsButton = UiFactory.Button("Terms & Conditions", column, new Vector2(185, -395));
+            ((RectTransform)TermsButton.transform).sizeDelta = new Vector2(350, 72);
+            TermsButton.onClick.AddListener(() => Open(AppInfo.TermsUrl));
             var version = UiFactory.Text("Version", column, "Version " + AppInfo.Version, 26, new Vector2(700, 44), new Vector2(0, -470));
             version.color = UiStyle.Muted;
             model = value; model.Changed += Refresh;
@@ -49,6 +54,7 @@ namespace ArrowEscape.UI
             ResetButton.onClick.AddListener(() => reset()); BackButton.onClick.AddListener(() => back());
             Refresh();
         }
+        private void Open(string url) { LastOpenedUrl = url; if (Application.isPlaying) Application.OpenURL(url); }
         /// <summary>Shows the neon page backdrop from the home page, or only a dim veil over a paused board.</summary>
         public void SetBackdrop(bool visible) { if (backdrop != null && backdrop.gameObject.activeSelf != visible) backdrop.gameObject.SetActive(visible); }
         /// <summary>Pulls current labels and toggle colors.</summary>

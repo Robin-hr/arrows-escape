@@ -69,7 +69,7 @@ namespace ArrowEscape.UI
             dim.transform.SetAsFirstSibling();
 
             logo = UiFactory.Rect("Logo", Root, new Vector2(1000, 491), Vector2.zero).gameObject.AddComponent<UnityEngine.UI.RawImage>();
-            logo.texture = BrandArt.Texture("arrows_escape_logo"); logo.raycastTarget = false;
+            logo.texture = BrandArt.Texture("arrows_keymaster_logo"); logo.raycastTarget = false;
             logo.rectTransform.anchorMin = logo.rectTransform.anchorMax = new Vector2(0.5f, 0.69f);
             if (logo.texture == null) logo.color = new Color(1, 1, 1, 0);
 

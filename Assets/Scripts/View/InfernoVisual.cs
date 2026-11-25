@@ -4,6 +4,8 @@ namespace ArrowEscape.View
     /// <summary>Fire-only renderer: moving ribbon, broad halo and symmetric SDF flame head.</summary>
     public sealed class InfernoVisual : MonoBehaviour
     {
+        /// <summary>Step 16: the skin drawn with this fire recipe (Phoenix Wing recolours it).</summary>
+        public ArrowSkin recolorSkin;
         private MeshRenderer body,halo,head;
         private MaterialPropertyBlock properties;
         private Mesh quad,bodyMesh;
@@ -39,7 +41,7 @@ namespace ArrowEscape.View
         public void Apply(Vector2 headPoint,Vector2 direction,float distance,float length,float progress,float clock,bool light,bool lod,bool feedback,Color tint,float alpha,int sorting)
         {
             if(body==null)return;UpdateGeometry(distance);if(flying){if(returning){temperature=Mathf.Sqrt(Mathf.Clamp01(distance/returnDistance));if(distance<=0)EndFlight();}else temperature=Mathf.Max(temperature,ArrowEscape.Core.InfernoDesign.Temperature(progress));}
-            properties.Clear();properties.SetFloat("_Temperature",temperature);properties.SetFloat("_Flying",flying?1:0);properties.SetFloat("_Blocked",impact/.12f);properties.SetFloat("_Clock",clock);properties.SetFloat("_WindowStart",distance);properties.SetFloat("_BodyLength",length);properties.SetFloat("_Lod",lod?1:0);properties.SetFloat("_State",feedback?1:0);properties.SetColor("_StateTint",tint);properties.SetFloat("_Opacity",alpha);
+            properties.Clear();properties.SetFloat("_Temperature",temperature);properties.SetFloat("_Flying",flying?1:0);properties.SetFloat("_Blocked",impact/.12f);properties.SetFloat("_Clock",clock);properties.SetFloat("_WindowStart",distance);properties.SetFloat("_BodyLength",length);properties.SetFloat("_Lod",lod?1:0);properties.SetFloat("_State",feedback?1:0);properties.SetColor("_StateTint",tint);properties.SetFloat("_Opacity",alpha);if(recolorSkin!=null)recolorSkin.ApplyRecolor(properties);else properties.SetFloat("_Recolor",0);
             Render(halo,2,light,sorting);Render(body,0,light,sorting);
             head.transform.localPosition=headPoint-direction*1.1f;head.transform.localRotation=Quaternion.Euler(0,0,Mathf.Atan2(direction.y,direction.x)*Mathf.Rad2Deg);Render(head,1,light,sorting);head.enabled=false;/* The uniform classic head replaces the flame head. */
         }

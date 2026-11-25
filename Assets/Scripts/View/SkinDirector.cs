@@ -92,7 +92,7 @@ namespace ArrowEscape.View
             for(int i=0;i<trails.Length;i++)
             {
                 var entry=trails[i];if(entry.View==null||entry.View.Skin==null||entry.View.Skin.Skin==null)continue;
-                entry.Time+=dt;var skin=entry.View.Skin;skin.SetFlight(Mathf.Clamp01(entry.Time/entry.Duration));entry.EmitTime+=dt;if(!skin.Skin.IsElemental||skin.Skin.Index==1)pool.Beam(i,skin.Skin,entry.Start,skin.HeadWorld,skin.IsLight);
+                entry.Time+=dt;var skin=entry.View.Skin;skin.SetFlight(Mathf.Clamp01(entry.Time/entry.Duration));entry.EmitTime+=dt;/* Step 16: no straight start-to-head beam: it looked like a stray line drawn across the board. */
                 if(entry.EmitTime>=.025f){entry.EmitTime=0;pool.Emit(skin.Skin,skin.HeadWorld,new Vector2(entry.View.Arrow.Direction.GetDx(),entry.View.Arrow.Direction.GetDy()),skin.Inferno!=null?4:skin.Skin.Index==2?8:5,skin.IsLight);}
                 if(skin.Skin.IsProcedural&&!entry.EdgeFlared&&board!=null&&!board.WorldBounds.Contains(skin.HeadWorld)){pool.Emit(skin.Skin,skin.HeadWorld,skin.DirectionWorld,22,skin.IsLight);if(game==null||!game.IsCleared){var bounds=board.WorldBounds;signatures?.Edge(entry.View,new Vector2(Mathf.Clamp(skin.HeadWorld.x,bounds.min.x,bounds.max.x),Mathf.Clamp(skin.HeadWorld.y,bounds.min.y,bounds.max.y)));}entry.EdgeFlared=true;}
                 if(entry.Time>=entry.Duration){skin.Inferno?.EndFlight();skin.Elemental?.EndFlight();skin.Rare?.EndFlight();skin.SetFlight(0);entry.View=null;}trails[i]=entry;

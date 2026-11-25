@@ -22,7 +22,7 @@ namespace ArrowEscape.EditorTools
         {
             EditorUserBuildSettings.buildAppBundle = false;
             EditorUserBuildSettings.development = false;
-            Build(BuildTarget.Android, BuildTargetGroup.Android, "Builds/Android/ArrowsEscape-" + ReleaseSetup.Version + ".apk");
+            Build(BuildTarget.Android, BuildTargetGroup.Android, "Builds/Android/ArrowsKeymaster-" + ReleaseSetup.Version + ".apk");
         }
 
         /// <summary>Step 15: Google Play upload. Builds a release-signed Android App Bundle (.aab) with the upload key in Keystore/upload.properties.</summary>
@@ -32,7 +32,7 @@ namespace ArrowEscape.EditorTools
             if (!UploadKey.Exists) { File.WriteAllText(Report, "RESULT NoUploadKey: create Keystore/upload.properties first (see AGENTS.md, Step 15)\n"); return; }
             EditorUserBuildSettings.buildAppBundle = true;
             EditorUserBuildSettings.development = false;
-            try { Build(BuildTarget.Android, BuildTargetGroup.Android, "Builds/Android/ArrowsEscape-" + ReleaseSetup.Version + ".aab"); }
+            try { Build(BuildTarget.Android, BuildTargetGroup.Android, "Builds/Android/ArrowsKeymaster-" + ReleaseSetup.Version + ".aab"); }
             finally { EditorUserBuildSettings.buildAppBundle = false; }
         }
 
@@ -48,7 +48,7 @@ namespace ArrowEscape.EditorTools
 
         /// <summary>Builds a Windows player for a quick desktop check.</summary>
         [MenuItem("Tools/Arrow Escape/Build Windows")]
-        public static void BuildWindows() => Build(BuildTarget.StandaloneWindows64, BuildTargetGroup.Standalone, "Builds/Windows/ArrowsEscape.exe");
+        public static void BuildWindows() => Build(BuildTarget.StandaloneWindows64, BuildTargetGroup.Standalone, "Builds/Windows/ArrowsKeymaster.exe");
 
         private static void Build(BuildTarget target, BuildTargetGroup group, string path)
         {

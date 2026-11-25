@@ -14,17 +14,8 @@ namespace ArrowEscape.View
         private bool missingCameraLogged;
         private int contentWidth, contentHeight;
         private Vector3 contentCenter;
-        private Color SkinBackground
-        {
-            get
-            {
-                var board=GetComponent<BoardView>();if(board!=null&&board.HasDarkTheme)return ThemeDesign.Background(board.ThemeId);if(board!=null&&ArrowSkinRegistry.Find(board.ArrowSkinId)?.PrefersDarkBoard==true)return board.IsLightBoard?ViewTheme.Background:ArrowSkinRegistry.Find(board.ArrowSkinId).DarkBoardColor;
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                var skins=GetComponent<SkinDirector>();if(skins!=null&&skins.IsDarkBoard)return new Color32(14,17,22,255);
-#endif
-                return ViewTheme.Background;
-            }
-        }
+        // Step 16: always the board's solid per-level colour.
+        private Color SkinBackground { get { var board = GetComponent<BoardView>(); return board != null ? board.Backdrop : ViewTheme.Background; } }
 
         /// <summary>Fits the centered board, reserving default margins plus safe-area insets.</summary>
         public void Fit(int width, int height)

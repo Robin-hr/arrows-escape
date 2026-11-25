@@ -49,6 +49,12 @@ namespace ArrowEscape.Core
         public string EquippedArrow { get; private set; } = "";
         /// <summary>Display name of the equipped theme.</summary>
         public string EquippedTheme { get; private set; } = "";
+        /// <summary>Step 16: tap sounds owned (themes were retired).</summary>
+        public int SoundsOwned { get; private set; }
+        /// <summary>Step 16: tap sounds in the shop.</summary>
+        public int SoundsTotal { get; private set; }
+        /// <summary>Step 16: equipped tap sound name.</summary>
+        public string EquippedSound { get; private set; } = "";
 
         /// <summary>Collects the summary; null inputs give an empty profile.</summary>
         public static ProfileStats Build(ProgressTracker tracker, IReadOnlyList<string> levelIds, Inventory inventory)
@@ -72,6 +78,7 @@ namespace ArrowEscape.Core
                 else if (item.Slot == ShopSlot.Theme) { stats.ThemesTotal++; if (owned) stats.ThemesOwned++; }
                 else if (item.Slot == ShopSlot.Avatar) { stats.AvatarsTotal++; if (owned) stats.AvatarsOwned++; }
                 else if (item.Slot == ShopSlot.Frame) { stats.FramesTotal++; if (owned) stats.FramesOwned++; }
+                else if (item.Slot == ShopSlot.Sound) { stats.SoundsTotal++; if (owned || item.Price == 0) stats.SoundsOwned++; }
             }
             if (inventory != null)
             {
@@ -79,6 +86,7 @@ namespace ArrowEscape.Core
                 stats.Trophies = inventory.Trophies; stats.League = TrophyRules.LeagueFor(inventory.Trophies);
                 stats.EquippedArrow = NameOf(inventory.EquippedArrowId);
                 stats.EquippedTheme = NameOf(inventory.EquippedThemeId);
+                stats.EquippedSound = NameOf(string.IsNullOrEmpty(inventory.EquippedSoundId) ? TapSoundSynth.DefaultId : inventory.EquippedSoundId);
                 stats.AvatarId = inventory.EquippedAvatarId ?? Inventory.DefaultAvatarId;
                 stats.FrameId = inventory.EquippedFrameId ?? Inventory.DefaultFrameId;
                 stats.EquippedAvatar = NameOf(stats.AvatarId);

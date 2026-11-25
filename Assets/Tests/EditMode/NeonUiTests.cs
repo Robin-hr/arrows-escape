@@ -133,7 +133,7 @@ namespace ArrowEscape.Tests
             var stats = ProfileStats.Build(tracker, new[] { "a", "b", "c" }, new Inventory());
             Assert.That(stats.LevelsCompleted, Is.EqualTo(2)); Assert.That(stats.LevelCount, Is.EqualTo(3));
             Assert.That(stats.PerfectLevels, Is.EqualTo(1)); Assert.That(stats.MaxStars, Is.EqualTo(9));
-            Assert.That(stats.EquippedTheme, Is.EqualTo("Paper"));
+            Assert.That(stats.EquippedTheme, Is.EqualTo("Paper")); Assert.That(stats.SoundsTotal, Is.EqualTo(13)); Assert.That(stats.EquippedSound, Is.Not.Empty);
         }
     }
 }

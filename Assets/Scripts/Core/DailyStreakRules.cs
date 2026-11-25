@@ -41,7 +41,7 @@ namespace ArrowEscape.Core
         public static string ShareText(int dateKey, int moves, int mistakes, int heartsLeft, int streak)
         {
             var text = new StringBuilder();
-            text.Append("Arrows Escape Daily · ").Append(DailyCalendar.Pretty(dateKey)).Append('\n');
+            text.Append("Arrows Keymaster Daily · ").Append(DailyCalendar.Pretty(dateKey)).Append('\n');
             text.Append("Solved in ").Append(moves).Append(moves == 1 ? " move" : " moves").Append('\n');
             for (int i = 0; i < 3; i++) text.Append(i < heartsLeft ? "❤️" : "🖤");
             text.Append(' ').Append(mistakes).Append(mistakes == 1 ? " mistake" : " mistakes").Append('\n');

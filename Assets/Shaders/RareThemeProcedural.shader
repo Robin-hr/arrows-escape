@@ -74,7 +74,11 @@ Shader "ArrowEscape/Rare Skins and Themes"
  return float4(linearColor(c),saturate(alpha));
  }
  #include "RareR1.cginc"
- float4 frag(vary i):SV_Target {
+
+   // Step 16: optional recolour so several skins can share one procedural recipe in their own colours.
+   float _Recolor; float4 _RecolorA,_RecolorB;
+   float4 recolor(float4 c){if(_Recolor<.5)return c;float l=dot(c.rgb,float3(.2126,.7152,.0722));float3 tint=lerp(_RecolorA.rgb,_RecolorB.rgb,smoothstep(.12,.85,l));c.rgb=lerp(c.rgb,tint*(.3+1.25*l)+pow(saturate(l),4)*.55,.9);return c;}
+ float4 frag0(vary i):SV_Target {
  float t=_Clock<0?_ArrowSkinTime:_Clock;
  if(_Mode>=10&&_Mode<14)return theme(i.uv,t);
  if(_Mode>=14){float2 d=abs((i.uv-.5)*2)-.91;float edge=length(max(d,0))+min(max(d.x,d.y),0);float dots=_PreviewDots*(1-smoothstep(.025,.065,length(frac(i.uv*float2(7,4))-.5)));return float4(dots*.5,dots*.6,dots*.65,max(dots*.20,.35*(1-smoothstep(.03,.10,edge))));}
@@ -109,6 +113,7 @@ Shader "ArrowEscape/Rare Skins and Themes"
  else {alpha=(1-smoothstep(.83,1,v))*taper;if(_Skin>6.5&&_Skin<7.5)alpha*=1-smoothstep(.35,.65,v);if(_Skin>7.5&&_Skin<8.5)alpha*=1-smoothstep(.25,.5,v);c+=spec*.12;if(_State>.5)c=lerp(c,_StateTint.rgb,smoothstep(.65,.9,v));if(_LightBoard>.5)c=lerp(float3(.06,.06,.075),c,1-smoothstep(.72,.95,v));}
  return float4(linearColor(c),saturate(alpha)*_Opacity);
  }
+  float4 frag(vary i):SV_Target {return recolor(frag0(i));}
  ENDCG
  }
  }

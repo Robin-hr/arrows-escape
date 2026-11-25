@@ -71,6 +71,7 @@ namespace ArrowEscape.View
             EnsureInitialized();bool sandbox=IsSandboxLevel;IsSandboxLevel=false;sandboxPath=null;
             IsJourneyLevel=false;dailyBoard=board.Clone();DailyKey=dateKey;IsDailyLevel=true;CurrentLevelIndex=-1;
             var zoom=GetComponent<BoardZoom>();if(zoom==null)zoom=gameObject.AddComponent<BoardZoom>();zoom.Forced=true;
+            GetComponent<BoardView>().ColorKey=dateKey;
             controller.SetLevelInfo("Daily Puzzle","daily/"+dateKey);
             controller.StartLevel(dailyBoard.Clone(),"Daily Puzzle");GetComponent<CameraFitter>().Fit(board.Width,board.Height);
         }
@@ -145,6 +146,7 @@ namespace ArrowEscape.View
             IsJourneyLevel = true; CurrentLevelIndex = index;
             // Journey boards are big (up to 34 x 44 cells): pinch/drag zoom and the HUD zoom buttons are always on.
             var zoom = GetComponent<BoardZoom>(); if (zoom == null) zoom = gameObject.AddComponent<BoardZoom>(); zoom.Forced = true;
+            view.ColorKey = index * 3 + 1;
             controller.SetLevelInfo(result.LevelName, journeyPaths[index]);
             controller.StartLevel(result.Board, result.LevelName);
             GetComponent<CameraFitter>().Fit(result.Board.Width, result.Board.Height);
@@ -255,6 +257,7 @@ namespace ArrowEscape.View
             CurrentLevelIndex = index;
             // Step 15: big catalog boards (60+ arrows) get pinch/drag zoom and the HUD zoom buttons like Journey.
             var zoom = GetComponent<BoardZoom>(); if (zoom == null) zoom = gameObject.AddComponent<BoardZoom>(); zoom.Forced = result.Board.Arrows.Count >= ZoomArrowThreshold;
+            view.ColorKey = index;
             controller.SetLevelInfo(result.LevelName, resource);
             controller.StartLevel(result.Board, result.LevelName);
             GetComponent<CameraFitter>().Fit(result.Board.Width, result.Board.Height);
@@ -381,9 +384,10 @@ namespace ArrowEscape.View
         private void ApplyEquipment()
         {
             if(Inventory==null)return;
-            var view=GetComponent<BoardView>();view.SetTheme(Inventory.State.EquippedThemeId);
-            Color background=view.HasDarkTheme?ThemeDesign.Background(view.ThemeId):ViewTheme.Background;
-            view.SetNormalArrowColor(Inventory.State.EquippedArrowId=="classic"?ThemeDesign.ClassicInk(view.ThemeId):ArrowTint.For(Inventory.State.EquippedArrowId,background));
+            // Step 16: themes are retired; every board is a solid per-level colour (BoardView.ColorKey).
+            var view=GetComponent<BoardView>();view.SetTheme("paper");
+            Color background=ViewTheme.Background;
+            view.SetNormalArrowColor(Inventory.State.EquippedArrowId=="classic"?ViewTheme.ArrowColor:ArrowTint.For(Inventory.State.EquippedArrowId,background));
             view.SetArrowSkin(Inventory.State.EquippedArrowId,SkinMaterials.IsLight(background));
             var audio=GetComponent<AudioDirector>();if(audio!=null)audio.SetTapSound(TapSoundSynth.IndexOf(Inventory.State.EquippedSoundId));
         }

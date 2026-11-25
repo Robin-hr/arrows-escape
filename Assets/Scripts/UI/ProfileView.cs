@@ -106,7 +106,7 @@ namespace ArrowEscape.UI
             PerfectText = Stat(column, "3-STAR LEVELS", -225, -10);
             CoinsText = Stat(column, "COINS", 225, -10);
             ArrowsText = Stat(column, "ARROWS", -225, -180);
-            ThemesText = Stat(column, "THEMES", 225, -180);
+            ThemesText = Stat(column, "SOUNDS", 225, -180);   // Step 16: themes retired, the slot shows tap sounds
             AvatarsText = Stat(column, "AVATARS", -225, -350);
             FramesText = Stat(column, "FRAMES", 225, -350);
 
@@ -170,10 +170,10 @@ namespace ArrowEscape.UI
             PerfectText.text = stats.PerfectLevels.ToString();
             CoinsText.text = stats.Coins.ToString();
             ArrowsText.text = stats.ArrowsOwned + " / " + stats.ArrowsTotal;
-            ThemesText.text = stats.ThemesOwned + " / " + stats.ThemesTotal;
+            ThemesText.text = stats.SoundsOwned + " / " + stats.SoundsTotal;
             AvatarsText.text = stats.AvatarsOwned + " / " + stats.AvatarsTotal;
             FramesText.text = stats.FramesOwned + " / " + stats.FramesTotal;
-            EquippedText.text = "Arrow: " + stats.EquippedArrow + "   Theme: " + stats.EquippedTheme + "\nAvatar: " + stats.EquippedAvatar + "   Frame: " + stats.EquippedFrame;
+            EquippedText.text = "Arrow: " + stats.EquippedArrow + "   Sound: " + stats.EquippedSound + "\nAvatar: " + stats.EquippedAvatar + "   Frame: " + stats.EquippedFrame;
             Avatar.Set(stats.AvatarId, stats.FrameId);
             SetLeague(stats.Trophies);
             Root.gameObject.SetActive(true); Root.SetAsLastSibling();

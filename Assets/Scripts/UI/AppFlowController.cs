@@ -468,7 +468,7 @@ namespace ArrowEscape.UI
             if (Profile != null && Profile.IsVisible) { CloseProfile(); return true; }
 #if UNITY_ANDROID && !UNITY_EDITOR
             // Android system Back on the home page asks before leaving the game (Step 14N).
-            if (Machine.Current == ScreenState.MainMenu) { Confirm.Show("Quit Game", "Leave Arrows Escape?", "Quit", Application.Quit); return true; }
+            if (Machine.Current == ScreenState.MainMenu) { Confirm.Show("Quit Game", "Leave Arrows Keymaster?", "Quit", Application.Quit); return true; }
 #endif
             return Machine.Back();
         }

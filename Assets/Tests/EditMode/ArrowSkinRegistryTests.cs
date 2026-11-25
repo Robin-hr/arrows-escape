@@ -1,3 +1,4 @@
+using System.Linq;
 using ArrowEscape.Core;
 using ArrowEscape.View;
 using NUnit.Framework;
@@ -10,9 +11,9 @@ namespace ArrowEscape.Tests
         /// <summary>Permanent ids match the available catalog, while Part 2 remains tint-only.</summary>
         [Test] public void TenRecipesAndTenFallbacks()
         {
-            Assert.That(ArrowSkinRegistry.All.Count,Is.EqualTo(9));int implemented=0,fallback=0;
+            Assert.That(ArrowSkinRegistry.All.Count,Is.EqualTo(19));int implemented=0,fallback=0;
             foreach(var item in ShopCatalog.Items)if(item.Slot==ShopSlot.Arrow&&item.Id!="classic"){if(ArrowSkinRegistry.Find(item.Id)!=null)implemented++;else fallback++;}
-            Assert.That(implemented,Is.EqualTo(9));Assert.That(fallback,Is.EqualTo(10));Assert.That(ArrowSkinRegistry.Find("classic"),Is.Null);Assert.That(ArrowSkinRegistry.Find("unknown"),Is.Null);
+            Assert.That(implemented,Is.EqualTo(19),"Step 16: every shop arrow has an animated recipe");Assert.That(fallback,Is.Zero);Assert.That(ArrowSkinRegistry.All.Count(x=>x.Recolor),Is.EqualTo(10));Assert.That(ArrowSkinRegistry.Find("classic"),Is.Null);Assert.That(ArrowSkinRegistry.Find("unknown"),Is.Null);
             foreach(var skin in ArrowSkinRegistry.All){Assert.That(ShopCatalog.Find(skin.Id),Is.Not.Null);if(!skin.PrefersDarkBoard)Assert.That(ArrowSkinResources.Load().Find(skin.Id).Full,Is.Not.Null);}
         }
         /// <summary>Unskinning restores the exact original sprite/material/rotation/scale/color; Ice never gains a skin.</summary>

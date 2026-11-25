@@ -36,7 +36,7 @@ namespace ArrowEscape.Tests
         public void DarkBackgroundAndClassic(string id,int r,int g,int b)
         {
             using(var scene=new EconomyTestScene())
-            {scene.Bootstrap.ShowLevel(0);scene.Board.SetArrowSkin(id);Assert.That(Camera.main.backgroundColor,Is.EqualTo((Color)new Color32((byte)r,(byte)g,(byte)b,255)));scene.Board.SetArrowSkin("classic");Assert.That(Camera.main.backgroundColor,Is.EqualTo(ViewTheme.Background));}
+            {scene.Bootstrap.ShowLevel(0);scene.Board.SetArrowSkin(id);Assert.That(scene.Board.IsLightBoard,Is.False);Assert.That(Camera.main.backgroundColor,Is.EqualTo(LevelColors.For(0,false)),"Step 16: the level's own deep solid colour");scene.Board.SetArrowSkin("classic");Assert.That(Camera.main.backgroundColor,Is.EqualTo(LevelColors.For(0,true)));}
         }
     }
 }

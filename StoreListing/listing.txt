@@ -1,0 +1,35 @@
+APP NAME (30)
+Arrows Keymaster: Arrow Puzzle
+
+SHORT DESCRIPTION (80)
+Arrows puzzle: tap arrows out of the maze, free keys, unlock padlocks. Offline!
+
+FULL DESCRIPTION
+Tap an arrow and it flies off the board, but only if nothing stands in its way. Pick the wrong one and you lose a heart. Clear every arrow to win.
+
+Arrows Keymaster is an arrows puzzle game that starts gentle and gets seriously hard: big boards packed with long, winding arrows, where only a few can move at any moment. Some arrows are padlocked, and only the arrow carrying the matching key can open them. Plan every move, escape the arrow maze, become the Keymaster.
+
+WHY PLAYERS LOVE IT
+• 360 levels, from quick warm-ups to huge Super Hard boards
+• Padlocks and keys: a padlocked arrow will not move until its key arrow has escaped
+• The Journey: 200 picture puzzles shaped like animals, vehicles, food and more, with gift boxes to win
+• A new Daily Puzzle every day, with streak badges from Rookie to Elite
+• Clean, solid board colours that change every level, so the arrows are always easy to see
+• 19 animated arrow skins (fire, frost, plasma, cyber, phoenix and more), each in its own colours, plus avatars, frames and tap sounds, all earned with coins from playing
+• Hints and undo when you are stuck, three hearts per level
+• World ranking and leagues
+• Play offline, no ads, no account, no real-money purchases
+
+HOW TO PLAY
+1. Tap an arrow to send it flying in the direction it points.
+2. If another arrow blocks the way, you lose a heart.
+3. A padlocked arrow waits for its key arrow to leave first.
+4. Clear the board to win stars and coins.
+
+If you enjoy arrow puzzles, arrow escape games, logic mazes and brain teasers, Arrows Keymaster will keep your mind sharp. How far can you get?
+
+CATEGORY: Games > Puzzle
+TAGS: Logic, Brain games, Offline, Single player
+PACKAGE: com.hebrusrobin.arrowskeymaster
+PRIVACY POLICY: https://claude.ai/artifact/7s1S1V9Fn5WUrxvUv2qQds
+TERMS & CONDITIONS: https://claude.ai/artifact/UoeB4W7pdEbPtQK4gScL8D

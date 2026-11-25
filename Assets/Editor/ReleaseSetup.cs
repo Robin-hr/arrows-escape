@@ -17,11 +17,11 @@ namespace ArrowEscape.EditorTools
         private const string IconFolder = "Assets/Art/AppIcon/";
         private const string BrandFolder = "Assets/Resources/Brand";
         /// <summary>Store name shown under the icon.</summary>
-        public const string ProductName = "Arrows Escape";
+        public const string ProductName = "Arrows Keymaster";
         /// <summary>Publisher name.</summary>
         public const string CompanyName = "Hebrus Robin";
         /// <summary>Package / bundle identifier.</summary>
-        public const string ApplicationId = "com.hebrusrobin.arrowsescape";
+        public const string ApplicationId = "com.hebrusrobin.arrowskeymaster";
 
         static ReleaseSetup() { EditorApplication.delayCall += AutoApply; }
 
@@ -70,9 +70,9 @@ namespace ArrowEscape.EditorTools
         }
 
         /// <summary>Release version shown in stores and in the APK.</summary>
-        public const string Version = "0.2.0";
+        public const string Version = "0.3.0";
         /// <summary>Android version code (increase for every upload).</summary>
-        public const int AndroidVersionCode = 2;
+        public const int AndroidVersionCode = 3;
 
         // Step 14N cross-platform settings: Android IL2CPP ARM64 with internet (world ranking) and edge-to-edge drawing,
         // iOS full screen, desktop portrait windows that can be resized.

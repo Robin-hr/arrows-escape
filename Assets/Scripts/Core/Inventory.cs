@@ -59,9 +59,9 @@ namespace ArrowEscape.Core
         public List<string> RefundedRetiredItemIds = new List<string>();
         /// <summary>Refund overflow held until spending makes room under the existing wallet cap.</summary>
         public int PendingRetirementCoins;
-        /// <summary>Retired paid items and their refunds (the thunderbolt arrow and the Step 14H scenic themes).</summary>
-        public static readonly string[] RetiredIds={"thunderbolt_dart","mystic_wood","frozen_cavern","pharaohs_tomb","volcanic_underworld","neon_cyberpunk","cosmic_nebula"};
-        private static readonly int[] RetiredRefunds={150,200,250,350,400,500,800};
+        /// <summary>Retired paid items and their refunds (the thunderbolt arrow, the Step 14H scenic themes and, in Step 16, every background theme).</summary>
+        public static readonly string[] RetiredIds={"thunderbolt_dart","mystic_wood","frozen_cavern","pharaohs_tomb","volcanic_underworld","neon_cyberpunk","cosmic_nebula","grad_midnight","grad_aurora","grad_sunset","grad_lagoon","grad_emerald","grad_rose","geo_crystal","geo_neon","geo_gold"};
+        private static readonly int[] RetiredRefunds={150,200,250,350,400,500,800,150,200,250,300,350,400,900,1200,1500};
         /// <summary>Refunds each retired paid item once and removes it, retaining all unrelated and unknown data.</summary>
         public bool ApplyRetirements()
         {

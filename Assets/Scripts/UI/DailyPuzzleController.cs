@@ -126,7 +126,7 @@ namespace ArrowEscape.UI
             if (string.IsNullOrEmpty(LastShareText)) return;
             // Always copy (works everywhere); phones also open their native share sheet (Step 14N).
             try { GUIUtility.systemCopyBuffer = LastShareText; } catch (Exception e) { Debug.LogWarning("Clipboard unavailable: " + e.Message); }
-            if (!NativeShare.Share(LastShareText, "Share your Arrows Escape result"))
+            if (!NativeShare.Share(LastShareText, "Share your Arrows Keymaster result"))
                 toast?.Show("RESULT COPIED!\nPaste it anywhere to share", "Daily/icon_share");
         }
 

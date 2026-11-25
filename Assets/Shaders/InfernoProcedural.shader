@@ -52,7 +52,10 @@ Shader "ArrowEscape/Procedural Inferno"
     float3 temperature=lerp(float3(.878,.251,.102),float3(1,1,1),_Temperature);
     return lerp(c,c*temperature,_Flying*(1-_Temperature)*.90);
    }
-   float4 frag(vary i):SV_Target
+   // Step 16: optional recolour (Phoenix Wing shares this fire recipe in its own colours).
+   float _Recolor; float4 _RecolorA,_RecolorB;
+   float4 recolor(float4 c){if(_Recolor<.5)return c;float l=dot(c.rgb,float3(.2126,.7152,.0722));float3 tint=lerp(_RecolorA.rgb,_RecolorB.rgb,smoothstep(.12,.85,l));c.rgb=lerp(c.rgb,tint*(.3+1.25*l)+pow(saturate(l),4)*.55,.9);return c;}
+   float4 frag0(vary i):SV_Target
    {
     float t=clock(),breath=.94+.06*sin(t*6.283185/1.2),alpha=1;float3 c;
     if(_Mode>3.5){float a=saturate(i.uv.x/max(.01,_TrailLength)),v=abs(i.uv.y*2-1);float fade=smoothstep(0,.22,a)*(1-smoothstep(.82,1,a));return float4(working(float3(1,.72,.32)),pow(saturate(1-v),3)*fade*.32*_Opacity);}
@@ -78,6 +81,7 @@ Shader "ArrowEscape/Procedural Inferno"
     c=lerp(c,_StateTint.rgb,_State*smoothstep(.55,.85,edge));c*=breath*(.97+.03*sin(t*62.83185+i.uv.x*3));
     return float4(working(c),alpha*_Opacity);
    }
+      float4 frag(vary i):SV_Target {return recolor(frag0(i));}
    ENDCG
   }
  }

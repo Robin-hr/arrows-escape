@@ -11,7 +11,7 @@ namespace ArrowEscape.Tests
         /// <summary>Isolated Step 14B state or regression check; never accesses player saves.</summary>
         [Test] public void CountsAndUniquePermanentIds()
         {
-            Assert.That(ShopCatalog.Items.Count,Is.EqualTo(75));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Arrow),Is.EqualTo(20));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Theme),Is.EqualTo(10));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Avatar),Is.EqualTo(22));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Frame),Is.EqualTo(10));Assert.That(ShopCatalog.Items.Select(i=>i.Id).Distinct().Count(),Is.EqualTo(75));
+            Assert.That(ShopCatalog.Items.Count,Is.EqualTo(66));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Arrow),Is.EqualTo(20));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Theme),Is.EqualTo(1),"Step 16: only the hidden default Paper remains");Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Avatar),Is.EqualTo(22));Assert.That(ShopCatalog.Items.Count(i=>i.Slot==ShopSlot.Frame),Is.EqualTo(10));Assert.That(ShopCatalog.Items.Select(i=>i.Id).Distinct().Count(),Is.EqualTo(66));
             foreach(var item in ShopCatalog.Items){Assert.That(Regex.IsMatch(item.Id,"^[a-z][a-z_]*$"),Is.True);Assert.That(ColorUtility.TryParseHtmlString(item.PrimaryColor,out _),Is.True);Assert.That(ColorUtility.TryParseHtmlString(item.SecondaryColor,out _),Is.True);}
         }
         /// <summary>Isolated Step 14B state or regression check; never accesses player saves.</summary>
@@ -19,7 +19,7 @@ namespace ArrowEscape.Tests
         /// <summary>Isolated Step 14B state or regression check; never accesses player saves.</summary>
         public void ArrowCategory(string category,int count,int price){var items=ShopCatalog.Items.Where(i=>i.Category==category).ToArray();Assert.That(items.Length,Is.EqualTo(count));foreach(var item in items){Assert.That(item.Price,Is.EqualTo(price));Assert.That(item.IsAvailable,Is.True);}}
         /// <summary>Isolated Step 14B state or regression check; never accesses player saves.</summary>
-        [Test] public void ThemePricesAndAvailability(){string[] ids={"grad_midnight","grad_aurora","grad_sunset","grad_lagoon","grad_emerald","grad_rose","geo_crystal","geo_neon","geo_gold"};int[] costs={150,200,250,300,350,400,900,1200,1500};for(int i=0;i<ids.Length;i++){var item=ShopCatalog.Find(ids[i]);Assert.That(item.Price,Is.EqualTo(costs[i]));Assert.That(item.IsAvailable,Is.True);}Assert.That(ShopCatalog.Find("classic").Price,Is.Zero);Assert.That(ShopCatalog.Find("paper").Price,Is.Zero);}
+        [Test] public void ThemesAreRetired(){foreach(string id in new[]{"grad_midnight","grad_aurora","grad_sunset","grad_lagoon","grad_emerald","grad_rose","geo_crystal","geo_neon","geo_gold"}){Assert.That(ShopCatalog.Find(id),Is.Null);Assert.That(ShopCatalog.RetiredItemIds,Does.Contain(id));}Assert.That(ShopCatalog.Find("classic").Price,Is.Zero);Assert.That(ShopCatalog.Find("paper").Price,Is.Zero);}
     }
 }
 

@@ -52,7 +52,7 @@ namespace ArrowEscape.View
             if(returning&&distance<=0)EndFlight();
             properties.Clear();properties.SetFloat("_Clock",clock);properties.SetFloat("_Seed",seed);properties.SetFloat("_WindowStart",distance+translation);properties.SetFloat("_BodyLength",length);properties.SetFloat("_Lod",lod?1:0);
             properties.SetFloat("_State",feedback?1:0);properties.SetColor("_StateTint",tint);properties.SetFloat("_Opacity",alpha);
-            properties.SetFloat("_Blocked",impact/.2f);properties.SetFloat("_Flying",flying?1:0);properties.SetFloat("_SignatureTime",flightTime);
+            properties.SetFloat("_Blocked",impact/.2f);properties.SetFloat("_Flying",flying?1:0);properties.SetFloat("_SignatureTime",flightTime);skin.ApplyRecolor(properties);
             renderers[1].transform.localPosition=head;renderers[1].transform.localRotation=Quaternion.Euler(0,0,Mathf.Atan2(direction.y,direction.x)*Mathf.Rad2Deg);
             renderers[1].transform.localScale=Vector3.one;
             if(rebuilt){Vector2 tailPoint=ribbon.Point(distance),tailDirection=(ribbon.Point(distance+.01f)-tailPoint).normalized;rareCaps.Build(head,direction,tailPoint,tailDirection,false);/* Rare arrows have no fletching tail. */filters[1].sharedMesh=rareCaps.Mesh;renderers[1].transform.localPosition=Vector3.zero;renderers[1].transform.localRotation=Quaternion.identity;}else filters[1].sharedMesh=quad;

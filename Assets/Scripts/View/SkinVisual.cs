@@ -58,6 +58,7 @@ namespace ArrowEscape.View
             if(visuals==null)Create();
             if(skin.Index==1&&inferno==null){inferno=visuals.gameObject.AddComponent<InfernoVisual>();inferno.Initialize(owner.Path!=null?owner.Path.RibbonMesh:singleMesh,owner.Path!=null?owner.Path.Ribbon:single);}
             if(inferno!=null)inferno.enabled=skin.Index==1;
+            if(inferno!=null)inferno.recolorSkin=skin.Index==1&&skin.Recolor?skin:null;
             if(skin.IsElemental&&skin.Index!=1&&elemental==null){elemental=visuals.gameObject.AddComponent<ElementalVisual>();elemental.Initialize(owner.Path!=null?owner.Path.RibbonMesh:singleMesh,owner.Path!=null?owner.Path.Ribbon:single,owner.Arrow.Id);}
             if(skin.IsRare&&rare==null){rare=visuals.gameObject.AddComponent<ElementalVisual>();rare.Initialize(owner.Path!=null?owner.Path.RibbonMesh:singleMesh,owner.Path!=null?owner.Path.Ribbon:single,owner.Arrow.Id,true);}
             visuals.gameObject.SetActive(true);if(owner.Path!=null)owner.Path.SetClassicVisible(false);else owner.SpriteRenderer.enabled=false;

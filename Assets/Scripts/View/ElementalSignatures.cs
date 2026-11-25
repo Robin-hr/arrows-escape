@@ -77,7 +77,7 @@ namespace ArrowEscape.View
                 int v=j*4;s.Vertices[v]=p-normal;s.Vertices[v+1]=p+normal;s.Vertices[v+2]=q+normal;s.Vertices[v+3]=q-normal;
                 s.UV[v]=new Vector2(a,0);s.UV[v+1]=new Vector2(a,1);s.UV[v+2]=new Vector2(b,1);s.UV[v+3]=new Vector2(b,0);
             }
-            s.Mesh.vertices=s.Vertices;s.Mesh.uv=s.UV;s.Mesh.RecalculateBounds();s.Renderer.sharedMaterial=Pass(s.Skin,4,view.Skin.IsLight);s.Renderer.enabled=true;Apply(s);
+            s.Mesh.vertices=s.Vertices;s.Mesh.uv=s.UV;s.Mesh.RecalculateBounds();s.Renderer.sharedMaterial=Pass(s.Skin,4,view.Skin.IsLight);s.Renderer.enabled=false;Apply(s);   // Step 16: no lingering residue line along the exit track
         }
         /// <summary>A smaller bite or ion arc reaches the actual blocking cell, never a whole-board ray.</summary>
         public void Blocked(ArrowView view,Vector2 blocker)
@@ -92,7 +92,7 @@ namespace ArrowEscape.View
                 Vector2 q=start+delta*b+side*(b>0&&b<1?ArrowEscape.Core.SkinEffectRules.Lightning(view.Arrow.Id,j+1,0)*.00025f:0);int v=j*4;Vector2 w=side*.035f;
                 s.Vertices[v]=p-w;s.Vertices[v+1]=p+w;s.Vertices[v+2]=q+w;s.Vertices[v+3]=q-w;s.UV[v]=new Vector2(a,0);s.UV[v+1]=new Vector2(a,1);s.UV[v+2]=new Vector2(b,1);s.UV[v+3]=new Vector2(b,0);
             }
-            s.Mesh.vertices=s.Vertices;s.Mesh.uv=s.UV;s.Mesh.RecalculateBounds();s.Renderer.sharedMaterial=Pass(s.Skin,4,view.Skin.IsLight);s.Renderer.enabled=true;Apply(s);
+            s.Mesh.vertices=s.Vertices;s.Mesh.uv=s.UV;s.Mesh.RecalculateBounds();s.Renderer.sharedMaterial=Pass(s.Skin,4,view.Skin.IsLight);s.Renderer.enabled=false;Apply(s);   // Step 16: no lingering residue line along the exit track
         }
         /// <summary>A shrinking crack at the exact board crossing, independent of the removed view.</summary>
         public void Edge(ArrowView view,Vector2 point)
@@ -119,7 +119,7 @@ namespace ArrowEscape.View
         private static Mesh RiftQuad
         {get{if(riftQuad!=null)return riftQuad;riftQuad=new Mesh{name="Procedural rift quad",hideFlags=HideFlags.HideAndDontSave};riftQuad.vertices=new[]{new Vector3(-1,-1),new Vector3(1,-1),new Vector3(1,1),new Vector3(-1,1)};riftQuad.uv=new[]{new Vector2(0,0),new Vector2(1,0),new Vector2(1,1),new Vector2(0,1)};riftQuad.triangles=new[]{0,1,2,0,2,3};return riftQuad;}}
         private static void Apply(Slot s)
-        {float t=Mathf.Clamp01((s.Time-s.Lead)/s.Duration);s.Properties.SetFloat("_Age",s.Returning?.3f:t*t*(3-2*t));float reveal=1000;if(s.View!=null)reveal=s.View.Path!=null?s.View.Path.Distance+s.View.Path.Ribbon.BodyLength:Vector2.Distance(s.InitialTail,s.View.Skin.TailWorld)+s.BodyLength;s.Properties.SetFloat("_Reveal",reveal);s.Properties.SetFloat("_Opacity",1);s.Renderer.SetPropertyBlock(s.Properties);s.Rift.SetPropertyBlock(s.Properties);s.Stars.SetPropertyBlock(s.Properties);if((s.Skin.Index==6||s.Skin.Index==7||s.Skin.Index==8)&&s.View!=null)s.Rift.transform.position=s.View.Skin.HeadWorld;float open=s.Impact?Mathf.Sin(Mathf.SmoothStep(0,1,t)*Mathf.PI):s.Returning?Mathf.Sin(Mathf.SmoothStep(0,1,t)*Mathf.PI):Mathf.SmoothStep(0,1,Mathf.Clamp01(s.Time/.1f))*(1-Mathf.SmoothStep(0,1,Mathf.Clamp01((s.Time-.45f)/.35f)));s.Rift.transform.localScale=(s.Skin.Index==5||s.Skin.Index==6||s.Skin.Index==7||s.Skin.Index==8)?new Vector3(1.25f*open,.95f*open,1):s.Skin.Index==9?new Vector3(open*(s.Impact?.7f:2),open*(s.Impact?.7f:2),1):new Vector3(.18f*open,.75f*open,1);}
+        {s.Skin?.ApplyRecolor(s.Properties);float t=Mathf.Clamp01((s.Time-s.Lead)/s.Duration);s.Properties.SetFloat("_Age",s.Returning?.3f:t*t*(3-2*t));float reveal=1000;if(s.View!=null)reveal=s.View.Path!=null?s.View.Path.Distance+s.View.Path.Ribbon.BodyLength:Vector2.Distance(s.InitialTail,s.View.Skin.TailWorld)+s.BodyLength;s.Properties.SetFloat("_Reveal",reveal);s.Properties.SetFloat("_Opacity",1);s.Renderer.SetPropertyBlock(s.Properties);s.Rift.SetPropertyBlock(s.Properties);s.Stars.SetPropertyBlock(s.Properties);if((s.Skin.Index==6||s.Skin.Index==7||s.Skin.Index==8)&&s.View!=null)s.Rift.transform.position=s.View.Skin.HeadWorld;float open=s.Impact?Mathf.Sin(Mathf.SmoothStep(0,1,t)*Mathf.PI):s.Returning?Mathf.Sin(Mathf.SmoothStep(0,1,t)*Mathf.PI):Mathf.SmoothStep(0,1,Mathf.Clamp01(s.Time/.1f))*(1-Mathf.SmoothStep(0,1,Mathf.Clamp01((s.Time-.45f)/.35f)));s.Rift.transform.localScale=(s.Skin.Index==5||s.Skin.Index==6||s.Skin.Index==7||s.Skin.Index==8)?new Vector3(1.25f*open,.95f*open,1):s.Skin.Index==9?new Vector3(open*(s.Impact?.7f:2),open*(s.Impact?.7f:2),1):new Vector3(.18f*open,.75f*open,1);}
         /// <summary>Eased follow-through only; the signature action itself is at most 0.8 seconds.</summary>
         public void Tick(float dt)
         {for(int i=0;i<slots.Length;i++){var s=slots[i];if(!s.Active)continue;s.Time+=dt;if(s.Time>=s.Lead+s.Duration){Release(s);s.Active=false;s.Renderer.enabled=s.Rift.enabled=s.Stars.enabled=false;}else Apply(s);}}

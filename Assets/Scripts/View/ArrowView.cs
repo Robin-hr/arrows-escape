@@ -151,7 +151,7 @@ namespace ArrowEscape.View
             if (SpriteRenderer == null) return;
             Color tint = flashing ? flashTint : highlighted ?
                 (stillOver ? ViewTheme.HighlightColor : ViewTheme.DraggedAwayColor) : hinted ? hintTint : originalColor;
-            if(flashing||highlighted||hinted){if(boardStyle==null)boardStyle=GetComponentInParent<BoardView>();if(boardStyle!=null&&boardStyle.HasDarkTheme)tint=ArrowTint.EnsureContrast(tint,ThemeDesign.Background(boardStyle.ThemeId));}
+            if(flashing||highlighted||hinted){if(boardStyle==null)boardStyle=GetComponentInParent<BoardView>();if(boardStyle!=null&&!boardStyle.IsLightBoard)tint=ArrowTint.EnsureContrast(tint,boardStyle.Backdrop);}
             tint.a *= alpha;
             float scale = (highlighted ? ViewTheme.HighlightScaleMultiplier : 1) * (flashing ? flashScale : 1) * (hinted ? hintScale : 1);
             transform.position = new Vector3(BaseWorldPosition.x + offset.x, BaseWorldPosition.y + offset.y, 0);

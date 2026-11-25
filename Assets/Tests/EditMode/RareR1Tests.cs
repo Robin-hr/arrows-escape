@@ -43,7 +43,7 @@ namespace ArrowEscape.Tests
         [TestCaseSource(nameof(ids))]public void SignatureHasVisibleAnticipationAndAction(string id)
         {
             var p=Create(id);p.SetCaptureBackground(Color.black);p.SetResolution(480,270);p.SetFraming(Vector2.zero,3.3f);var rest=Read(p);p.Fly();float elapsed=0;
-            foreach(float time in new[]{.07f,.14f,.22f,.32f,.44f,.58f}){p.Tick(time-elapsed);elapsed=time;var frame=Read(p);long difference=0;for(int i=0;i<frame.Length;i++)difference+=Math.Abs(frame[i].r-rest[i].r)+Math.Abs(frame[i].g-rest[i].g)+Math.Abs(frame[i].b-rest[i].b);Assert.That(difference/(frame.Length*765.0),Is.GreaterThan(.0008),id+" at "+time);}
+            foreach(float time in new[]{.07f,.14f,.22f,.32f,.44f,.58f}){p.Tick(time-elapsed);elapsed=time;var frame=Read(p);long difference=0;for(int i=0;i<frame.Length;i++)difference+=Math.Abs(frame[i].r-rest[i].r)+Math.Abs(frame[i].g-rest[i].g)+Math.Abs(frame[i].b-rest[i].b);Assert.That(difference/(frame.Length*765.0),Is.GreaterThan(time<.1f?.0005:.0008),id+" at "+time); /* Step 16: the exit-track residue strip is gone, so the first anticipation frame is a little quieter */}
             p.Tick(.9f-elapsed);Assert.That(p.Signatures.HasActive,Is.False);
         }
         /// <summary>Travel uses prepared buffers and stays inside the existing global particle cap.</summary>

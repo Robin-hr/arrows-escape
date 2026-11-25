@@ -103,7 +103,7 @@ namespace ArrowEscape.View
         private void Update() => AdvanceFrame(Time.deltaTime);
         private void SetLineAlpha(float alpha)
         {
-            Color color = ViewTheme.GuideLineColor;if(boardView!=null&&boardView.HasDarkTheme)color=ArrowTint.EnsureContrast(color,ThemeDesign.Background(boardView.ThemeId)); color.a *= alpha;
+            Color color = ViewTheme.GuideLineColor;if(boardView!=null&&!boardView.IsLightBoard)color=ArrowTint.EnsureContrast(color,boardView.Backdrop); color.a *= alpha;
             if (line != null) line.color = color;
             if (marker != null) marker.color = color;
         }

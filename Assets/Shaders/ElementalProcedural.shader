@@ -42,7 +42,11 @@ Shader "ArrowEscape/Procedural Elemental"
    float crystal(float2 p){float x=-p.x;float width=x*.43;return max(abs(p.y)-width,max(x-1.1,(x-.72)*.7-abs(p.y)));}
    float chevron(float2 p){p.y=abs(p.y);return max(abs(p.y+p.x*.44)-(.006+.065*saturate(-p.x)),max(-p.x-1.05,p.x));}
    float dart(float2 p){float x=saturate(-p.x/1.15);return abs(p.y)-.42*sin(x*3.14159)*pow(max(.001,x),.35);}
-   float4 frag(vary i):SV_Target {
+
+   // Step 16: optional recolour so several skins can share one procedural recipe in their own colours.
+   float _Recolor; float4 _RecolorA,_RecolorB;
+   float4 recolor(float4 c){if(_Recolor<.5)return c;float l=dot(c.rgb,float3(.2126,.7152,.0722));float3 tint=lerp(_RecolorA.rgb,_RecolorB.rgb,smoothstep(.12,.85,l));c.rgb=lerp(c.rgb,tint*(.3+1.25*l)+pow(saturate(l),4)*.55,.9);return c;}
+   float4 frag0(vary i):SV_Target {
     float t=clock(),n=tex2D(_Noise,float2(i.uv.x*.55-t*.22,i.uv.y*.9+t*.08)).r;
     float n2=_Lod>.5?.5:tex2D(_Noise,float2(i.uv.x*1.75+t*.34,i.uv.y*2.1-t*.12+n*.2)).r;
     float v=abs(i.uv.y*2-1),a=1;float3 c=1;
@@ -85,6 +89,7 @@ Shader "ArrowEscape/Procedural Elemental"
     else{float width=.4+(n-.5)*.35;float edge=v/max(.1,width);a=(1-smoothstep(.4,1,edge))*(.12+.48*u)*smoothstep(0,.12,u);c=lerp(float3(.37,.31,.45),float3(.102,.043,.18),u);c=lerp(c,float3(.36,.20,.58),smoothstep(.35,.95,edge)*.5);if(_Lod>.5){c=lerp(float3(.50,.38,.73),float3(.60,.48,.85),v*v);a=(1-smoothstep(.55,1,v))*.9*smoothstep(0,.08,u);}}
     c=lerp(c,float3(.12,.07,.09),_LightBoard*smoothstep(.65,.95,v)*.75);c=lerp(c,_StateTint.rgb,_State*smoothstep(.45,.8,v));return float4(working(c),a*_Opacity);
    }
+      float4 frag(vary i):SV_Target {return recolor(frag0(i));}
    ENDCG
   }
  }

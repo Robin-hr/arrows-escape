@@ -110,8 +110,8 @@ namespace ArrowEscape.UI
             var area = UiFactory.Rect("MenuContent", safe, Vector2.zero, Vector2.zero); UiFactory.Stretch(area); area.offsetMax = new Vector2(0, -180);
             var column = UiFactory.Column(area, 900, 1500);
             logo = UiFactory.Rect("Title", column, new Vector2(900, 441), new Vector2(0, 450));
-            var logoImage = logo.gameObject.AddComponent<UnityEngine.UI.RawImage>(); logoImage.texture = BrandArt.Texture("arrows_escape_logo"); logoImage.raycastTarget = false;
-            if (logoImage.texture == null) { logoImage.color = new Color(1, 1, 1, 0); BrandArt.Text("TitleText", logo, "ARROWS ESCAPE", 72, new Vector2(900, 120), Vector2.zero, BrandArt.Cyan); }
+            var logoImage = logo.gameObject.AddComponent<UnityEngine.UI.RawImage>(); logoImage.texture = BrandArt.Texture("arrows_keymaster_logo"); logoImage.raycastTarget = false;
+            if (logoImage.texture == null) { logoImage.color = new Color(1, 1, 1, 0); BrandArt.Text("TitleText", logo, "ARROWS KEYMASTER", 72, new Vector2(900, 120), Vector2.zero, BrandArt.Cyan); }
 
             playGlow = BrandArt.Image("PlayGlow", column, "ui_button_primary", new Vector2(PlaySize.x + 60, PlaySize.y + 28), new Vector2(0, PlayY + 2), PrimaryBorder);
             playGlow.color = new Color(0.31f, 0.85f, 1f, 0.35f);

@@ -24,11 +24,16 @@ namespace ArrowEscape.View
         private bool lightBoard=true;
         /// <summary>Equipped background; visual identity never replaces a progress key.</summary>
         public string ThemeId {get;private set;}="paper";
-        /// <summary>Non-Paper themes take precedence over skin preferences and debug light fallback.</summary>
-        public bool HasDarkTheme=>ThemeDesign.Index(ThemeId)>=0;
+        /// <summary>Step 16: themes are retired; boards always use a solid per-level colour (kept false for old callers).</summary>
+        public bool HasDarkTheme=>false;
+        /// <summary>Step 16: picks this level's solid colour from <see cref="LevelColors"/>.</summary>
+        public int ColorKey { get => colorKey; set { colorKey = value; ApplyDotStyle(); GetComponent<CameraFitter>()?.ApplyBackground(); } }
+        private int colorKey;
+        /// <summary>Step 16: the solid colour behind the arrows for the current level and skin.</summary>
+        public Color Backdrop => LevelColors.For(colorKey, lightBoard);
         /// <summary>Applies the equipped theme before refreshing skins and contrast.</summary>
         public void SetTheme(string id)
-        {ThemeId=ThemeDesign.Index(id)<0?"paper":id;var backdrop=GetComponent<ThemeBackdrop>();if(backdrop==null&&HasDarkTheme){backdrop=gameObject.AddComponent<ThemeBackdrop>();backdrop.Bind(Camera.main,this,GetComponent<GameController>());}backdrop?.SetTheme(ThemeId);SetArrowSkin(arrowSkinId);ApplyDotStyle();GetComponent<CameraFitter>()?.ApplyBackground();}
+        {ThemeId="paper";var backdrop=GetComponent<ThemeBackdrop>();backdrop?.SetTheme(ThemeId);SetArrowSkin(arrowSkinId);ApplyDotStyle();GetComponent<CameraFitter>()?.ApplyBackground();}
 
         /// <summary>Current visual recipe id, independent of the saved inventory.</summary>
         public string ArrowSkinId=>arrowSkinId;
@@ -55,7 +60,7 @@ namespace ArrowEscape.View
         }
         private void ApplyDotStyle()
         {
-            bool fire=ArrowSkinRegistry.Find(arrowSkinId)?.PrefersDarkBoard==true&&!lightBoard;Color tint=HasDarkTheme?new Color(233f/255,238f/255,242f/255,.20f):ViewTheme.CellDot;if(fire&&!HasDarkTheme)tint.a=.18f;
+            Color tint=lightBoard?ViewTheme.CellDot:new Color(233f/255,238f/255,242f/255,.16f);
             if(PathDots!=null)PathDots.SetRestColor(tint);
             else if(root!=null)for(int i=0;i<root.childCount;i++){var child=root.GetChild(i);if(child.name.StartsWith("Cell ",StringComparison.Ordinal)){var dot=child.GetComponent<SpriteRenderer>();if(dot!=null)dot.color=tint;}}
         }
@@ -128,7 +133,7 @@ namespace ArrowEscape.View
             }
             root.gameObject.SetActive(IsVisible);
             currentBoard = board;
-            if(HasDarkTheme||ArrowSkinRegistry.Find(arrowSkinId)?.PrefersDarkBoard==true)ApplyDotStyle();
+            ApplyDotStyle();
             BoardChanged?.Invoke();
         }
 
